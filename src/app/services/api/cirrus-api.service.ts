@@ -10,14 +10,13 @@ import { LocalCallPayload } from '@models/contract-calls/local-call';
 
 @Injectable({providedIn: 'root'})
 export class ApiService extends RestApiService {
-  api: string;
+  api: string = `${environment.cirrusApi}:${environment.cirrusPort}/api`;
 
   constructor(
     protected _http: HttpClient,
     protected _router: Router
   ) {
     super(_http, _router);
-    this.api = `http://localhost:${environment.cirrusPort}/api`;
   }
 
   // Signalr
