@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  cirrusPort: 82333,
+  cirrusPort: 37223,
   cirrusApi: 'http://localhost'
 };

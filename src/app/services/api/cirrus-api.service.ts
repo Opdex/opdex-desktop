@@ -3,13 +3,15 @@ import { Injectable } from "@angular/core";
 import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, ISignalRResponse, ISmartContractWalletHistory } from "@interfaces/full-node.interface";
 import { Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { CallPayload } from '@models/contract-calls/call';
 import { LocalCallPayload } from '@models/contract-calls/local-call';
+import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ParameterType } from '@enums/parameter-type';
 
 @Injectable({providedIn: 'root'})
-export class ApiService extends RestApiService {
+export class CirrusApiService extends RestApiService {
   api: string = `${environment.cirrusApi}:${environment.cirrusPort}/api`;
 
   constructor(
@@ -39,7 +41,7 @@ export class ApiService extends RestApiService {
   }
 
   getAddresses(walletName: string):Observable<INodeAddressList> {
-    return this.get<INodeAddressList>(`${this.api}/Wallet/addresses?walletName=${walletName}`);
+    return this.get(`${this.api}/Wallet/addresses?walletName=${walletName}`);
   }
 
   getAddressBalance(address: string):Observable<number> {
@@ -51,15 +53,13 @@ export class ApiService extends RestApiService {
   }
 
   // Smart Contracts
-  getContractReceipt(txHash: string): Observable<IContractReceiptResult<any>> {
+  getContractReceipt(txHash: string): Observable<IContractReceiptResult> {
     return this.get(`${this.api}/SmartContracts/receipt?txHash=${txHash}`);
   }
 
-  searchContractReceipts(request: any): Observable<any[]> {
-    // Todo: add topics
-    // Todo: add request model
-    // Todo: add response model
-    return this.get(`${this.api}/SmartContracts/receipt-search?contractAddress=${request.address}&eventName=${request.eventName}&fromBlock=${request.fromBlock}&toBlock=${request.toBlock}`);
+  searchContractReceipts(request: ReceiptSearchRequest): Observable<IContractReceiptResult[]> {
+    console.log(request.query)
+    return this.get(`${this.api}/SmartContracts/receipt-search${request.query}`);
   }
 
   localCall(payload: LocalCallPayload): Observable<ILocalCallResult> {
@@ -70,7 +70,7 @@ export class ApiService extends RestApiService {
     return this.post(`${this.api}/SmartContractWallet/call`, payload);
   }
 
-  getContractStorageItem(contractAddress: string, storageKey: string, dataType: string): Observable<string | { message: string }> {
+  getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string | { message: string }> {
     const response = this.get<string | { message: string }>(`${this.api}/SmartContracts/storage?contractAddress=${contractAddress}&storageKey=${storageKey}&dataType=${dataType}`);
 
     // If a key isn't found, it doesn't error, just returns a message.

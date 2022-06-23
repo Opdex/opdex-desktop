@@ -3,6 +3,12 @@
 </header>
 
 <main>
+  <mat-card style="margin-bottom: 10px;" *ngFor="let pool of pools">
+    <h3>{{pool.token.symbol}}-CRS</h3>
+    <p>{{pool.pool.reserveCrs}} CRS Reserves</p>
+    <p>{{pool.pool.reserveSrc}} SRC Reserves</p>
+  </mat-card>
+
   <router-outlet></router-outlet>
 </main>
 

@@ -11,7 +11,7 @@ export interface IGasConsumed {
   value: number;
 }
 
-export interface IContractReceiptResult<T> {
+export interface IContractReceiptResult {
   transactionHash: string;
   blockHash: string;
   postState: string;
@@ -23,14 +23,19 @@ export interface IContractReceiptResult<T> {
   returnValue: any;
   bloom: string;
   error: string;
-  logs: IReceiptLogs<T>[];
+  logs: IReceiptLogs[];
 }
 
-export interface IReceiptLogs<T> {
+export interface IReceiptLogs {
   address: string;
   topics: string[];
   data: string;
-  log: T;
+  log: IReceiptLog;
+}
+
+export interface IReceiptLog {
+  event: string;
+  data: any;
 }
 
 export interface IContractCallResult {

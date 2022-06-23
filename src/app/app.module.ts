@@ -11,6 +11,13 @@ import { ErrorMiddlewareService } from '@services/middleware/error-middleware.se
 import { LoginComponent } from './views/login/login.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 
+// Material Imports
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -24,6 +31,12 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
     BrowserAnimationsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    MatCardModule,
+    MatDividerModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorMiddlewareService },
