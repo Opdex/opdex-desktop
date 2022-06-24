@@ -87,6 +87,23 @@ export class FixedDecimal {
     this._decimals = decimals;
   }
 
+  static FromBigInt = (sats: BigInt, decimals: number) => {
+    var valueString = sats.toString();
+
+    if (valueString.length === decimals) {
+      valueString = `0.${valueString}`;
+    } else if (valueString.length > decimals) {
+      const wholeNumber = valueString.slice(0, valueString.length - decimals);
+      const fraction = valueString.slice(valueString.length - decimals);
+
+      valueString = `${wholeNumber}.${fraction}`
+    } else {
+      valueString = `0.${valueString.padStart(decimals, '0')}`;
+    }
+
+    return new FixedDecimal(valueString, decimals);
+  }
+
   static Zero = (decimals: number): FixedDecimal => new FixedDecimal('0', decimals);
   static One = (decimals: number): FixedDecimal => new FixedDecimal('1', decimals);
   static NegativeOne = (decimals: number): FixedDecimal => new FixedDecimal('-1', decimals);

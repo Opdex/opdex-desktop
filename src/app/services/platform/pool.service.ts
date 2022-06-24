@@ -7,19 +7,7 @@ import { combineLatest, Observable, tap, switchMap, of } from 'rxjs';
 import { LocalCallPayload } from '@models/contract-calls/local-call';
 import { Parameter } from '@models/contract-calls/parameter';
 import { catchError } from 'rxjs';
-
-const keys = {
-  totalSupply: 'PA',
-  transactionFee: 'PB',
-  token: 'PC',
-  reserveCrs: 'PD',
-  reserveSrc: 'PE',
-  kLast: 'PF',
-  locked: 'PG',
-  balance: 'PH',
-  allowance: 'PI',
-  totalStaked: 'PP'
-};
+import { LiquidityPoolStateKeys } from '@lookups/state-keys/liquidity-pool-state-keys';
 
 @Injectable({providedIn: 'root'})
 export class PoolService {
@@ -27,8 +15,8 @@ export class PoolService {
 
   getStaticPool(address: string): Observable<any> {
     const properties = [
-      this._cirrus.getContractStorageItem(address, keys.token, ParameterType.Address),
-      this._cirrus.getContractStorageItem(address, keys.transactionFee, ParameterType.UInt),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.token, ParameterType.Address),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.transactionFee, ParameterType.UInt),
     ];
 
     const miningPoolRequest = new LocalCallPayload(Contracts.mainnet.miningGovernance, "GetMiningPool", address, [new Parameter(ParameterType.Address, address)]);
@@ -53,10 +41,10 @@ export class PoolService {
     const miningPeriodEndBlockStateKey = 'PY';
 
     const properties = [
-      this._cirrus.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(address, keys.reserveCrs, ParameterType.ULong),
-      this._cirrus.getContractStorageItem(address, keys.reserveSrc, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(address, keys.totalStaked, ParameterType.UInt256).pipe(catchError(_ => '0')),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.totalSupply, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.reserveCrs, ParameterType.ULong),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.reserveSrc, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.totalStaked, ParameterType.UInt256).pipe(catchError(_ => '0')),
       this._cirrus.getContractStorageItem(miningPool, miningPeriodEndBlockStateKey, ParameterType.ULong).pipe(catchError(_ => '0'))
     ];
 

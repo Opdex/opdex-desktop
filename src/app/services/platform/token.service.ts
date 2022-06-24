@@ -6,9 +6,7 @@ import { CirrusApiService } from "@services/api/cirrus-api.service";
 
 @Injectable({providedIn: 'root'})
 export class TokenService {
-  constructor(private _cirrus: CirrusApiService) {
-
-  }
+  constructor(private _cirrus: CirrusApiService) { }
 
   getToken(address: string) {
     const isODX = address === Contracts.mainnet.odx || address === Contracts.testnet.odx;

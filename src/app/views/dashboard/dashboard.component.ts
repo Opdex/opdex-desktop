@@ -1,4 +1,4 @@
-import { MiningService } from './../../services/platform/mining.service';
+import { MiningService } from '@services/platform/mining.service';
 import { Component, OnInit } from '@angular/core';
 import { db } from '@services/data/db.service';
 import { PoolRepositoryService } from '@services/data/pool-repository.service';
@@ -69,7 +69,8 @@ export class DashboardComponent implements OnInit {
           address: pool.address,
           name: `${token.symbol}-${nodeStatus.coinTicker}`,
           srcToken: token.address,
-          miningPool: pool.miningPool
+          miningPool: pool.miningPool,
+          transactionFee: pool.transactionFee
         }
       }));
 

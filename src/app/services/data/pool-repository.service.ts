@@ -1,12 +1,10 @@
-import { ILiquidityPoolEntity } from './../../interfaces/database.interface';
+import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { db } from './db.service';
 import { Injectable } from "@angular/core";
 
 @Injectable({providedIn: 'root'})
 export class PoolRepositoryService {
-  constructor() {
-
-  }
+  constructor() { }
 
   async getPoolByAddress(address: string) {
     return await db.liquidityPool.get({ address });

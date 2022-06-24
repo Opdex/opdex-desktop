@@ -5,21 +5,12 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'coinNotation'
 })
 export class CoinNotationPipe implements PipeTransform {
-  transform(value: string, decimals: number = 8): string {
-    var valueString = value.toString();
-
-    if (valueString.length === decimals) {
-      valueString = `0.${valueString}`;
-    } else if (valueString.length > decimals) {
-      const wholeNumber = valueString.slice(0, valueString.length - decimals);
-      const fraction = valueString.slice(valueString.length - decimals);
-
-      valueString = `${wholeNumber}.${fraction}`
-    } else {
-      valueString = `0.${valueString.padStart(decimals, '0')}`;
+  transform(value: string | BigInt, decimals: number = 8): string {
+    if (typeof(value) === 'string') {
+      value = BigInt(value);
     }
 
-    var fixedDecimal = new FixedDecimal(valueString, decimals);
+    const fixedDecimal = FixedDecimal.FromBigInt(value, decimals);
 
     return this.numberWithCommas(fixedDecimal.formattedValue);
   }
