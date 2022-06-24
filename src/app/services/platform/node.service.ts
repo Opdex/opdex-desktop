@@ -1,3 +1,4 @@
+import { INodeStatus } from '@interfaces/full-node.interface';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { Observable } from 'rxjs';
@@ -8,7 +9,7 @@ export class NodeService {
 
   }
 
-  getStatus(): Observable<any> {
+  getStatus(): Observable<INodeStatus> {
     return this._cirrus.getNodeStatus();
   }
 }

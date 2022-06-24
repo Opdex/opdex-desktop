@@ -1,18 +1,20 @@
 <header>
-  <h1>Opdex Desktop</h1>
+  <nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <button mat-button routerLink="/">Dashboard</button>
+          <button mat-button routerLink="/pools">Pools</button>
+          <button mat-button routerLink="/tokens">Tokens</button>
+          <button mat-button routerLink="/mining">Mining</button>
+          <button mat-button routerLink="/vault">Vault</button>
+        </div>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <main>
-  <mat-card style="margin-bottom: 10px;" *ngFor="let pool of pools">
-    <h3>{{pool.token.symbol}}-CRS</h3>
-    <p>{{pool.pool.reserveCrs}} CRS Reserves</p>
-    <p>{{pool.pool.reserveSrc}} SRC Reserves</p>
-  </mat-card>
-
   <router-outlet></router-outlet>
 </main>
-
-<footer>
-  Footer
-</footer>
 

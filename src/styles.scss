@@ -37,3 +37,7 @@ $opdex-desktop-theme: mat.define-light-theme((
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #f4f4f4 }
+
+
+// Import NPM Package Styles
+@import '~bootstrap-4-grid/scss/grid';

@@ -1,0 +1,8 @@
+<mat-card style="margin-bottom: 15px;" *ngIf="pool">
+  <h3>{{pool.token.symbol}}-CRS</h3>
+  <p>{{pool.pool.address}}</p>
+  <p>{{pool.pool.reserveCrs}} CRS Reserves</p>
+  <p>{{pool.pool.reserveSrc}} SRC Reserves</p>
+  <p>{{pool.pool.totalStaked}} ODX Staked</p>
+  <p>{{pool.pool.miningPeriodEndBlock}} Mining Period End</p>
+</mat-card>

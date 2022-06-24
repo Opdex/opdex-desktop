@@ -8,7 +8,7 @@ export class LocalCallPayload extends CallBase {
     sender: string,
     parameters: Parameter[] = [],
     amount: string = '0',
-    gasLimit: number = 100000,
+    gasLimit: number = 250000,
     gasPrice: number = 100
   ) {
     super(contractAddress, methodName, sender, parameters, amount, gasLimit, gasPrice);

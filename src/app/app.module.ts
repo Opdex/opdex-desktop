@@ -1,3 +1,4 @@
+import { SharedPipesModule } from './pipes/shared-pipes.module';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
@@ -18,12 +19,24 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PoolsComponent } from './views/pools/pools.component';
+import { TokensComponent } from './views/tokens/tokens.component';
+import { MiningComponent } from './views/mining/mining.component';
+import { VaultComponent } from './views/vault/vault.component';
+import { PoolComponent } from './views/pool/pool.component';
+import { TokenComponent } from './views/token/token.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    PoolsComponent,
+    TokensComponent,
+    MiningComponent,
+    VaultComponent,
+    PoolComponent,
+    TokenComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +49,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    SharedPipesModule
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorMiddlewareService },

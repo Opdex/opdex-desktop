@@ -10,9 +10,9 @@ export class MarketService {
 
   }
 
-  getMarketPools(): Observable<any> {
+  getMarketPools(fromBlock: number = 3500000): Observable<any> {
     const createPoolLog = 'CreateLiquidityPoolLog';
-    const request = new ReceiptSearchRequest(Contracts.mainnet.market, createPoolLog, 3800000);
+    const request = new ReceiptSearchRequest(Contracts.mainnet.market, createPoolLog, fromBlock);
 
     return this._cirrus.searchContractReceipts(request)
       .pipe(
@@ -22,8 +22,8 @@ export class MarketService {
 
           response.forEach(tx => {
             tx.logs
-                .filter(log => log.log.event === createPoolLog)
-                .forEach(log => pools.push(log.log.data));
+              .filter(log => log.log.event === createPoolLog)
+              .forEach(log => pools.push(log.log.data));
           });
 
           console.log(pools);

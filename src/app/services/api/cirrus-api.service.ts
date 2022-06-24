@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Injectable } from "@angular/core";
-import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, ISignalRResponse, ISmartContractWalletHistory } from "@interfaces/full-node.interface";
+import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory } from "@interfaces/full-node.interface";
 import { Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { HttpClient } from '@angular/common/http';
@@ -27,7 +27,7 @@ export class CirrusApiService extends RestApiService {
   }
 
   // Node
-  getNodeStatus():Observable<any> {
+  getNodeStatus():Observable<INodeStatus> {
     return this.get(`${this.api}/Node/status`);
   }
 

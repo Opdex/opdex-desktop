@@ -14,6 +14,7 @@ export interface IGasConsumed {
 export interface IContractReceiptResult {
   transactionHash: string;
   blockHash: string;
+  blockNumber: number;
   postState: string;
   gasUsed: number;
   from: string;
@@ -71,4 +72,21 @@ export interface INodeWalletAddressModel {
   isChange: boolean;
   amountConfirmed: number;
   amountUncomfirmed: number;
+}
+
+export interface INodeStatus {
+  agent: string;
+  version: string;
+  network: string;
+  coinTicker: string;
+  consensusHeight: number;
+  headerHeight: number;
+  blockStoreHeight: number;
+  bestPeerHeight: number;
+  dataDirectoryPath: string;
+  runningTime: string;
+  testnet: boolean;
+  relayFee: number;
+  state: string;
+  inIbd: boolean;
 }
