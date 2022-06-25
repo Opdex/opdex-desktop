@@ -1,4 +1,6 @@
+import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
 import { Component, OnInit } from '@angular/core';
+import { LiquidityPool } from '@models/platform/liquidity-pool';
 
 @Component({
   selector: 'opdex-pools',
@@ -6,10 +8,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./pools.component.scss']
 })
 export class PoolsComponent implements OnInit {
+  pools: LiquidityPool[];
 
-  constructor() { }
+  constructor(private _poolFactory: LiquidityPoolFactoryService) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.pools = await this._poolFactory.buildLiquidityPools();
   }
-
 }

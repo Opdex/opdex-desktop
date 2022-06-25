@@ -1,0 +1,19 @@
+<div class="deadline-widget">
+  <mat-form-field floatLabel="always">
+    <mat-label>Deadline</mat-label>
+
+    <input matInput aria-label="Transaction Deadline" [matAutocomplete]="auto" [formControl]="customDeadline" type="text" placeholder="10">
+
+    <span matSuffix>Minutes</span>
+
+    <mat-hint class="w-100" *ngIf="estimatedBlocks">
+      {{estimatedBlocks}} Blocks
+    </mat-hint>
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectDeadline($event)">
+      <mat-option *ngFor="let option of filteredDeadlines" [value]="option">
+        <small style="font-size: 15px; line-height: 20px">{{option}} Minutes</small>
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>

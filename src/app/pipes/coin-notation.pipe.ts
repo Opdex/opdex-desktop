@@ -1,9 +1,7 @@
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-  name: 'coinNotation'
-})
+@Pipe({ name: 'coinNotation' })
 export class CoinNotationPipe implements PipeTransform {
   transform(value: string | BigInt, decimals: number = 8): string {
     if (typeof(value) === 'string') {

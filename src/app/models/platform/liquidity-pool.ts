@@ -13,7 +13,8 @@ export class LiquidityPool {
   totalStaked: FixedDecimal;
   srcToken: Token;
   stakingToken: Token;
-
+  crsPerSrc: FixedDecimal;
+  srcPerCrs: FixedDecimal;
 
   constructor(entity: ILiquidityPoolEntity, hydrated: any, srcToken: ITokenEntity, stakingToken: ITokenEntity) {
     this.address = entity.address;
@@ -26,5 +27,7 @@ export class LiquidityPool {
     this.totalStaked = FixedDecimal.FromBigInt(hydrated.totalStaked, 8);
     this.srcToken = new Token(srcToken);
     this.stakingToken = new Token(stakingToken);
+    this.crsPerSrc = this.reserveCrs.divide(this.reserveSrc);
+    this.srcPerCrs = this.reserveSrc.divide(this.reserveCrs);
   }
 }

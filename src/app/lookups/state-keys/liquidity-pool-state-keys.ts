@@ -8,5 +8,21 @@ export const LiquidityPoolStateKeys = {
   locked: 'PG',
   balance: 'PH',
   allowance: 'PI',
-  totalStaked: 'PP'
+
+  // Standard Pool
+  market: 'PJ',
+  authProviders: 'PK',
+  authTraders: 'PL',
+  marketFeeEnabled: 'PM',
+
+  // Staking Pool
+  stakingToken: 'PN',
+  miningPool: 'PO',
+  totalStaked: 'PP',
+  stakingRewardsBalance: 'PQ',
+  rewardPerStakedTokenLast: 'PR',
+  applicableStakingRewards: 'PS',
+  rewardPerStakedToken: 'PT',
+  reward: 'PU',
+  stakedBalance: 'PV'
 };
