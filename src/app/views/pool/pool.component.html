@@ -1,17 +1,12 @@
 <div class="container">
   <div class="row">
     <div class="col-12" *ngIf="pool">
-      <h1>{{pool.name}}</h1>
-      <p>{{pool.address}}</p>
+      <h1 class="mb-0">{{pool.name}}</h1>
+      <opdex-copy-address [address]="pool.address"></opdex-copy-address>
 
-      <opdex-card>
-        <p>{{pool.reserveCrs.formattedValue}} CRS Reserves</p>
-        <p>{{pool.reserveSrc.formattedValue}} {{pool.srcToken.symbol}} Reserves</p>
-        <p>{{pool.totalStaked.formattedValue}} ODX Staked</p>
-        <p>1 CRS = {{pool.srcPerCrs.formattedValue}} {{pool.srcToken.symbol}}</p>
-        <p>1 {{pool.srcToken.symbol}} = {{pool.crsPerSrc.formattedValue}} CRS</p>
-        <!-- <p>{{pool.miningPeriodEndBlock}} Mining Period End</p> -->
-      </opdex-card>
+      <div class="mt-4">
+        <opdex-liquidity-pool-summary-card [pool]="pool"></opdex-liquidity-pool-summary-card>
+      </div>
     </div>
   </div>
 </div>

@@ -1,0 +1,23 @@
+<div
+  class="number overflow-ellipsis"
+  *ngIf="fixed"
+  [matTooltip]="copied ? 'Copied!' : (fixed | formatNumber:decimals)"
+  matTooltipClass="number-tooltip"
+  matTooltipPosition="below"
+  [cdkCopyToClipboard]="fixed"
+  #tooltip="matTooltip"
+  (click)="copyHandler($event)">
+
+  <span class="prefix" *ngIf="prefix">{{prefix}}</span>
+
+  <ng-container *ngIf="!!short === true; else format">
+    <span class="short">{{fixed | shortNumber}}</span>
+  </ng-container>
+
+  <ng-template #format>
+    <span class="numerator">{{numerator | formatNumber:0}}</span>
+    <span class="denominator light" *ngIf="denominator && decimals > 0">.{{denominator}}</span>
+  </ng-template>
+
+  <small class="suffix ml-1" *ngIf="suffix">{{suffix}}</small>
+</div>

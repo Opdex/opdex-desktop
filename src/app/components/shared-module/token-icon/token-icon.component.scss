@@ -1,0 +1,20 @@
+.token-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background-size: cover;
+
+  &.cirrus {
+    background-image: url('/assets/tokens/crs.png') !important;
+  }
+
+  &.odx {
+    background-image: url('/assets/tokens/odx.png') !important;
+  }
+
+  &.large {
+    width: 40px;
+    height: 40px;
+  }
+}

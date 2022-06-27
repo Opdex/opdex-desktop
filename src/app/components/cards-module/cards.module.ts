@@ -1,3 +1,4 @@
+import { SharedModule } from '@components/shared-module/shared.module';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
@@ -13,10 +14,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 // Module Components
 import { CardComponent } from './card/card.component';
+import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card/liquidity-pool-summary-card.component';
 
 @NgModule({
   declarations: [
-    CardComponent
+    CardComponent,
+    LiquidityPoolSummaryCardComponent
   ],
   imports: [
     CommonModule,
@@ -27,10 +30,12 @@ import { CardComponent } from './card/card.component';
     MatTooltipModule,
     MatMenuModule,
     MatProgressBarModule,
-    MatDividerModule
+    MatDividerModule,
+    SharedModule
   ],
   exports: [
-    CardComponent
+    CardComponent,
+    LiquidityPoolSummaryCardComponent
   ]
 })
 export class CardsModule { }

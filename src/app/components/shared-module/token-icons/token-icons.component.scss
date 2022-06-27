@@ -1,0 +1,12 @@
+opdex-token-icon {
+  &:not(:last-of-type) {
+    position: relative;
+    margin-left: -15px;
+  }
+}
+
+.reverse {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
