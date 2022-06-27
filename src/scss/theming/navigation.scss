@@ -1,0 +1,57 @@
+@import 'src/scss/colors';
+
+.light-mode {
+  .wallet-indicator {
+    border: .2em solid #fff;
+  }
+
+  .border {
+    border: 1px solid #ccc;
+  }
+
+  #side-nav {
+    border-right: 1px solid #ccc;
+    background: #fff;
+
+    .navbar-pin {
+      &.mat-mini-fab {
+        background: #fff;
+        border: 1px solid #ccc;
+        color: #333;
+      }
+    }
+  }
+
+  .mobile-navbar {
+    border-top: 1px solid #f4f4f4;
+    background: #fff;
+  }
+}
+
+.dark-mode {
+  .wallet-indicator {
+    border: .2em solid $dark-primary;
+  }
+
+  .border {
+    border: 1px solid #292929;
+  }
+
+  #side-nav {
+    border-right: 1px solid #292929;
+    background: $dark-primary;
+
+    .navbar-pin {
+      &.mat-mini-fab {
+        background: $dark-primary;
+        border: 1px solid #292929;
+        color: #fff;
+      }
+    }
+  }
+
+  .mobile-navbar {
+    border-top: 1px solid #292929;
+    background: $dark-primary;
+  }
+}

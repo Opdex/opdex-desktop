@@ -4,14 +4,14 @@
       <h1>{{pool.name}}</h1>
       <p>{{pool.address}}</p>
 
-      <mat-card style="margin-bottom: 15px;">
+      <opdex-card>
         <p>{{pool.reserveCrs.formattedValue}} CRS Reserves</p>
         <p>{{pool.reserveSrc.formattedValue}} {{pool.srcToken.symbol}} Reserves</p>
         <p>{{pool.totalStaked.formattedValue}} ODX Staked</p>
         <p>1 CRS = {{pool.srcPerCrs.formattedValue}} {{pool.srcToken.symbol}}</p>
         <p>1 {{pool.srcToken.symbol}} = {{pool.crsPerSrc.formattedValue}} CRS</p>
         <!-- <p>{{pool.miningPeriodEndBlock}} Mining Period End</p> -->
-      </mat-card>
+      </opdex-card>
     </div>
   </div>
 </div>

@@ -1,0 +1,57 @@
+@import '/src/scss/colors';
+
+.card {
+  margin-bottom: 15px;
+  overflow: hidden;
+
+  &.hidden {
+    transition: all .1s ease-out;
+    opacity: 0;
+    margin: 0;
+    height: 0px;
+  }
+
+  .toolbar {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    height: 47px;
+    padding-left: 15px;
+    padding-right: 15px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .foreground {
+    padding: 15px;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    &.warn {
+      background: rgba(245, 25, 55, 0.4);
+      border: 1px solid $red-primary;
+    }
+
+    &.success {
+      background: rgb(43 255 0 / 23%);
+      border: 1px solid $green-primary;
+    }
+
+    &.info {
+      background: rgba($blue-primary, .2);
+    }
+  }
+
+  &.h-100 {
+    height: calc(100% - 15px) !important;
+
+    .foreground {
+      height: 100% !important;
+
+      &.has-toolbar {
+        height: calc(100% - 47px) !important;
+      }
+    }
+  }
+}

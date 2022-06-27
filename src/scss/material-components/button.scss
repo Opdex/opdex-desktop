@@ -1,0 +1,140 @@
+@import 'src/scss/colors';
+
+button, .mat-button, .mat-icon-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  &.tiny {
+    &.mat-button-base {
+      line-height: 16px;
+      font-size: .8em;
+    }
+
+    &.mat-icon-button {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+
+      .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &.mat-mini-fab {
+      width: 20px;
+      height: 20px;
+
+      .mat-button-wrapper {
+        padding: 0;
+        line-height: 16px;
+      }
+    }
+
+    .mat-icon {
+      line-height: 16px;
+      height: 16px;
+      width: 16px;
+      font-size: 16px;
+    }
+  }
+
+  &.small {
+    &.mat-button-base {
+      line-height: 28px;
+    }
+
+    &.mat-icon-button {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+
+      .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &.mat-mini-fab {
+      width: 28px;
+      height: 28px;
+
+      .mat-button-wrapper {
+        padding: 0;
+        line-height: 22px;
+      }
+    }
+
+    .mat-icon {
+      font-size: 22px;
+      height: 22px;
+      width: 22px;
+      line-height: 22px;
+    }
+  }
+
+  .mat-button-wrapper {
+    flex: 1 !important;
+  }
+
+  &.white {
+    background-color: white !important;
+    background: white !important;
+    color: $dark-primary !important;
+  }
+
+  &:not(.mat-button-disabled) {
+    &.purple, &.stake {
+      background-color: $purple-primary !important;
+      color: white !important;
+    }
+
+    &.red, &.mine {
+      background-color: $red-primary !important;
+      color: white !important;
+    }
+
+    &.green, &.provide {
+      background-color: $green-primary !important;
+      color: white !important;
+    }
+
+    &.blue, &.swap {
+      background-color: $blue-primary !important;
+      color: white !important;
+    }
+  }
+
+  &.flat {
+    box-shadow: none !important;
+  }
+}
+
+
+.mat-button-toggle-label-content {
+  line-height: 32px !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+}
+
+.mat-button-toggle-checked {
+  background: $blue-primary !important;
+
+  .mat-button-toggle-label-content {
+    color: #fff !important;
+  }
+}
+
+.mat-button {
+  &.transparent {
+    .mat-button-focus-overlay {
+      display: none !important;
+    }
+  }
+}

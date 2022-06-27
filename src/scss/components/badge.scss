@@ -1,0 +1,51 @@
+.badge {
+  font-size: .8em;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1em;
+
+  &.balance, &.blue {
+    background: $blue-primary;
+  }
+
+  &.staking, &.purple {
+    background: $purple-primary;
+  }
+
+  &.mining, &.red {
+    background: $red-primary;
+  }
+
+  &.active, &.green {
+    background: $green-primary;
+  }
+
+  &.orange {
+    background: $orange-primary;
+  }
+
+  &.cirrus {
+    background: $cirrus-primary;
+    color: white;
+  }
+
+  &.ethereum {
+    background: $eth-primary;
+    color: white;
+  }
+
+  &.gray {
+    background: $gray-primary;
+  }
+
+  .mat-icon {
+    font-size: 1em !important;
+    line-height: 1em !important;
+    height: 1em !important;
+    width: 1em !important;
+  }
+}

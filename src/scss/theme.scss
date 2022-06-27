@@ -1,0 +1,90 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Fonts
+@import 'font';
+@import 'colors';
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+$mat-primary: (
+  main: #1da7dc,
+  lighter: #46bceb,
+  darker: #1287b6,
+  200: #1da7dc, // For slide toggle,
+  contrast : (
+    main: white,
+    lighter: rgba(black, 0.87),
+    darker: white,
+  )
+);
+$theme-primary: mat.define-palette($mat-primary, main, lighter, darker);
+
+$mat-accent: (
+  main: $dark-primary,
+  lighter: #252342,
+  darker: #11101d,
+  200: $dark-primary, // For slide toggle,
+  contrast : (
+    main: white,
+    lighter: white,
+    darker: white,
+  )
+);
+$theme-accent: mat.define-palette($mat-accent, main, lighter, darker);
+
+$mat-warn: (
+  main: $red-primary,
+  lighter: lighten($red-primary, 10%),
+  darker: darken($red-primary, 10%),
+  200: #e21d1d, // For slide toggle,
+  contrast : (
+    main: white,
+    lighter: rgba(black, 0.87),
+    darker: white,
+  )
+);
+$theme-warn: mat.define-palette($mat-warn, main, lighter, darker);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$theme: mat.define-light-theme($theme-primary, $theme-accent, $theme-warn);
+$altTheme: mat.define-dark-theme($theme-primary, $theme-accent, $theme-warn);
+
+.light-mode {
+  color-scheme: light;
+  // background: #ffff;
+  @include mat.all-component-themes($theme);
+
+  $primary: map-get($theme, primary);
+  $primaryDarkerColor: mat.get-color-from-palette($primary, darker);
+
+  a {
+    color: $primaryDarkerColor;
+  }
+}
+
+.dark-mode {
+  color-scheme: dark;
+  // background: $dark-primary;
+  color: #fff;
+  @include mat.all-component-themes($altTheme);
+
+  $primary: map-get($altTheme, primary);
+  $primaryLighterColor: mat.get-color-from-palette($primary, lighter);
+
+  a {
+    color: $primaryLighterColor;
+  }
+}
+
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #f4f4f4 }

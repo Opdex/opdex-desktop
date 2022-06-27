@@ -1,3 +1,4 @@
+import { CardsModule } from './components/cards-module/cards.module';
 import { SharedPipesModule } from './pipes/shared-pipes.module';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -50,7 +51,8 @@ import { TokenComponent } from './views/token/token.component';
     MatIconModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-    SharedPipesModule
+    SharedPipesModule,
+    CardsModule
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorMiddlewareService },

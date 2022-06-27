@@ -1,0 +1,15 @@
+.dark-mode {
+  .mat-card {
+    box-shadow: none !important;
+    border: none !important;
+    background: $dark-primary !important;
+  }
+}
+
+.light-mode {
+  .mat-card {
+    box-shadow: none !important;
+    border: none !important;
+    background: #fff !important;
+  }
+}

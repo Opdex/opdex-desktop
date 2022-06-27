@@ -1,0 +1,40 @@
+mat-selection-list {
+  padding-top: 0px !important;
+
+  &:focus {
+    outline: 0;
+  }
+
+  .mat-list-item-content {
+    padding: 0px 10px !important;
+  }
+
+  mat-list-item {
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      background: #fff;
+      cursor: pointer;
+    }
+  }
+
+  mat-list-option {
+    .mat-list-text {
+      padding-right: 0px !important;
+    }
+  }
+}
+
+.light-mode {
+  mat-list-item:hover {
+    background: #fff;
+  }
+}
+
+.dark-mode {
+  mat-list-item:hover {
+    background: #1a1a1a;
+  }
+}

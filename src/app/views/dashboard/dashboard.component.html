@@ -6,7 +6,7 @@
   </div>
   <div class="row">
     <div class="col-12 col-md-6 col-lg-4" *ngFor="let pool of pools">
-      <mat-card style="margin-bottom: 15px;" routerLink="/pools/{{pool.address}}">
+      <opdex-card routerLink="/pools/{{pool.address}}">
         <h3>{{pool.name}}</h3>
         <small>{{pool.address}}</small>
         <p>{{pool.reserveCrs.formattedValue}} CRS Reserves</p>
@@ -14,7 +14,7 @@
         <p>{{pool.totalStaked.formattedValue}} ODX Staked</p>
         <p>1 CRS = {{pool.srcPerCrs.formattedValue}} {{pool.srcToken.symbol}}</p>
         <p>1 {{pool.srcToken.symbol}} = {{pool.crsPerSrc.formattedValue}} CRS</p>
-      </mat-card>
+      </opdex-card>
     </div>
   </div>
 </div>
