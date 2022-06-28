@@ -1,7 +1,10 @@
+import { ThemeService } from './services/utility/theme.service';
+import { ICurrencyPricing } from './interfaces/coin-gecko.interface';
+import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
-import { Component, OnInit } from '@angular/core';
-import { timer, switchMap, lastValueFrom } from 'rxjs';
+import { Component, HostBinding, OnInit } from '@angular/core';
+import { timer, switchMap, lastValueFrom, tap } from 'rxjs';
 import { db } from '@services/data/db.service';
 import { PoolRepositoryService } from '@services/data/pool-repository.service';
 import { TokenRepositoryService } from '@services/data/token-repository.service';
@@ -9,6 +12,10 @@ import { MarketService } from '@services/platform/market.service';
 import { MiningService } from '@services/platform/mining.service';
 import { PoolService } from '@services/platform/pool.service';
 import { TokenService } from '@services/platform/token.service';
+import { CurrencyService } from '@services/platform/currency.service';
+import { RouterOutlet } from '@angular/router';
+import { Icons } from '@enums/icons';
+import { OverlayContainer } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'opdex-root',
@@ -16,23 +23,41 @@ import { TokenService } from '@services/platform/token.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  @HostBinding('class') componentCssClass: string;
   nodeStatus: INodeStatus;
   indexing: boolean;
+  prices: ICurrencyPricing;
+  theme: string;
+  icons = Icons;
+  menuOpen = false;
+  isPinned = true;
 
   constructor(
+    public overlayContainer: OverlayContainer,
     private _nodeService: NodeService,
     private _marketService: MarketService,
     private _poolsService: PoolService,
     private _poolsRepository: PoolRepositoryService,
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
-    private _miningService: MiningService
+    private _miningService: MiningService,
+    private _coinGecko: CoinGeckoApiService,
+    private _currencyService: CurrencyService,
+    private _themeService: ThemeService
   ) { }
 
   ngOnInit(): void {
-    // Todo: Once per minute refresh CRS price, emit observable
+    this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
 
-    timer(0, 10000)
+    timer(0, 60000)
+      .pipe(
+        switchMap(_ => this._coinGecko.getLatestPrice()),
+        tap(pricing => this._currencyService.setPricing(pricing.stratis)),
+        switchMap(_ => this._currencyService.prices$)
+      )
+      .subscribe(prices => this.prices = prices)
+
+    timer(0, 30000)
       .pipe(
         switchMap(_ => this._nodeService.refreshStatus$())
       )
@@ -119,5 +144,39 @@ export class AppComponent implements OnInit {
     });
 
     this.indexing = false;
+  }
+
+  public handlePinnedToggle(event: boolean): void {
+    this.isPinned = event;
+  }
+
+  public handleRouteChanged(url: string): void {
+    // dont care about the url just close the menu
+    this.menuOpen = false;
+  }
+
+  public handleToggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  public prepareRoute(outlet: RouterOutlet) {
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
+
+  private setTheme(theme: string): void {
+    if (theme === this.theme) return;
+
+    const overlayClassList = this.overlayContainer.getContainerElement().classList;
+    overlayClassList.add(theme);
+    overlayClassList.remove(this.theme);
+
+    document.documentElement.classList.add(theme);
+    document.documentElement.classList.remove(this.theme);
+
+    this.componentCssClass = `${theme} root`;
+    this.theme = theme;
+
+    const metaThemeColor = document.querySelector("meta[name=theme-color]");
+    metaThemeColor.setAttribute("content", this.theme === 'light-mode' ? '#ffffff' : '#1b192f');
   }
 }

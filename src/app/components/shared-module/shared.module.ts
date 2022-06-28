@@ -19,6 +19,7 @@ import { CopyAddressComponent } from './copy-address/copy-address.component';
 // import { TokenIconComponent } from './token-icon/token-icon.component';
 // import { TokenIconsComponent } from './token-icons/token-icons.component';
 import { NumberComponent } from './number/number.component';
+import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 
 // Other Imports
 
@@ -28,7 +29,8 @@ import { NumberComponent } from './number/number.component';
     CopyAddressComponent,
     // TokenIconComponent,
     // TokenIconsComponent,
-    NumberComponent
+    NumberComponent,
+    ThemeToggleComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +48,8 @@ import { NumberComponent } from './number/number.component';
     CopyAddressComponent,
     // TokenIconComponent,
     // TokenIconsComponent,
-    NumberComponent
+    NumberComponent,
+    ThemeToggleComponent
   ]
 })
 export class SharedModule { }

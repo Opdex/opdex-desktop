@@ -1,7 +1,7 @@
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ValueAccessor } from '@services/utility/value-accessor';
+import { ValueAccessor } from '@models/value-accessor';
 import { Icons } from '@enums/icons';
 
 @Component({

@@ -1,3 +1,4 @@
+import { NavigationModule } from './components/navigation-module/navigation.module';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { CardsModule } from './components/cards-module/cards.module';
 import { SharedPipesModule } from './pipes/shared-pipes.module';
@@ -54,7 +55,8 @@ import { TokenComponent } from './views/token/token.component';
     MatProgressSpinnerModule,
     SharedPipesModule,
     CardsModule,
-    SharedModule
+    SharedModule,
+    NavigationModule
   ],
   providers: [
     { provide: ErrorHandler, useClass: ErrorMiddlewareService },

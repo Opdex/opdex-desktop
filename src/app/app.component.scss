@@ -1,7 +1,124 @@
+@import 'src/scss/colors';
+@import 'src/scss/bootstrap-grid';
+
+$sidebar-width: 100px;
+
 nav {
   background: #1ca7dc;
 
   button {
     color: #fff;
+  }
+}
+
+.main-content-container {
+  #desktop-sidenav {
+    width: $sidebar-width;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    transition: width .15s ease-in;
+    overflow: hidden;
+    display: none;
+    height: 100%;
+
+    &.pinned {
+      width: 225px;
+    }
+  }
+
+  .animation-container {
+    display: flex;
+    flex-direction: column;
+    transition: margin-left .15s ease-in;
+
+    #page-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+      .page-content-container {
+        padding-bottom: 50px;
+        padding-bottom: calc(50px + env(safe-area-inset-bottom, 0));
+      }
+    }
+  }
+
+  .notification-banner {
+    width: 100%;
+    background: $blue-primary;
+    color: #fff;
+    font-weight: 400;
+
+    &.warning {
+      background: $red-primary;
+    }
+
+    &.purple {
+      background: $purple-primary;
+    }
+  }
+}
+
+.mobile-navbar {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 4;
+}
+
+.mobile-nav {
+  position: fixed;
+  width: 100%;
+  max-width: 400px;
+  z-index: 999;
+  transform: translateX(-100vw);
+  height: 100%;
+  transition: transform .2s ease-out;
+  top: 0;
+  left: 0;
+
+  &.open {
+    transform: translateX(0);
+    transition: transform .2s ease-out;
+  }
+
+  .close-button {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 10
+  }
+}
+
+@media (min-width: map_get($grid-breakpoints, md)) {
+  .mobile-nav, .mobile-navbar {
+    display: none;
+  }
+
+  .main-content-container {
+    &.sidebar-pinned {
+      #desktop-sidenav {
+        width: 225px;
+      }
+
+      .animation-container {
+        margin-left: 225px;
+      }
+    }
+
+    .animation-container {
+      margin-left: 100px;
+
+      .page-content-container {
+        padding-bottom: 0px !important;
+      }
+    }
+
+    #desktop-sidenav {
+      display: inline-block;
+    }
   }
 }

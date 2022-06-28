@@ -1,8 +1,10 @@
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Currencies } from '@enums/currencies';
 import { RestApiService } from "./rest-api.service";
+import { ICurrenciesResponse } from '@interfaces/coin-gecko.interface';
 
 @Injectable({providedIn: 'root'})
 export class CoinGeckoApiService extends RestApiService {
@@ -15,7 +17,8 @@ export class CoinGeckoApiService extends RestApiService {
     super(_http, _router);
   }
 
-  getLatestPrice(currency: Currencies) {
-    this.get(`${this.api}/simple/price?ids=stratis&vs_currencies=${currency}`);
+  getLatestPrice(): Observable<ICurrenciesResponse> {
+    const currencies = Object.keys(Currencies).map(key => Currencies[key]);
+    return this.get(`${this.api}/simple/price?ids=stratis&vs_currencies=${currencies}`);
   }
 }

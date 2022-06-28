@@ -1,10 +1,18 @@
-<div class="container">
-  <div class="row">
-    <div class="col-12" *ngIf="pool">
-      <h1 class="mb-0">{{pool.name}}</h1>
-      <opdex-copy-address [address]="pool.address"></opdex-copy-address>
+<div class="header-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="mb-0">{{pool?.name}}</h1>
+        <opdex-copy-address [address]="pool?.address"></opdex-copy-address>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <div class="mt-4">
+<div class="offset-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
         <opdex-liquidity-pool-summary-card [pool]="pool"></opdex-liquidity-pool-summary-card>
       </div>
     </div>

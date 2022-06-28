@@ -1,0 +1,168 @@
+<div id="side-nav" [ngClass]="{'pinned': isPinned || mobileMenuOpen}">
+  <div class="foreground">
+    <div class="logo" routerLink="/">
+      <img src="/assets/logo-light-blue.png" alt="Opdex Logo">
+      <p class="opdex">OPDEX</p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/')" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Dashboard' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.market}}</mat-icon>
+          <span class="secondary">Dashboard</span>
+        </a>
+      </li>
+      <!-- <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/trade')" routerLink="/trade" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Trade' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.swap}}</mat-icon>
+          <span class="secondary">Trade</span>
+        </a>
+      </li> -->
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/pools')" routerLink="/pools" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Liquidity Pools' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.liquidityPool}}</mat-icon>
+          <span class="secondary">Pools</span>
+        </a>
+      </li>
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/tokens')" routerLink="/tokens" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Tokens' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.tokens}}</mat-icon>
+          <span class="secondary">Tokens</span>
+        </a>
+      </li>
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/mining')" routerLink="/mining" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Mining' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.mining}}</mat-icon>
+          <span class="secondary">Mining</span>
+        </a>
+      </li>
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/vault')" routerLink="/vault" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Vault' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.vault}}</mat-icon>
+          <span class="secondary">Vault</span>
+        </a>
+      </li>
+      <li *ngIf="!context?.wallet">
+        <a mat-button
+          class="transparent"
+          (click)="login()"
+          [matTooltip]="!isPinned && !mobileMenuOpen ? 'Connect Wallet' : null" matTooltipPosition="right">
+          <span class="wallet-indicator invalid"></span>
+          <mat-icon>{{icons.wallet}}</mat-icon>
+          <span class="secondary">Connect</span>
+        </a>
+      </li>
+      <li *ngIf="context?.wallet">
+        <a mat-button
+          class="transparent"
+          (click)="emitRouteChange('/wallet')"
+          routerLink="{{'/wallet'}}"
+          routerLinkActive="active"
+          [matTooltip]="!isPinned && !mobileMenuOpen ? 'Wallet' : null" matTooltipPosition="right">
+          <span class="wallet-indicator valid"></span>
+          <mat-icon>{{icons.wallet}}</mat-icon>
+          <span class="secondary">Wallet</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="space-between"></div>
+
+    <div class="sidebar-nav secondary mb-2">
+      <div class="flex-row-center no-wrap"  *ngIf="pendingTransactions?.length > 0">
+        <button mat-button [matMenuTriggerFor]="qMenu" class="small d-inline pl-0 pr-0 transparent">
+          <mat-icon class="swap mr-2">{{icons.send}}</mat-icon>
+          <small>Pending Transactions</small>
+        </button>
+
+        <mat-menu #qMenu="matMenu" class="queue-panel pl-2 pr-2 pb-0 pt-0" style="min-height: auto">
+          <div class="flex-row-center mb-1" *ngIf="pendingTransactions.length > 0; else noTransactions">
+            <mat-icon class="tiny green mr-2">{{icons.checkOutline}}</mat-icon>
+            <small>Pending Transactions</small>
+          </div>
+
+          <ng-template #noTransactions>
+            <small>No Pending Transactions</small>
+          </ng-template>
+
+          <div class="queue-item flex-column" *ngFor="let tx of pendingTransactions; let i = index">
+            <small class="light pt-1 pb-1 overflow-ellipsis">{{tx}}</small>
+            <mat-divider style="position: relative;" *ngIf="i + 1 < pendingTransactions.length"></mat-divider>
+          </div>
+        </mat-menu>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <opdex-theme-toggle></opdex-theme-toggle>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="networkTooltip.toggle()" *ngIf="latestSyncedBlock$ | async as block">
+          <mat-icon class="mr-2" [matTooltip]="network" #networkTooltip="matTooltip">languages</mat-icon>
+          <small>#{{block | formatNumber:0}}</small>
+        </button>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="openBugReport()">
+          <mat-icon class="mr-2">{{icons.bug}}</mat-icon>
+          <small>Report Issue</small>
+        </button>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <a mat-button class="small d-inline pl-0 pr-0 transparent" href="https://docs.opdex.com/docs/knowledge-center-overview" target="_blank" rel="noopener noreferrer">
+          <mat-icon class="mr-2">{{icons.help}}</mat-icon>
+          <small>Help</small>
+        </a>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <a mat-button class="small d-inline pl-0 pr-0 transparent" href="https://interflux.stratisplatform.com" target="_blank" rel="noopener noreferrer">
+          <mat-icon class="mr-2">{{icons.interflux}}</mat-icon>
+          <small>InterFlux</small>
+        </a>
+      </div>
+
+      <div class="flex-row-center no-wrap" *ngIf="context?.wallet">
+        <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="logout()">
+          <mat-icon class="mr-2">{{icons.exit}}</mat-icon>
+          <small>Logout</small>
+        </button>
+      </div>
+
+      <div class="pl-2">
+        <div class="button-group mt-3">
+          <a href="https://github.com/opdex" target="_blank" rel="noopener" matTooltip="Github">
+            <img class="social-icon" src="assets/social/github-blue.svg" alt="Github Logo">
+          </a>
+
+          <a href="https://twitter.com/OpdexProtocol" target="_blank" rel="noopener" matTooltip="Twitter">
+            <img class="social-icon" src="assets/social/twitter-blue.svg" alt="Twitter Logo">
+          </a>
+
+          <a href="https://discord.gg/TnWVDTTrjf" target="_blank" rel="noreferrer" matTooltip="Discord">
+            <img class="social-icon" src="assets/social/discord-blue.svg" alt="Discord Logo">
+          </a>
+
+          <a href="https://reddit.com/r/opdex" target="_blank" rel="noreferrer" matTooltip="Reddit">
+            <img class="social-icon" src="assets/social/reddit-blue.svg" alt="Reddit Logo">
+          </a>
+
+          <a href="https://www.youtube.com/channel/UCFFfUIa-pwOXevO9HCWbaDg" target="_blank" rel="noreferrer" matTooltip="YouTube">
+            <img class="social-icon" src="assets/social/youtube-blue.svg" alt="YoutTube Logo">
+          </a>
+        </div>
+
+        <a mat-button class="tiny body-content d-inline pl-0 pr-0 transparent" href="https://opdex.com/assets/opdex-platform-ui-terms-of-use.pdf" target="_blank" rel="noopener"><small>Terms of Use</small></a>
+      </div>
+    </div>
+
+    <div class="flex-row-center no-wrap pl-2" *ngIf="!mobileMenuOpen">
+      <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="togglePin()">
+        <mat-icon class="mr-2">{{isPinned ? icons.arrowDown : icons.arrowRight}}</mat-icon>
+        <small>{{isPinned ? 'Less': 'More'}}</small>
+      </button>
+    </div>
+  </div>
+</div>

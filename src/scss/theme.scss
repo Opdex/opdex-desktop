@@ -4,14 +4,14 @@
 @use '@angular/material' as mat;
 // Plus imports for other components in your app.
 
-// Fonts
-@import 'font';
-@import 'colors';
-
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat.core();
+
+// Fonts
+@import 'font';
+@import 'colors';
 
 $mat-primary: (
   main: #1da7dc,
@@ -59,7 +59,6 @@ $altTheme: mat.define-dark-theme($theme-primary, $theme-accent, $theme-warn);
 
 .light-mode {
   color-scheme: light;
-  // background: #ffff;
   @include mat.all-component-themes($theme);
 
   $primary: map-get($theme, primary);
@@ -87,4 +86,36 @@ $altTheme: mat.define-dark-theme($theme-primary, $theme-accent, $theme-warn);
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #f4f4f4 }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+main {
+  overscroll-behavior-y: none;
+  min-height: 100vh;
+
+  &.dark-mode {
+    background: $dark-primary;
+  }
+
+  &.light-mode {
+    background: #ffff;
+  }
+}
+
+.space-between {
+  flex: 1;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.overflow-ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.number-tooltip {
+  font-family: 'Inconsolata', monospace !important;
+}

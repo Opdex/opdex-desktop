@@ -1,0 +1,29 @@
+<div class="mobile-navbar">
+  <div class="button-group flex-row-center-around">
+    <button mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <mat-icon>{{icons.market}}</mat-icon>
+    </button>
+
+    <button mat-button routerLink="/trade" routerLinkActive="active">
+      <mat-icon>{{icons.swap}}</mat-icon>
+    </button>
+
+    <button mat-button (click)="login()" *ngIf="!context?.wallet">
+      <span class="wallet-indicator invalid"></span>
+      <mat-icon>{{icons.wallet}}</mat-icon>
+    </button>
+
+    <button mat-button routerLink="/wallet" *ngIf="context?.wallet">
+      <span class="wallet-indicator valid"></span>
+      <mat-icon>{{icons.wallet}}</mat-icon>
+    </button>
+
+    <button mat-button routerLink="/pools" routerLinkActive="active">
+      <mat-icon>{{icons.liquidityPool}}</mat-icon>
+    </button>
+
+    <button mat-button (click)="toggleMenu()">
+      <mat-icon>{{icons.more}}</mat-icon>
+    </button>
+  </div>
+</div>

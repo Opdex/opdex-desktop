@@ -1,20 +1,30 @@
-<header>
-  <nav>
-    <div class="container">
-      <div class="row">
-        <div class="col-12">
-          <button mat-button routerLink="/">Dashboard</button>
-          <button mat-button routerLink="/pools">Pools</button>
-          <button mat-button routerLink="/tokens">Tokens</button>
-          <button mat-button routerLink="/mining">Mining</button>
-          <button mat-button routerLink="/vault">Vault</button>
+<main *ngIf="indexing !== undefined">
+  <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}">
+    <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
+      <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>
+    </aside>
+
+    <div class="animation-container">
+      <div id="page-content">
+        <div class="mobile-nav" [ngClass]="{'open': menuOpen}">
+          <opdex-side-nav (onRouteChanged)="handleRouteChanged($event)" [mobileMenuOpen]="menuOpen"></opdex-side-nav>
+          <button mat-icon-button class="small close-button" (click)="handleToggleMenu()" *ngIf="menuOpen">
+            <mat-icon>{{icons.close}}</mat-icon>
+          </button>
+        </div>
+
+        <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
+          <div class="pricing">
+            CRS &#36;{{prices?.usd}}
+          </div>
+          <router-outlet #outlet="outlet"></router-outlet>
+        </div>
+
+        <div class="mobile-navbar">
+          <opdex-mobile-nav (onToggleMenu)="handleToggleMenu()"></opdex-mobile-nav>
         </div>
       </div>
     </div>
-  </nav>
-</header>
-
-<main *ngIf="indexing !== undefined" class="mt-3 mb-3">
-  <router-outlet></router-outlet>
+  </div>
 </main>
 

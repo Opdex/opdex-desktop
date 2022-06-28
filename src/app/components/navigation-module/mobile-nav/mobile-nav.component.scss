@@ -1,0 +1,31 @@
+@import 'src/scss/colors';
+
+.mobile-navbar {
+  padding-bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+
+  .button-group {
+    min-height: 50px;
+
+    .active {
+      color: $blue-primary;
+    }
+  }
+}
+
+.wallet-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: absolute;
+  left: 13px;
+  top: 3px;
+
+  &.invalid {
+    background: #F2435B;
+  }
+
+  &.valid {
+    background: #00EB93;
+  }
+}
