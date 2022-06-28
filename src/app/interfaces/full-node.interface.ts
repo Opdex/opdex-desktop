@@ -90,3 +90,11 @@ export interface INodeStatus {
   state: string;
   inIbd: boolean;
 }
+
+export interface ISupportedContract {
+  nativeNetwork: string;
+  nativeChainAddress: string;
+  src20Address: string;
+  tokenName: string;
+  decimals: number;
+}

@@ -1,4 +1,4 @@
-import { ITokenEntity } from './../../interfaces/database.interface';
+import { ITokenEntity } from '@interfaces/database.interface';
 import { Injectable } from "@angular/core";
 import { db } from "./db.service";
 
@@ -13,6 +13,7 @@ export class TokenRepositoryService {
   }
 
   async persistTokens(tokens: ITokenEntity[]) {
+    console.log(tokens)
     const entities = await db.token.toArray();
 
     await db.token.bulkPut(tokens.map(token => {

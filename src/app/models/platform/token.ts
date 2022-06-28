@@ -14,7 +14,7 @@ export class Token {
     this.name = entity.name;
     this.symbol = entity.symbol;
     this.decimals = entity.decimals;
-    this.sats = BigInt(entity.sats);
+    this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'))
   }
 }
 

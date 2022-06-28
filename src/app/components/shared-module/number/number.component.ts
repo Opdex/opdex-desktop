@@ -1,4 +1,4 @@
-import { Icons } from 'src/app/enums/icons';
+import { Icons } from '@enums/icons';
 import { Component, Input, ViewChild } from '@angular/core';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { MatTooltip } from '@angular/material/tooltip';

@@ -5,7 +5,6 @@ import { timer, switchMap, lastValueFrom } from 'rxjs';
 import { db } from '@services/data/db.service';
 import { PoolRepositoryService } from '@services/data/pool-repository.service';
 import { TokenRepositoryService } from '@services/data/token-repository.service';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
 import { MarketService } from '@services/platform/market.service';
 import { MiningService } from '@services/platform/mining.service';
 import { PoolService } from '@services/platform/pool.service';
@@ -18,7 +17,7 @@ import { TokenService } from '@services/platform/token.service';
 })
 export class AppComponent implements OnInit {
   nodeStatus: INodeStatus;
-  indexed: boolean = false;
+  indexing: boolean;
 
   constructor(
     private _nodeService: NodeService,
@@ -27,11 +26,12 @@ export class AppComponent implements OnInit {
     private _poolsRepository: PoolRepositoryService,
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
-    private _miningService: MiningService,
-    private _poolsFactory: LiquidityPoolFactoryService
+    private _miningService: MiningService
   ) { }
 
   ngOnInit(): void {
+    // Todo: Once per minute refresh CRS price, emit observable
+
     timer(0, 10000)
       .pipe(
         switchMap(_ => this._nodeService.refreshStatus$())
@@ -55,18 +55,20 @@ export class AppComponent implements OnInit {
   }
 
   private async _indexLatest() {
-    const indexer = await db.indexer.get(1);
+    if (this.indexing) return;
 
-    console.log(indexer)
+    this.indexing = true;
+
+    const indexer = await db.indexer.get(1);
 
     const [pools, rewardedMiningPools] = await Promise.all([
       lastValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
       lastValueFrom(this._miningService.getRewardedPools(indexer?.lastUpdateBlock)),
     ]);
 
+    console.log(rewardedMiningPools);
+
     const nodeStatus = this._nodeService.status;
-    console.log(nodeStatus)
-    console.log(rewardedMiningPools)
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
       const poolDetails = await lastValueFrom(this._poolsService.getStaticPool(pool.pool));
@@ -94,12 +96,15 @@ export class AppComponent implements OnInit {
       await this._tokenRepository.persistTokens(poolsDetails.map(({ token }) => {
         const decimals = parseInt(token.decimals);
 
+        console.log(token.nativeChain, token.nativeAddress);
+
         return {
           address: token.address,
           name: token.name,
           symbol: token.symbol,
           decimals: decimals,
-          sats: '1'.padEnd(decimals+1, '0')
+          nativeChain: token.nativeChain || 'Cirrus',
+          nativeChainAddress: token.nativeChainAddress
         }
       }));
     }
@@ -113,6 +118,6 @@ export class AppComponent implements OnInit {
       id: 1
     });
 
-    this.indexed = true;
+    this.indexing = false;
   }
 }

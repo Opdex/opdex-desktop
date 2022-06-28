@@ -14,5 +14,6 @@ export class PoolsComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.pools = await this._poolFactory.buildLiquidityPools();
+    console.log(this.pools)
   }
 }

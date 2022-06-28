@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Injectable } from "@angular/core";
-import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory } from "@interfaces/full-node.interface";
+import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
 import { Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { HttpClient } from '@angular/common/http';
@@ -81,5 +81,11 @@ export class CirrusApiService extends RestApiService {
     // }
 
     return response;
+  }
+
+  // Supported Contracts
+  getSupportedInterfluxTokens(): Observable<ISupportedContract[]> {
+    const networkType = '0'; // 0 = mainnet, 1 = testnet
+    return this.get(`${this.api}/SupportedContracts/list?networkType=${networkType}`);
   }
 }

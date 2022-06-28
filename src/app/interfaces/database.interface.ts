@@ -18,5 +18,6 @@ export interface ITokenEntity {
   name: string;
   symbol: string;
   decimals: number;
-  sats: string;
+  nativeChain?: string;
+  nativeChainAddress?: string;
 }

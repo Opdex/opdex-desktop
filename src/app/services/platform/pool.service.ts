@@ -44,8 +44,8 @@ export class PoolService {
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.totalSupply, ParameterType.UInt256),
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.reserveCrs, ParameterType.ULong),
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.reserveSrc, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.totalStaked, ParameterType.UInt256).pipe(catchError(_ => '0')),
-      this._cirrus.getContractStorageItem(miningPool, miningPeriodEndBlockStateKey, ParameterType.ULong).pipe(catchError(_ => '0'))
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.totalStaked, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
+      this._cirrus.getContractStorageItem(miningPool, miningPeriodEndBlockStateKey, ParameterType.ULong).pipe(catchError(_ => of('0')))
     ];
 
     return combineLatest(properties)

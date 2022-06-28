@@ -1,5 +1,5 @@
 import { Contracts } from '@lookups/contracts.lookup';
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, catchError, of } from 'rxjs';
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
@@ -22,12 +22,14 @@ export class TokenService {
       this._cirrus.getContractStorageItem(address, keys.name, ParameterType.String),
       this._cirrus.getContractStorageItem(address, keys.symbol, ParameterType.String),
       this._cirrus.getContractStorageItem(address, keys.decimals, ParameterType.Byte),
-      this._cirrus.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256)
+      this._cirrus.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(address, 'NativeChain', ParameterType.String).pipe(catchError(_ => of(''))),
+      this._cirrus.getContractStorageItem(address, 'NativeAddress', ParameterType.String).pipe(catchError(_ => of(''))),
     ];
 
     return combineLatest(properties)
-      .pipe(map(([name, symbol, decimals, totalSupply]) => {
-        return { address, name, symbol, decimals, totalSupply }
+      .pipe(map(([name, symbol, decimals, totalSupply, nativeChain, nativeChainAddress]) => {
+        return { address, name, symbol, decimals, totalSupply, nativeChain, nativeChainAddress }
       }));
   }
 }

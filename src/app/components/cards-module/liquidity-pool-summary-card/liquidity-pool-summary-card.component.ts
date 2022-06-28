@@ -1,7 +1,7 @@
 import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Subscription } from 'rxjs';
-import { Icons } from 'src/app/enums/icons';
+import { Icons } from '@enums/icons';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 

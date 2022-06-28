@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Icons } from 'src/app/enums/icons';
+import { Icons } from '@enums/icons';
 
 @Component({
   selector: 'opdex-card',
