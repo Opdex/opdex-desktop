@@ -1,8 +1,7 @@
-// import { UserContextService } from '@sharedServices/utility/user-context.service';
+import { UserContextService } from '@services/utility/user-context.service';
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
-// import { StorageService } from './storage.service';
-// import { environment } from '@environments/environment';
+import { StorageService } from '@services/utility/storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +11,12 @@ export class ThemeService {
   private themeKey = 'theme';
 
   constructor(
-    // private _db: StorageService,
-    // private _userContextService: UserContextService
+    private _storage: StorageService,
+    private _userContextService: UserContextService
   ) {
     const defaultTheme =
-      // this._userContextService.userContext?.preferences?.theme ||
-      // this._db.getLocalStorage<string>(this.themeKey, false) ||
+      this._userContextService.userContext?.preferences?.theme ||
+      this._storage.getLocalStorage<string>(this.themeKey, false) ||
       'light-mode';
 
     this.theme$ = new BehaviorSubject(defaultTheme);
@@ -28,7 +27,7 @@ export class ThemeService {
   }
 
   setTheme(theme: string): void {
-    // this._db.setLocalStorage(this.themeKey, theme, false);
+    this._storage.setLocalStorage(this.themeKey, theme, false);
     this.theme$.next(theme);
   }
 }

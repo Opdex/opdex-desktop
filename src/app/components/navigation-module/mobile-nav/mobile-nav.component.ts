@@ -1,6 +1,8 @@
+import { UserContext } from '@models/user-context';
 import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { Icons } from 'src/app/enums/icons';
 import { Subscription } from 'rxjs';
+import { UserContextService } from '@services/utility/user-context.service';
 
 @Component({
   selector: 'opdex-mobile-nav',
@@ -10,16 +12,16 @@ import { Subscription } from 'rxjs';
 export class MobileNavComponent implements OnDestroy {
   @Output() onToggleMenu = new EventEmitter();
   icons = Icons;
-  context: any;
+  context: UserContext;
   subscription = new Subscription();
 
   constructor(
-    // private _userContextService: UserContextService,
+    private _userContextService: UserContextService,
     // private _authService: AuthService
   ) {
-    // this.subscription.add(
-    //   this._userContextService.context$
-    //     .subscribe(context => this.context = context));
+    this.subscription.add(
+      this._userContextService.context$
+        .subscribe(context => this.context = context));
   }
 
   login(): void {

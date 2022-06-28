@@ -30,7 +30,8 @@
       "@models/*": ["./src/app/models/*"],
       "@lookups/*": ["./src/app/lookups/*"],
       "@enums/*": ["./src/app/enums/*"],
-      "@interfaces/*": ["./src/app/interfaces/*"]
+      "@interfaces/*": ["./src/app/interfaces/*"],
+      "@animations/*": ["./src/app/animations/*"]
     }
   },
   "angularCompilerOptions": {

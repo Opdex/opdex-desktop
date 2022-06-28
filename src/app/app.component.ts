@@ -16,11 +16,13 @@ import { CurrencyService } from '@services/platform/currency.service';
 import { RouterOutlet } from '@angular/router';
 import { Icons } from '@enums/icons';
 import { OverlayContainer } from '@angular/cdk/overlay';
+import { FadeAnimation } from '@animations/fade-animation';
 
 @Component({
   selector: 'opdex-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  animations: [FadeAnimation]
 })
 export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: string;

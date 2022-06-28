@@ -1,9 +1,9 @@
-// import { UserContext, UserContextPreferences } from '@sharedModels/user-context';
+import { UserContext, UserContextPreferences } from '@models/user-context';
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Component } from '@angular/core';
 import { ThemeService } from '@services/utility/theme.service';
-// import { UserContextService } from '@sharedServices/utility/user-context.service';
+import { UserContextService } from '@services/utility/user-context.service';
 import { Icons } from 'src/app/enums/icons';
 
 @Component({
@@ -12,7 +12,7 @@ import { Icons } from 'src/app/enums/icons';
   styleUrls: ['./theme-toggle.component.scss']
 })
 export class ThemeToggleComponent implements OnDestroy {
-  wallet: any;
+  wallet: UserContext;
   theme: string;
   icons = Icons;
   subscription = new Subscription();
@@ -22,37 +22,37 @@ export class ThemeToggleComponent implements OnDestroy {
   }
 
   constructor(
-    // private _userContextService: UserContextService,
+    private _userContextService: UserContextService,
     private _theme: ThemeService,
   ) {
-    // this.subscription.add(this._userContextService.context$.subscribe(context => this.wallet = context));
+    this.subscription.add(this._userContextService.context$.subscribe(context => this.wallet = context));
     this.subscription.add(
       this._theme.getTheme()
         .subscribe(theme => {
           if (theme !== this.theme) {
             this.theme = theme;
-            // this._setThemePreference(theme);
+            this._setThemePreference(theme);
           }
         }));
   }
 
   toggleTheme(): void {
     const theme = this.theme === 'light-mode' ? 'dark-mode' : 'light-mode';
-    // this._setThemePreference(theme);
+    this._setThemePreference(theme);
     this._theme.setTheme(theme);
   }
 
-  // private _setThemePreference(theme: string) {
-  //   if (this.wallet) {
-  //     let { wallet, preferences } = this.wallet;
-  //     if (wallet) {
-  //       if (!preferences) preferences = new UserContextPreferences();
+  private _setThemePreference(theme: string) {
+    if (this.wallet) {
+      let { wallet, preferences } = this.wallet;
+      if (wallet) {
+        if (!preferences) preferences = new UserContextPreferences();
 
-  //       preferences.theme = theme;
-  //       this._userContextService.setUserPreferences(wallet, preferences);
-  //     }
-  //   }
-  // }
+        preferences.theme = theme;
+        this._userContextService.setUserPreferences(wallet, preferences);
+      }
+    }
+  }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
