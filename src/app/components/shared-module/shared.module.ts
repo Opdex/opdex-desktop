@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 // Opdex Component Imports
 import { CopyAddressComponent } from './copy-address/copy-address.component';
@@ -20,6 +21,7 @@ import { CopyAddressComponent } from './copy-address/copy-address.component';
 // import { TokenIconsComponent } from './token-icons/token-icons.component';
 import { NumberComponent } from './number/number.component';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
+import { CurrencySelectComponent } from './currency-select/currency-select.component';
 
 // Other Imports
 
@@ -30,7 +32,8 @@ import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
     // TokenIconComponent,
     // TokenIconsComponent,
     NumberComponent,
-    ThemeToggleComponent
+    ThemeToggleComponent,
+    CurrencySelectComponent
   ],
   imports: [
     CommonModule,
@@ -39,6 +42,7 @@ import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
     MatIconModule,
     MatTooltipModule,
     MatButtonModule,
+    MatMenuModule,
     ClipboardModule,
     SharedPipesModule
   ],
@@ -49,7 +53,8 @@ import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
     // TokenIconComponent,
     // TokenIconsComponent,
     NumberComponent,
-    ThemeToggleComponent
+    ThemeToggleComponent,
+    CurrencySelectComponent
   ]
 })
 export class SharedModule { }

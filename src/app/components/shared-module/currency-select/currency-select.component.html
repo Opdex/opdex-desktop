@@ -1,0 +1,15 @@
+<button mat-button [matMenuTriggerFor]="currencyMenu">
+  <div class="flex-row-center-between">
+    <span [innerHtml]="currency.htmlEntity" class="mr-2"></span>
+    {{currency.abbreviation | uppercase}}
+  </div>
+</button>
+
+<mat-menu #currencyMenu="matMenu">
+  <button mat-menu-item *ngFor="let currency of currencies" (click)="select(currency)">
+    <div class="flex-row-center">
+      <span [innerHtml]="currency.htmlEntity" class="mr-2"></span>
+      {{currency.abbreviation | uppercase}}
+    </div>
+  </button>
+</mat-menu>
