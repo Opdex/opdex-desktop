@@ -87,15 +87,13 @@ export class AppComponent implements OnInit {
     this.indexing = true;
 
     const indexer = await db.indexer.get(1);
+    const nodeStatus = this._nodeService.status;
 
-    const [pools, rewardedMiningPools] = await Promise.all([
+    const [pools, rewardedMiningPools, nominations] = await Promise.all([
       lastValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
       lastValueFrom(this._miningService.getRewardedPools(indexer?.lastUpdateBlock)),
+      lastValueFrom(this._miningService.getNominatedPools())
     ]);
-
-    console.log(rewardedMiningPools);
-
-    const nodeStatus = this._nodeService.status;
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
       const poolDetails = await lastValueFrom(this._poolsService.getStaticPool(pool.pool));
@@ -136,8 +134,12 @@ export class AppComponent implements OnInit {
       }));
     }
 
-    // Todo: Refresh mining nominations (NominationsLog)
-    // Todo: Refresh active mining pools (RewardMiningPoolLog)
+    // Todo: Persist active mining pools
+    console.log(rewardedMiningPools);
+
+    // Todo: Persist nominations
+    console.log(nominations);
+
     // Todo: Refresh vault proposals
 
     db.indexer.put({

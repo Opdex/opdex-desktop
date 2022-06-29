@@ -58,7 +58,6 @@ export class CirrusApiService extends RestApiService {
   }
 
   searchContractReceipts(request: ReceiptSearchRequest): Observable<IContractReceiptResult[]> {
-    console.log(request.query)
     return this.get(`${this.api}/SmartContracts/receipt-search${request.query}`);
   }
 

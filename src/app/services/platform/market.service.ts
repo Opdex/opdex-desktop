@@ -6,9 +6,7 @@ import { map, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class MarketService {
-  constructor(private _cirrus: CirrusApiService) {
-
-  }
+  constructor(private _cirrus: CirrusApiService) { }
 
   getMarketPools(fromBlock: number = 3500000): Observable<any> {
     const createPoolLog = 'CreateLiquidityPoolLog';
@@ -18,7 +16,6 @@ export class MarketService {
       .pipe(
         map(response => {
           const pools = [];
-          console.log(response);
 
           response.forEach(tx => {
             tx.logs
@@ -26,7 +23,6 @@ export class MarketService {
               .forEach(log => pools.push(log.log.data));
           });
 
-          console.log(pools);
           return pools;
       }));
   }
