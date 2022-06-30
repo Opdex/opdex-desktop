@@ -117,6 +117,12 @@
     <div class="row">
       <div class="col-12">
         <h3>Nominated Pools</h3>
+
+        <div class="scrollable-row">
+          <div class="scrollable-card" *ngFor="let pool of nominatedPools; trackBy: poolsTrackBy">
+            <opdex-liquidity-pool-summary-card [pool]="pool" [showPoolName]="true"></opdex-liquidity-pool-summary-card>
+          </div>
+        </div>
       </div>
     </div>
   </div>

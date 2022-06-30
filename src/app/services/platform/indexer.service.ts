@@ -56,7 +56,8 @@ export class IndexerService {
           name: `${token.symbol}-${nodeStatus.coinTicker}`,
           srcToken: token.address,
           miningPool: pool.miningPool,
-          transactionFee: pool.transactionFee
+          transactionFee: pool.transactionFee,
+          isNominated: 0 // false by default
         }
       }));
 
@@ -80,7 +81,7 @@ export class IndexerService {
     console.log(rewardedMiningPools);
 
     // Todo: Persist nominations
-    console.log(nominations);
+    await this._poolsRepository.setNominations(nominations.map(({stakingPool}) => stakingPool));
 
     // Todo: Refresh vault proposals
 

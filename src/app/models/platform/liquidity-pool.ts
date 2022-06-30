@@ -30,4 +30,8 @@ export class LiquidityPool {
     this.crsPerSrc = this.reserveCrs.divide(this.reserveSrc);
     this.srcPerCrs = this.reserveSrc.divide(this.reserveCrs);
   }
+
+  public get trackBy(): string {
+    return `${this.address}-${this.crsPerSrc.bigInt}-${this.srcPerCrs.bigInt}-${this.totalStaked.bigInt}`;
+  }
 }

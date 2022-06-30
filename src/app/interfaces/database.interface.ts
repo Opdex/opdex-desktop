@@ -10,6 +10,7 @@ export interface ILiquidityPoolEntity {
   srcToken: string;
   miningPool: string;
   transactionFee: number;
+  isNominated: number;
 }
 
 export interface ITokenEntity {

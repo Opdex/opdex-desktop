@@ -28,4 +28,22 @@ export class PoolRepositoryService {
       }
     }));
   }
+
+  async getNominatedPools(): Promise<ILiquidityPoolEntity[]> {
+    return await db.liquidityPool.where('isNominated').equals(1).toArray();
+  }
+
+  async setNominations(nominations: string[]): Promise<void> {
+    // Clear all non nominated pools
+    await db.liquidityPool
+      .where('isNominated').equals(1)
+        .and(item => !nominations.includes(item.address))
+          .modify({isNominated: 0});
+
+    // Set new nominated pools
+    await db.liquidityPool
+      .where('address').anyOfIgnoreCase(nominations)
+        .and(item => item.isNominated === 0)
+          .modify({isNominated: 1});
+  }
 }
