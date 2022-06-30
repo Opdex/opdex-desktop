@@ -1,5 +1,6 @@
 import { ILiquidityPoolEntity, ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
+import { IHydratedLiquidityPoolDetailsDto } from '@services/platform/liquidity-pool.service';
 import { Token } from './token';
 
 export class LiquidityPool {
@@ -16,7 +17,7 @@ export class LiquidityPool {
   crsPerSrc: FixedDecimal;
   srcPerCrs: FixedDecimal;
 
-  constructor(entity: ILiquidityPoolEntity, hydrated: any, srcToken: ITokenEntity, stakingToken: ITokenEntity) {
+  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, srcToken: ITokenEntity, stakingToken: ITokenEntity) {
     this.address = entity.address;
     this.name = entity.name;
     this.miningPool = entity.miningPool;

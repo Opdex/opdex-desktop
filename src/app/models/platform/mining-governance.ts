@@ -1,4 +1,4 @@
-import { FixedDecimal } from './../types/fixed-decimal';
+import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Token } from './token';
 
 export class MiningGovernance {

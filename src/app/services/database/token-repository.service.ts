@@ -4,10 +4,6 @@ import { db } from "./db.service";
 
 @Injectable({providedIn: 'root'})
 export class TokenRepositoryService {
-  constructor() {
-
-  }
-
   async getTokenByAddress(address: string) {
     return await db.token.get({ address });
   }

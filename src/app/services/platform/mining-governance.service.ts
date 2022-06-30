@@ -8,7 +8,7 @@ import { Observable, map, combineLatest } from "rxjs";
 import { ParameterType } from '@enums/parameter-type';
 
 @Injectable({providedIn: 'root'})
-export class MiningService {
+export class MiningGovernanceService {
   constructor(private _cirrus: CirrusApiService) { }
 
   getHydratedMiningGovernance(): Observable<any> {

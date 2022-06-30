@@ -1,7 +1,7 @@
 import { Router } from '@angular/router';
 import { Injectable } from "@angular/core";
 import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
-import { Observable } from "rxjs";
+import { map, Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
@@ -69,17 +69,12 @@ export class CirrusApiService extends RestApiService {
     return this.post(`${this.api}/SmartContractWallet/call`, payload);
   }
 
-  getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string | { message: string }> {
-    const response = this.get<string | { message: string }>(`${this.api}/SmartContracts/storage?contractAddress=${contractAddress}&storageKey=${storageKey}&dataType=${dataType}`);
-
-    // If a key isn't found, it doesn't error, just returns a message.
-    // if (response?.message?.includes('No data at storage with key')) {
-    //   response.hasError = true;
-    //   response.error = new HttpErrorResponse({ error: response.data.message });
-    //   this._log.error(response.data.message);
-    // }
-
-    return response;
+  getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string> {
+    return this.get<string | { message: string }>(`${this.api}/SmartContracts/storage?contractAddress=${contractAddress}&storageKey=${storageKey}&dataType=${dataType}`)
+      .pipe(map(response => {
+          if (typeof(response) !== 'string') throw new Error(response.message);
+          return response;
+        }));
   }
 
   // Supported Contracts

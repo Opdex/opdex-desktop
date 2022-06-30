@@ -1,3 +1,4 @@
+import { StakingPoolCardComponent } from './staking-pool-card/staking-pool-card.component';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
@@ -19,7 +20,8 @@ import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card
 @NgModule({
   declarations: [
     CardComponent,
-    LiquidityPoolSummaryCardComponent
+    LiquidityPoolSummaryCardComponent,
+    StakingPoolCardComponent
   ],
   imports: [
     CommonModule,
@@ -35,7 +37,8 @@ import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card
   ],
   exports: [
     CardComponent,
-    LiquidityPoolSummaryCardComponent
+    LiquidityPoolSummaryCardComponent,
+    StakingPoolCardComponent
   ]
 })
 export class CardsModule { }

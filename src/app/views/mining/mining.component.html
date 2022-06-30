@@ -120,7 +120,7 @@
 
         <div class="scrollable-row">
           <div class="scrollable-card" *ngFor="let pool of nominatedPools; trackBy: poolsTrackBy">
-            <opdex-liquidity-pool-summary-card [pool]="pool" [showPoolName]="true"></opdex-liquidity-pool-summary-card>
+            <opdex-staking-pool-card [pool]="pool"></opdex-staking-pool-card>
           </div>
         </div>
       </div>

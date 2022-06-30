@@ -1,0 +1,71 @@
+<opdex-card class="pool-card">
+  <ng-container *ngIf="!!pool; else loading">
+    <div class="top-details mb-2">
+      <div class="flex-row-center">
+        <!-- <opdex-token-icons [tokens]="[pool.tokens.crs, pool.tokens.src]"></opdex-token-icons> -->
+
+        <a class="title mb-0 ml-2" href="javascript:void(0)" [routerLink]="['/pools', pool.address]">
+          <h4>{{pool.name}}</h4>
+        </a>
+      </div>
+
+      <!-- <button mat-icon-button color="primary" [ngClass]="iconSizes.small" [matMenuTriggerFor]="beforeMenu">
+        <mat-icon>{{icons.more}}</mat-icon>
+      </button>
+
+      <mat-menu #beforeMenu="matMenu" xPosition="before" class="w-100">
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.swap)">
+          <mat-icon class="swap">{{icons.swap}}</mat-icon> Swap
+        </button>
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.provide)">
+          <mat-icon class="provide">{{icons.provide}}</mat-icon> Provide
+        </button>
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.stake)" *ngIf="pool.summary.staking">
+          <mat-icon class="stake">{{icons.staking}}</mat-icon> Stake
+        </button>
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.mine)" *ngIf="pool.miningPool?.isActive">
+          <mat-icon class="mine">{{icons.mining}}</mat-icon> Mine
+        </button>
+      </mat-menu> -->
+    </div>
+
+    <div class="flex-row-center-between">
+      <div class="flex-row-center-center">
+        <mat-icon class="tiny mr-1 purple">{{icons.staking}}</mat-icon>
+        <p class="mb-0">Staking</p>
+      </div>
+
+      <!-- <opdex-number [short]="true" prefix="$" [value]="pool.summary.staking.usd"></opdex-number> -->
+    </div>
+
+    <div class="flex-row-center-between">
+      <p class="mb-0 sub-heading">Weight</p>
+
+      <div class="flex-row-center">
+        <!-- <opdex-change-indicator
+          class="mr-2"
+          [value]="pool.summary.staking.dailyWeightChangePercent"
+          *ngIf="!!pool.summary.staking.dailyWeightChangePercent">
+        </opdex-change-indicator> -->
+
+        <opdex-number [short]="true" [suffix]="pool.stakingToken?.symbol" [value]="pool.totalStaked"></opdex-number>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="skeleton-bg w-50 mb-3"></div>
+
+    <div class="flex-row-center">
+      <div class="w-50">
+        <div class="skeleton-bg w-75 mb-1"></div>
+        <div class="skeleton-bg w-75 mb-1"></div>
+      </div>
+
+      <div class="w-50 flex-column-end">
+        <div class="skeleton-bg w-75 mb-1"></div>
+        <div class="skeleton-bg w-75 mb-1"></div>
+      </div>
+    </div>
+  </ng-template>
+</opdex-card>

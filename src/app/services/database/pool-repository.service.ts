@@ -4,8 +4,6 @@ import { Injectable } from "@angular/core";
 
 @Injectable({providedIn: 'root'})
 export class PoolRepositoryService {
-  constructor() { }
-
   async getPoolByAddress(address: string): Promise<ILiquidityPoolEntity> {
     return await db.liquidityPool.get({ address });
   }

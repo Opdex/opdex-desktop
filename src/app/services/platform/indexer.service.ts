@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
-import { db } from "@services/data/db.service";
-import { PoolRepositoryService } from "@services/data/pool-repository.service";
-import { TokenRepositoryService } from "@services/data/token-repository.service";
+import { db } from "@services/database/db.service";
+import { PoolRepositoryService } from "@services/database/pool-repository.service";
+import { TokenRepositoryService } from "@services/database/token-repository.service";
 import { lastValueFrom } from "rxjs";
 import { MarketService } from "./market.service";
-import { MiningService } from "./mining.service";
+import { MiningGovernanceService } from "./mining-governance.service";
 import { NodeService } from "./node.service";
-import { PoolService } from "./pool.service";
+import { LiquidityPoolService } from "./liquidity-pool.service";
 import { TokenService } from "./token.service";
 
 @Injectable({providedIn: 'root'})
@@ -16,11 +16,11 @@ export class IndexerService {
   constructor(
     private _nodeService: NodeService,
     private _marketService: MarketService,
-    private _poolsService: PoolService,
+    private _liquidityPoolService: LiquidityPoolService,
     private _poolsRepository: PoolRepositoryService,
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
-    private _miningService: MiningService
+    private _miningGovernanceService: MiningGovernanceService
   ) { }
 
   public async index(): Promise<void> {
@@ -33,12 +33,12 @@ export class IndexerService {
 
     const [pools, rewardedMiningPools, nominations] = await Promise.all([
       lastValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
-      lastValueFrom(this._miningService.getRewardedPools(indexer?.lastUpdateBlock)),
-      lastValueFrom(this._miningService.getNominatedPools())
+      lastValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
+      lastValueFrom(this._miningGovernanceService.getNominatedPools())
     ]);
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
-      const poolDetails = await lastValueFrom(this._poolsService.getStaticPool(pool.pool));
+      const poolDetails = await lastValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
       const tokenDetails = await lastValueFrom(this._tokenService.getToken(pool.token));
 
       const poolResponse = {
@@ -61,7 +61,7 @@ export class IndexerService {
         }
       }));
 
-      await this._tokenRepository.persistTokens(poolsDetails.map(({ token }) => {
+      await this._tokenRepository.persistTokens(poolsDetails.map(({token}) => {
         const decimals = parseInt(token.decimals);
 
         console.log(token.nativeChain, token.nativeAddress);
@@ -78,7 +78,9 @@ export class IndexerService {
     }
 
     // Todo: Persist active mining pools
-    console.log(rewardedMiningPools);
+    // -- Get mining period end block from each of mining pools
+    // -- Persist affected pools
+    console.log(rewardedMiningPools); // { stakingPool, miningPool, amount }
 
     // Todo: Persist nominations
     await this._poolsRepository.setNominations(nominations.map(({stakingPool}) => stakingPool));
