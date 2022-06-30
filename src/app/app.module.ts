@@ -14,6 +14,12 @@ import { AppComponent } from './app.component';
 import { ErrorMiddlewareService } from '@services/middleware/error-middleware.service';
 import { LoginComponent } from './views/login/login.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
+import { PoolsComponent } from './views/pools/pools.component';
+import { TokensComponent } from './views/tokens/tokens.component';
+import { MiningComponent } from './views/mining/mining.component';
+import { VaultComponent } from './views/vault/vault.component';
+import { PoolComponent } from './views/pool/pool.component';
+import { TokenComponent } from './views/token/token.component';
 
 // Material Imports
 import { MatCardModule } from '@angular/material/card';
@@ -22,12 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { PoolsComponent } from './views/pools/pools.component';
-import { TokensComponent } from './views/tokens/tokens.component';
-import { MiningComponent } from './views/mining/mining.component';
-import { VaultComponent } from './views/vault/vault.component';
-import { PoolComponent } from './views/pool/pool.component';
-import { TokenComponent } from './views/token/token.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { TokenComponent } from './views/token/token.component';
     MatIconModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
     SharedPipesModule,
     CardsModule,
     SharedModule,

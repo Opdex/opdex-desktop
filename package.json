@@ -23,6 +23,7 @@
     "@microsoft/signalr": "^6.0.6",
     "bootstrap-4-grid": "^3.4.0",
     "dexie": "^3.2.2",
+    "ngx-timeago": "^2.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

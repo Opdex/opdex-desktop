@@ -1,4 +1,4 @@
-<main *ngIf="indexing !== undefined">
+<main>
   <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}">
     <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
       <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>

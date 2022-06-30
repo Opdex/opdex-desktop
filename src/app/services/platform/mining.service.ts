@@ -11,7 +11,7 @@ import { ParameterType } from '@enums/parameter-type';
 export class MiningService {
   constructor(private _cirrus: CirrusApiService) { }
 
-  getHydratedMiningGovernance() {
+  getHydratedMiningGovernance(): Observable<any> {
     const { miningGovernance } = Contracts.mainnet;
 
     const properties = [
@@ -25,7 +25,7 @@ export class MiningService {
     return combineLatest(properties)
       .pipe(
         map(([minedToken, nominationPeriodEnd, miningPoolsFunded, miningPoolReward, miningDuration]) => {
-          return { minedToken, nominationPeriodEnd, miningPoolsFunded, miningPoolReward, miningDuration };
+          return { minedToken, nominationPeriodEnd, miningPoolsFunded, miningPoolReward, miningDuration, address: miningGovernance };
         }));
   }
 

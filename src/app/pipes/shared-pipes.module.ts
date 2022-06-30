@@ -4,6 +4,7 @@ import { FormatNumberPipe } from './format-number.pipe';
 import { ShortNumberPipe } from './short-number.pipe';
 import { ShortAddressPipe } from './short-address.pipe';
 import { CoinNotationPipe } from './coin-notation.pipe';
+import { TimeagoModule } from 'ngx-timeago';
 
 @NgModule({
   declarations: [
@@ -12,11 +13,15 @@ import { CoinNotationPipe } from './coin-notation.pipe';
     ShortNumberPipe,
     FormatNumberPipe
   ],
+  imports: [
+    TimeagoModule.forRoot()
+  ],
   exports: [
     CoinNotationPipe,
     ShortAddressPipe,
     ShortNumberPipe,
-    FormatNumberPipe
+    FormatNumberPipe,
+    TimeagoModule
   ]
 })
 export class SharedPipesModule { }
