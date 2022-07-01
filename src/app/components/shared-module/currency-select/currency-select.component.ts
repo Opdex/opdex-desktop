@@ -17,6 +17,7 @@ export class CurrencySelectComponent implements OnInit {
 
   public select(currency: any) {
     console.log(currency)
+    this.currency = this.currencies.find(item => item.abbreviation === currency.abbreviation);
     this._currencyService.setSelectedCurrency(Currencies[currency.abbreviation.toUpperCase()])
   }
 }

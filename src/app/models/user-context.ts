@@ -1,3 +1,5 @@
+import { Currencies } from '@enums/currencies';
+
 export class UserContext {
   private _wallet: string;
   private _preferences: UserContextPreferences;
@@ -20,4 +22,5 @@ export class UserContextPreferences {
   theme: string;
   deadlineThreshold: number;
   toleranceThreshold: number;
+  currency: Currencies;
 }

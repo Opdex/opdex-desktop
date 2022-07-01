@@ -1,16 +1,19 @@
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
-import { Contracts } from "@lookups/contracts.lookup";
 import { VaultStateKeys } from "@lookups/state-keys/vault-state-keys";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
+import { EnvironmentsService } from "@services/utility/environments.service";
 import { combineLatest, map } from "rxjs";
 
 @Injectable({providedIn: 'root'})
 export class VaultService {
-  constructor(private _cirrus: CirrusApiService) { }
+  constructor(
+    private _cirrus: CirrusApiService,
+    private _env: EnvironmentsService
+  ) { }
 
   getHydratedVault() {
-    const vault = Contracts.mainnet.vault;
+    const vault = this._env.contracts.vault;
 
     const properties = [
       this._cirrus.getContractStorageItem(vault, VaultStateKeys.token, ParameterType.Address),

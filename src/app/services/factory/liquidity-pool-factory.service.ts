@@ -1,3 +1,4 @@
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { TokenRepositoryService } from '@services/database/token-repository.service';
@@ -6,7 +7,6 @@ import { PoolRepositoryService } from '@services/database/pool-repository.servic
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { Contracts } from '@lookups/contracts.lookup';
 
 @Injectable({providedIn: 'root'})
 export class LiquidityPoolFactoryService {
@@ -14,7 +14,8 @@ export class LiquidityPoolFactoryService {
     private _liquidityPoolService: LiquidityPoolService,
     private _poolRepository: PoolRepositoryService,
     private _tokenService: TokenService,
-    private _tokenRepository: TokenRepositoryService
+    private _tokenRepository: TokenRepositoryService,
+    private _env: EnvironmentsService
   ) { }
 
   public async buildLiquidityPool(address: string): Promise<LiquidityPool> {
@@ -35,7 +36,7 @@ export class LiquidityPoolFactoryService {
   private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
     const hydrated = await lastValueFrom(this._liquidityPoolService.getHydratedPool(entity.address, entity.miningPool));
     const srcTokenEntity = await this._tokenRepository.getTokenByAddress(entity.srcToken);
-    const stakingTokenEntity = await this._tokenRepository.getTokenByAddress(Contracts.mainnet.odx);
+    const stakingTokenEntity = await this._tokenRepository.getTokenByAddress(this._env.contracts.odx);
 
     return new LiquidityPool(entity, hydrated, srcTokenEntity, stakingTokenEntity);
   }

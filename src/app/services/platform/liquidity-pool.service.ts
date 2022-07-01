@@ -1,5 +1,4 @@
 import { MiningPoolStateKeys } from '@lookups/state-keys/mining-pool-state-keys';
-import { Contracts } from '@lookups/contracts.lookup';
 import { ParameterType } from '@enums/parameter-type';
 import { map } from 'rxjs/operators';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
@@ -9,6 +8,7 @@ import { LocalCallPayload } from '@models/contract-calls/local-call';
 import { Parameter } from '@models/contract-calls/parameter';
 import { catchError } from 'rxjs';
 import { LiquidityPoolStateKeys } from '@lookups/state-keys/liquidity-pool-state-keys';
+import { EnvironmentsService } from '@services/utility/environments.service';
 
 export interface IBaseLiquidityPoolDetailsDto {
   address: string;
@@ -28,7 +28,10 @@ export interface IHydratedLiquidityPoolDetailsDto {
 
 @Injectable({providedIn: 'root'})
 export class LiquidityPoolService {
-  constructor(private _cirrus: CirrusApiService) { }
+  constructor(
+    private _cirrus: CirrusApiService,
+    private _env: EnvironmentsService
+  ) { }
 
   getStaticPool(address: string): Observable<IBaseLiquidityPoolDetailsDto> {
     const properties = [
@@ -36,7 +39,7 @@ export class LiquidityPoolService {
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.transactionFee, ParameterType.UInt),
     ];
 
-    const miningPoolRequest = new LocalCallPayload(Contracts.mainnet.miningGovernance, "GetMiningPool", address, [new Parameter(ParameterType.Address, address)]);
+    const miningPoolRequest = new LocalCallPayload(this._env.contracts.miningGovernance, "GetMiningPool", address, [new Parameter(ParameterType.Address, address)]);
     const miningPool$ = this._cirrus.localCall(miningPoolRequest);
     let pool: IBaseLiquidityPoolDetailsDto;
 
