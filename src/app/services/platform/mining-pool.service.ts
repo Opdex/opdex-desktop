@@ -1,4 +1,4 @@
-import { MiningPoolStateKeys } from '@lookups/state-keys/mining-pool-state-keys';
+import { MiningPoolStateKeys } from '@enums/contracts/state-keys/mining-pool-state-keys';
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
@@ -18,10 +18,10 @@ export class MiningPoolService {
 
   getHydratedMiningPool(miningPool: string): Observable<IMiningPoolDetailsDto> {
     const properties = [
-      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.stakingToken, ParameterType.Address),
-      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.miningPeriodEndBlock, ParameterType.ULong),
-      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.rewardRate, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.totalSupply, ParameterType.UInt256)
+      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.StakingToken, ParameterType.Address),
+      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong),
+      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.RewardRate, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.TotalSupply, ParameterType.UInt256)
     ];
 
     return combineLatest(properties)

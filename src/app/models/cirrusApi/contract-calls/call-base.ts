@@ -15,7 +15,7 @@ export abstract class CallBase {
     sender: string,
     parameters: Parameter[] = [],
     amount: string = '0',
-    gasLimit: number = 100000,
+    gasLimit: number = 250000,
     gasPrice: number = 100
   ) {
     this.contractAddress = contractAddress;

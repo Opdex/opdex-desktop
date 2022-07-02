@@ -14,11 +14,9 @@ export class CallPayload extends CallBase {
     sender: string,
     parameters: Parameter[] = [],
     amount: string = '0',
-    feeAmount: string = '.001',
-    gasLimit: number = 100000,
-    gasPrice: number = 100,
+    feeAmount: string = '.001'
   ) {
-    super(contractAddress, methodName, sender, parameters, amount, gasLimit, gasPrice);
+    super(contractAddress, methodName, sender, parameters, amount);
     this.walletName = walletName;
     this.password = password;
     this.feeAmount = feeAmount;

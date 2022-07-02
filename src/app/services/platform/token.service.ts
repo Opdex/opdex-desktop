@@ -1,3 +1,4 @@
+import { OdxStateKeys, StandardTokenStateKeys, InterfluxTokenStateKeys } from '@enums/contracts/state-keys/token-state-keys';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { combineLatest, map, catchError, of, Observable } from 'rxjs';
 import { Injectable } from "@angular/core";
@@ -25,10 +26,10 @@ export class TokenService {
     const isODX = address === this._env.contracts.odx;
 
     const keys = {
-      name: isODX ? 'TB' : 'Name',
-      symbol: isODX ? 'TA' : 'Symbol',
-      decimals: isODX ? 'TC' : 'Decimals',
-      totalSupply: isODX ? 'TD' : 'TotalSupply'
+      name: isODX ? OdxStateKeys.Name : StandardTokenStateKeys.Name,
+      symbol: isODX ? OdxStateKeys.Symbol : StandardTokenStateKeys.Symbol,
+      decimals: isODX ? OdxStateKeys.Decimals : StandardTokenStateKeys.Decimals,
+      totalSupply: isODX ? OdxStateKeys.TotalSupply : StandardTokenStateKeys.TotalSupply
     };
 
     const properties = [
@@ -36,8 +37,8 @@ export class TokenService {
       this._cirrus.getContractStorageItem(address, keys.symbol, ParameterType.String),
       this._cirrus.getContractStorageItem(address, keys.decimals, ParameterType.Byte),
       this._cirrus.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(address, 'NativeChain', ParameterType.String).pipe(catchError(_ => of(''))),
-      this._cirrus.getContractStorageItem(address, 'NativeAddress', ParameterType.String).pipe(catchError(_ => of(''))),
+      this._cirrus.getContractStorageItem(address, InterfluxTokenStateKeys.NativeChain, ParameterType.String).pipe(catchError(_ => of(''))),
+      this._cirrus.getContractStorageItem(address, InterfluxTokenStateKeys.NativeAddress, ParameterType.String).pipe(catchError(_ => of(''))),
     ];
 
     return combineLatest(properties)

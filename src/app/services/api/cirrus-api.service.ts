@@ -5,8 +5,8 @@ import { map, Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
-import { CallPayload } from '@models/contract-calls/call';
-import { LocalCallPayload } from '@models/contract-calls/local-call';
+import { CallPayload } from '@models/cirrusApi/contract-calls/call';
+import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { ParameterType } from '@enums/parameter-type';
 

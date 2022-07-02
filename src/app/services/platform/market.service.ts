@@ -1,3 +1,4 @@
+import { LogTypes } from '@enums/contracts/log-types';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { Injectable } from "@angular/core";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
@@ -12,7 +13,7 @@ export class MarketService {
   ) { }
 
   getMarketPools(fromBlock: number = 3500000): Observable<any> {
-    const createPoolLog = 'CreateLiquidityPoolLog';
+    const createPoolLog = LogTypes.CreateLiquidityPoolLog;
     const request = new ReceiptSearchRequest(this._env.contracts.market, createPoolLog, fromBlock);
 
     return this._cirrus.searchContractReceipts(request)

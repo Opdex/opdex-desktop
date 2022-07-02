@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
-import { VaultStateKeys } from "@lookups/state-keys/vault-state-keys";
+import { VaultStateKeys } from "@enums/contracts/state-keys/vault-state-keys";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 import { EnvironmentsService } from "@services/utility/environments.service";
 import { combineLatest, map } from "rxjs";
@@ -16,12 +16,12 @@ export class VaultService {
     const vault = this._env.contracts.vault;
 
     const properties = [
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.token, ParameterType.Address),
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.totalSupply, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.vestingDuration, ParameterType.ULong),
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.totalProposedAmount, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.totalPledgeMinimum, ParameterType.ULong),
-      this._cirrus.getContractStorageItem(vault, VaultStateKeys.totalVoteMinimum, ParameterType.ULong),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.Token, ParameterType.Address),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.TotalSupply, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.VestingDuration, ParameterType.ULong),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.TotalProposedAmount, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.TotalPledgeMinimum, ParameterType.ULong),
+      this._cirrus.getContractStorageItem(vault, VaultStateKeys.TotalVoteMinimum, ParameterType.ULong),
     ];
 
     return combineLatest(properties)
