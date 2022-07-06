@@ -10,10 +10,10 @@ Development and production versions require a locally running Cirrus Full Node f
 
 ```sh
 ## Clone 
-git clone 
+git clone https://github.com/Opdex/opdex-desktop.git
 
 ## Navigate to project
-cd ../
+cd ./path/to/opdex-desktop
 
 ## Install dependencies
 npm i
@@ -56,35 +56,9 @@ npm run pack
 Publish for Linux, Windows, and Mac with a single command.
 
 ```sh
-$ GH_TOKEN <token> npm run publish
+$GH_TOKEN <token> npm run publish
 ```
 
-## Cirrus Blockchain Full Node
+## Requirements
 
-This project requires running a local Full Node of the Cirrus Blockchain to connect too.
-
-Options of compatible full nodes:
-
-- [Cirrus Core](https://github.com/stratisproject/CirrusCore/releases)
-- [Stratis Full Node](https://github.com/stratisproject/StratisFullNode)
-
-### Cirrus Core
-
-Using Cirrus Core it is important to keep up to date with latest versions to ensure the underlying Full Node is up to date. Just install and run in the background.
-
-### Stratis Full Node
-
-To run via a Stratis Full Node, install requirements specified for the project and run the latest release branch.
-
-```sh
-## Clone Stratis Full Node
-git clone https://github.com/stratisproject/StratisFullNode.git
-
-## Navigate to Cirrus Full Node and switch branch
-cd ../path/to/StratisFullNode/src/Stratis.CirrusD
-
-## Run 
-## optional --testnet arg
-## required for Mac --dbtype=rocksdb arg
-dotnet run
-```
+This project requires running a local Full Node of the Cirrus Blockchain using either [Cirrus Core](https://github.com/stratisproject/CirrusCore/releases) or [Stratis Full Node](https://github.com/stratisproject/StratisFullNode).
