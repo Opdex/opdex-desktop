@@ -1,7 +1,7 @@
 import { INodeStatus } from '@interfaces/full-node.interface';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, filter, Observable, tap } from 'rxjs';
+import { BehaviorSubject, filter, Observable, tap, of, catchError } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class NodeService {
@@ -31,6 +31,7 @@ export class NodeService {
   refreshStatus$(): Observable<INodeStatus> {
     return this._cirrus.getNodeStatus()
       .pipe(
+        catchError(_ => of(undefined)),
         tap((status: INodeStatus) => {
           this._status = status;
           this._status$.next(status);

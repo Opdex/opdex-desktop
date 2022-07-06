@@ -47,24 +47,27 @@ export class AppComponent implements OnInit {
       )
       .subscribe(prices => this.prices = prices)
 
-    timer(0, 30000)
+    timer(0, 10000)
       .pipe(
         switchMap(_ => this._nodeService.refreshStatus$())
       )
       .subscribe(status => {
         this.nodeStatus = status;
-        if (status.inIbd) {
-          // Todo: node is syncing, wait
+
+        // Node is not finished starting
+        if (status?.state !== 'Started') {
           return;
         }
 
-        // Todo: Watch each new block on timer or signalR
-        // Todo: Index primary data periodically
-        // --- OnInit - if indexing, show loader
+        // Todo: node is syncing, wait
+        if (status?.inIbd) {
+          return;
+        }
       });
 
     this._nodeService.latestBlock$
-      .subscribe(async status => {
+      .subscribe(async block => {
+        // Todo: If initial index - show loader (it can take a while)
         await this._indexerService.index();
       });
   }

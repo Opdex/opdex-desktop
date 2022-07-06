@@ -1,5 +1,5 @@
 <main>
-  <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}">
+  <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}" *ngIf="nodeStatus && nodeStatus.state === 'Started'; else disconnected">
     <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
       <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>
     </aside>
@@ -27,5 +27,19 @@
       </div>
     </div>
   </div>
+
+  <ng-template #disconnected>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
+          <opdex-card>
+            <h2 class="mb-2">Connecting to Cirrus</h2>
+            <p>Waiting for a connection to Cirrus blockchain.</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </opdex-card>
+        </div>
+      </div>
+    </div>
+  </ng-template>
 </main>
 
