@@ -4,33 +4,25 @@
   "directories": {
     "output": "dist/"
   },
-    "files": [
-        "**/*",
-        "!**/*.ts",
-        "!*.code-workspace",
-        "!LICENSE.md",
-        "!package.json",
-        "!package-lock.json",
-        "!src/",
-        "!e2e/",
-        "!hooks/",
-        "!angular.json",
-        "!_config.yml",
-        "!karma.conf.js",
-        "!tsconfig.json",
-        "!tslint.json"
-    ],
+  "files": [
+    "dist/out-tsc/**/*",
+    "dist/opdex-desktop/**/*",
+    "package.json"
+  ],
   "win": {
+    "icon": "dist/opdex-desktop/assets/electron/win/icon",
     "target": [
       "nsis"
     ]
   },
   "mac": {
+    "icon": "dist/opdex-desktop/assets/electron/mac/icon",
     "target": [
       "dmg"
     ]
   },
   "linux": {
+    "icon": "dist/opdex-desktop/assets/electron/png",
     "target": [
       "deb",
       "tar.gz"

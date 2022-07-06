@@ -51,6 +51,14 @@ Package electron apps for Linux, Windows, and Mac with a single command.
 npm run pack
 ```
 
+### Publish
+
+Publish for Linux, Windows, and Mac with a single command.
+
+```sh
+$ GH_TOKEN <token> npm run publish
+```
+
 ## Cirrus Blockchain Full Node
 
 This project requires running a local Full Node of the Cirrus Blockchain to connect too.

@@ -4,13 +4,13 @@ import * as url from 'url'
 
 let win: BrowserWindow;
 
+// Command line arguments
 const args = process.argv.slice(1);
-console.log(args)
 const serve = args.some(val => val === '--serve');
 const isTestnet = args.some(val => val === `--testnet`);
 
 const SERVE_URL = url.format({
-  pathname: path.join(__dirname, '/../../dist/opdex-desktop/index.html'),
+  pathname: path.join(__dirname, '../../dist/opdex-desktop/index.html'),
   protocol: 'file:',
   slashes: true
 });
@@ -19,6 +19,10 @@ const SERVE_URL = url.format({
 require('electron-context-menu')({
   showInspectElement: serve
 });
+
+////////////////////////////////////
+//  APP State                     //
+////////////////////////////////////
 
 app.whenReady().then(() => {
   createWindow();
@@ -37,11 +41,25 @@ app.on('window-all-closed', () => {
   }
 });
 
+app.on('activate', () => {
+  // On Mac it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (!window) createWindow();
+});
+
+////////////////////////////////////
+//  IPC Calls                     //
+////////////////////////////////////
+
 ipcMain.on('getNetwork', event => {
   // Network args provided must match the Network enum key in @enums
   const network = isTestnet ? 'Testnet' : 'Mainnet';
   event.sender.send('getNetworkResponse', network);
 });
+
+////////////////////////////////////
+//  Private helper methods        //
+////////////////////////////////////
 
 const createWindow = () => {
   win = new BrowserWindow({
@@ -59,7 +77,7 @@ const createWindow = () => {
 
     // hot reloads
     require('electron-reload')(__dirname, {
-      electron: require(path.join(__dirname, '/../../node_modules/electron'))
+      electron: require(path.join(__dirname, '../../node_modules/electron'))
     });
 
     // Look to localhost

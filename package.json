@@ -2,7 +2,7 @@
   "name": "opdex-desktop",
   "version": "0.9.0",
   "description": "Opdex platform for desktop utilizing Stratis blockchain for backend data and DeFi functionality.",
-  "main": "electron/dist/main.js",
+  "main": "dist/out-tsc/main.js",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/opdex/opdex-desktop/issues"
@@ -12,20 +12,24 @@
     "type": "git",
     "url": "https://github.com/opdex/opdex-desktop.git"
   },
+  "author": {
+    "name": "Tyler Pena",
+    "email": "tylerpena@me.com"
+  },
   "scripts": {
-    "postinstall": "electron-builder -c electron/electron-builder.json install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
-    "pack": "npm run build:electron && electron-builder -c electron/electron-builder.json -mwl",
-    "publish": "npm run build:electron && electron-builder -c electron/electron-builder.json -mwl --publish always",
-    "watch": "ng build --watch --configuration development",
     "start:electron": "npm-run-all -p start serve:electron",
     "start:electron:testnet": "npm-run-all -p start serve:electron:testnet",
+    "build": "ng build",
+    "test": "ng test",
+    "pack": "npm run build:electron && electron-builder -mwl",
+    "publish": "npm run build:electron && electron-builder -mwl --publish always",
+    "watch": "ng build --watch --configuration development",
     "serve:electron": "wait-on http-get://localhost:4200/ && npm run build:electron && electron . --serve",
     "serve:electron:testnet": "wait-on http-get://localhost:4200/ && npm run build:electron && electron . --serve --testnet",
-    "build:electron": "ng build --base-href ./ && tsc --p electron"
+    "build:electron": "ng build --base-href ./ && tsc"
   },
   "private": true,
   "dependencies": {
@@ -42,6 +46,7 @@
     "@microsoft/signalr": "^6.0.6",
     "bootstrap-4-grid": "^3.4.0",
     "dexie": "^3.2.2",
+    "electron-context-menu": "^3.3.0",
     "ngx-timeago": "^2.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
@@ -54,7 +59,6 @@
     "@types/jasmine": "~4.0.0",
     "electron": "^19.0.7",
     "electron-builder": "^23.1.0",
-    "electron-context-menu": "^3.3.0",
     "electron-reload": "^2.0.0-alpha.1",
     "jasmine-core": "~4.1.0",
     "karma": "~6.3.0",
