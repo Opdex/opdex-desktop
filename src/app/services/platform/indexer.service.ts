@@ -8,6 +8,7 @@ import { MiningGovernanceService } from "./mining-governance.service";
 import { NodeService } from "./node.service";
 import { LiquidityPoolService } from "./liquidity-pool.service";
 import { TokenService } from "./token.service";
+import { toChecksumAddress } from "ethereum-checksum-address";
 
 @Injectable({providedIn: 'root'})
 export class IndexerService {
@@ -66,13 +67,16 @@ export class IndexerService {
 
         console.log(token.nativeChain, token.nativeAddress);
 
+        // Todo: try/catch checksummed native chain address, validate against supported FN tokens
+        // Todo: -- Add functionality to re-validate interflux tokens
+        // ----------- Edge case when opdex-desktop syncs new pools/tokens but the user hasn't updated their FN yet.
         return {
           address: token.address,
           name: token.name,
           symbol: token.symbol,
           decimals: decimals,
           nativeChain: token.nativeChain || 'Cirrus',
-          nativeChainAddress: token.nativeChainAddress
+          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress('0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1') : undefined
         }
       }));
     }

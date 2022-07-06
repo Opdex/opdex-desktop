@@ -51,3 +51,8 @@ import 'zone.js';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// Required for ethereum-checksum-address to define window polyfill
+(window as any).global = window;
+// Buffer NPM package required w/ polyfill for ethereum-checksum-address package
+(window as any).global.Buffer = (window as any).global.Buffer || require('buffer').Buffer;
