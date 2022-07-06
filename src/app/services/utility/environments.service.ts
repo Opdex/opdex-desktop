@@ -1,7 +1,9 @@
+import { ElectronService } from './electron-service';
 import { IEnvironment, IEnvironmentContracts } from '@interfaces/environment.interface';
 import { Injectable } from '@angular/core';
 import { Environments } from '@lookups/environments.lookup';
 import { Network } from 'src/app/enums/networks';
+import { environment } from '@environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class EnvironmentsService {
@@ -19,14 +21,26 @@ export class EnvironmentsService {
     return this._env.contracts;
   }
 
-  constructor() {
-    // Todo: Find network via runtime flags set in electron.
-    const env = this._find(Network.Mainnet);
+  constructor(private _electron: ElectronService) { }
 
-    this._env = {...env};
+  async setNetwork(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this._electron.isElectron) {
+        this._electron.send('getNetwork');
+
+        this._electron.on('getNetworkResponse', (_, response: string) => {
+          this._setEnv(Network[response]);
+          resolve();
+        });
+      } else {
+        // If not electron, serving via web locally so use environment variables
+        this._setEnv(environment.network);
+        resolve();
+      }
+    });
   }
 
-  private _find(network: Network) {
-    return {...Environments.find(e => e.network === network)};
+  private _setEnv(network: Network): void {
+    this._env = {...Environments.find(e => e.network === network)};
   }
 }

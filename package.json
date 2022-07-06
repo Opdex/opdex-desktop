@@ -1,12 +1,31 @@
 {
   "name": "opdex-desktop",
-  "version": "0.0.0",
+  "version": "0.9.0",
+  "description": "Opdex platform for desktop utilizing Stratis blockchain for backend data and DeFi functionality.",
+  "main": "electron/dist/main.js",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/opdex/opdex-desktop/issues"
+  },
+  "homepage": "https://github.com/opdex/opdex-desktop#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opdex/opdex-desktop.git"
+  },
   "scripts": {
+    "postinstall": "electron-builder -c electron/electron-builder.json install-app-deps",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "test": "ng test",
+    "pack": "npm run build:electron && electron-builder -c electron/electron-builder.json -mwl",
+    "publish": "npm run build:electron && electron-builder -c electron/electron-builder.json -mwl --publish always",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "start:electron": "npm-run-all -p start serve:electron",
+    "start:electron:testnet": "npm-run-all -p start serve:electron:testnet",
+    "serve:electron": "wait-on http-get://localhost:4200/ && npm run build:electron && electron . --serve",
+    "serve:electron:testnet": "wait-on http-get://localhost:4200/ && npm run build:electron && electron . --serve --testnet",
+    "build:electron": "ng build --base-href ./ && tsc --p electron"
   },
   "private": true,
   "dependencies": {
@@ -33,12 +52,18 @@
     "@angular/cli": "~14.0.2",
     "@angular/compiler-cli": "^14.0.0",
     "@types/jasmine": "~4.0.0",
+    "electron": "^19.0.7",
+    "electron-builder": "^23.1.0",
+    "electron-context-menu": "^3.3.0",
+    "electron-reload": "^2.0.0-alpha.1",
     "jasmine-core": "~4.1.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "~4.7.2"
+    "npm-run-all": "^4.1.5",
+    "typescript": "~4.7.2",
+    "wait-on": "^6.0.1"
   }
 }

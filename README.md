@@ -1,27 +1,82 @@
 # OpdexDesktop
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.2.
+Opdex platform UI built using Angular with Electron requiring access to a local Cirrus Blockchain Full Node. 
 
-## Development server
+## Development
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Development and production versions require a locally running Cirrus Full Node from Stratis.
 
-## Code scaffolding
+### Clone and Install Dependencies
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```sh
+## Clone 
+git clone 
 
-## Build
+## Navigate to project
+cd ../
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Install dependencies
+npm i
+```
 
-## Running unit tests
+### Run
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Commands to run locally via development environment. 
 
-## Running end-to-end tests
+```sh
+## Browser
+## using environment.ts to set Testnet/Mainnet network
+npm run start 
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Electron Mainnet
+npm run start:electron
 
-## Further help
+## Electron Testnet
+npm run start:electron:testnet
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Test
+
+Run project tests with the following command:
+
+```sh
+npm run test
+```
+
+### Pack
+
+Package electron apps for Linux, Windows, and Mac with a single command.
+
+```sh
+npm run pack
+```
+
+## Cirrus Blockchain Full Node
+
+This project requires running a local Full Node of the Cirrus Blockchain to connect too.
+
+Options of compatible full nodes:
+
+- [Cirrus Core](https://github.com/stratisproject/CirrusCore/releases)
+- [Stratis Full Node](https://github.com/stratisproject/StratisFullNode)
+
+### Cirrus Core
+
+Using Cirrus Core it is important to keep up to date with latest versions to ensure the underlying Full Node is up to date. Just install and run in the background.
+
+### Stratis Full Node
+
+To run via a Stratis Full Node, install requirements specified for the project and run the latest release branch.
+
+```sh
+## Clone Stratis Full Node
+git clone https://github.com/stratisproject/StratisFullNode.git
+
+## Navigate to Cirrus Full Node and switch branch
+cd ../path/to/StratisFullNode/src/Stratis.CirrusD
+
+## Run 
+## optional --testnet arg
+## required for Mac --dbtype=rocksdb arg
+dotnet run
+```

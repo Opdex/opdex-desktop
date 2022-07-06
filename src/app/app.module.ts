@@ -1,8 +1,9 @@
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { NavigationModule } from './components/navigation-module/navigation.module';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { CardsModule } from './components/cards-module/cards.module';
 import { SharedPipesModule } from './pipes/shared-pipes.module';
-import { ErrorHandler, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +13,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { ErrorMiddlewareService } from '@services/middleware/error-middleware.service';
+import { initEnvironment } from '@services/init-environment.service';
 import { LoginComponent } from './views/login/login.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { PoolsComponent } from './views/pools/pools.component';
@@ -61,6 +63,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     NavigationModule
   ],
   providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initEnvironment,
+      deps: [ EnvironmentsService ],
+      multi: true
+    },
     { provide: ErrorHandler, useClass: ErrorMiddlewareService },
   ],
   bootstrap: [AppComponent]

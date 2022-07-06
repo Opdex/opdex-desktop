@@ -1,0 +1,53 @@
+{
+  "appId": "com.opdex.app",
+  "productName": "Opdex Desktop",
+  "directories": {
+    "output": "dist/"
+  },
+    "files": [
+        "**/*",
+        "!**/*.ts",
+        "!*.code-workspace",
+        "!LICENSE.md",
+        "!package.json",
+        "!package-lock.json",
+        "!src/",
+        "!e2e/",
+        "!hooks/",
+        "!angular.json",
+        "!_config.yml",
+        "!karma.conf.js",
+        "!tsconfig.json",
+        "!tslint.json"
+    ],
+  "win": {
+    "target": [
+      "nsis"
+    ]
+  },
+  "mac": {
+    "target": [
+      "dmg"
+    ]
+  },
+  "linux": {
+    "target": [
+      "deb",
+      "tar.gz"
+    ],
+    "synopsis": "Opdex Desktop"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": true,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": true,
+    "guid": "",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "msi": {
+    "warningsAsErrors": false
+  },
+  "extraResources": [ ]
+}

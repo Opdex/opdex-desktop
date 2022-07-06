@@ -1,10 +1,10 @@
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { Router } from '@angular/router';
 import { Injectable } from "@angular/core";
 import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
 import { map, Observable } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@environments/environment';
 import { CallPayload } from '@models/cirrusApi/contract-calls/call';
 import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
@@ -12,11 +12,12 @@ import { ParameterType } from '@enums/parameter-type';
 
 @Injectable({providedIn: 'root'})
 export class CirrusApiService extends RestApiService {
-  api: string = `${environment.cirrusApi}:${environment.cirrusPort}/api`;
+  api: string = `${this._env.cirrusApi}/api`;
 
   constructor(
     protected _http: HttpClient,
-    protected _router: Router
+    protected _router: Router,
+    private _env: EnvironmentsService
   ) {
     super(_http, _router);
   }

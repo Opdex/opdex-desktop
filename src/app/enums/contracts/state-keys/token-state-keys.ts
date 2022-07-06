@@ -7,7 +7,7 @@ export enum StandardTokenStateKeys {
 
 export enum OdxStateKeys {
   Symbol = 'TA',
-  Name = '',
+  Name = 'TB',
   Decimals = 'TC',
   TotalSupply = 'TD',
   Creator = 'TE',
