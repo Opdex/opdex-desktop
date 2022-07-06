@@ -1,7 +1,7 @@
 <opdex-card>
   <ng-container *ngIf="pool; else loading">
     <div class="flex-row-center mb-2" *ngIf="showPoolName">
-      <!-- <opdex-token-icons [tokens]="[pool?.tokens?.crs, pool?.tokens?.src]"></opdex-token-icons> -->
+      <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
       <a class="ml-2 b-400 no-decoration" routerLink="/pools/{{pool?.address}}">{{pool?.name}}</a>
     </div>
 

@@ -17,8 +17,8 @@ import { MatMenuModule } from '@angular/material/menu';
 
 // Opdex Component Imports
 import { CopyAddressComponent } from './copy-address/copy-address.component';
-// import { TokenIconComponent } from './token-icon/token-icon.component';
-// import { TokenIconsComponent } from './token-icons/token-icons.component';
+import { TokenIconComponent } from './token-icon/token-icon.component';
+import { TokenIconsComponent } from './token-icons/token-icons.component';
 import { NumberComponent } from './number/number.component';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 import { CurrencySelectComponent } from './currency-select/currency-select.component';
@@ -29,8 +29,8 @@ import { CurrencySelectComponent } from './currency-select/currency-select.compo
 @NgModule({
   declarations: [
     CopyAddressComponent,
-    // TokenIconComponent,
-    // TokenIconsComponent,
+    TokenIconComponent,
+    TokenIconsComponent,
     NumberComponent,
     ThemeToggleComponent,
     CurrencySelectComponent
@@ -50,8 +50,8 @@ import { CurrencySelectComponent } from './currency-select/currency-select.compo
     MatIconModule,
     MatButtonModule,
     CopyAddressComponent,
-    // TokenIconComponent,
-    // TokenIconsComponent,
+    TokenIconComponent,
+    TokenIconsComponent,
     NumberComponent,
     ThemeToggleComponent,
     CurrencySelectComponent

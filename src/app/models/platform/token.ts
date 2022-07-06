@@ -14,7 +14,28 @@ export class Token {
     this.name = entity.name;
     this.symbol = entity.symbol;
     this.decimals = entity.decimals;
-    this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'))
+    this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'));
+
+    if (entity.nativeChain !== 'Cirrus') {
+      this.wrappedToken = new WrappedToken({
+        chain: entity.nativeChain,
+        address: entity.nativeChainAddress,
+        // Todo: should validate the ethereum address via checksum (we do but don't mark success)
+        validated: true,
+        // Validate supported tokens via Cirrus FN API
+        trusted: true
+      });
+    }
+  }
+
+  static Crs(): Token {
+    return new Token({
+      name: 'Cirrus',
+      symbol: 'CRS',
+      address: 'CRS',
+      decimals: 8,
+      nativeChain: 'Cirrus'
+    })
   }
 }
 

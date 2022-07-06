@@ -2,7 +2,11 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="mb-0">{{pool?.name}}</h1>
+        <div class="flex-row-center">
+          <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
+          <h1 class="mb-0 ml-2">{{pool?.name}}</h1>
+        </div>
+
         <opdex-copy-address [address]="pool?.address"></opdex-copy-address>
       </div>
     </div>
