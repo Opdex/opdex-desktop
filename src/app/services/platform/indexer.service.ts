@@ -1,5 +1,5 @@
+import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
-import { db } from "@services/database/db.service";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
 import { lastValueFrom } from "rxjs";
@@ -21,7 +21,8 @@ export class IndexerService {
     private _poolsRepository: PoolRepositoryService,
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
-    private _miningGovernanceService: MiningGovernanceService
+    private _miningGovernanceService: MiningGovernanceService,
+    private _db: OpdexDB
   ) { }
 
   public async index(): Promise<void> {
@@ -29,7 +30,7 @@ export class IndexerService {
 
     this.indexing = true;
 
-    const indexer = await db.indexer.get(1);
+    const indexer = await this._db.indexer.get(1);
     const nodeStatus = this._nodeService.status;
 
     const [pools, rewardedMiningPools, nominations] = await Promise.all([
@@ -91,7 +92,7 @@ export class IndexerService {
 
     // Todo: Refresh vault proposals
 
-    db.indexer.put({
+    await this._db.indexer.put({
       lastUpdateBlock: nodeStatus.blockStoreHeight,
       id: 1
     });

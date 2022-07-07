@@ -1,21 +1,20 @@
 // import { EnvironmentsService } from './environments.service';
 import { Injectable } from '@angular/core';
 import { Network } from 'src/app/enums/networks';
+import { EnvironmentsService } from './environments.service';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
   keyPrefix: string;
 
   constructor(
-    // private _env: EnvironmentsService
+    private _env: EnvironmentsService
   ) {
-    // const network = this._env.network === Network.Devnet
-    //   ? 'dev'
-    //   : this._env.network === Network.Testnet
-    //     ? 'test'
-    //     : 'main';
-
-    const network = 'main';
+    const network = this._env.network === Network.Devnet
+      ? 'dev'
+      : this._env.network === Network.Testnet
+        ? 'test'
+        : 'main';
 
     this.keyPrefix = `odx-${network}-`;
   }
