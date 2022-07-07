@@ -16,11 +16,13 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 // Module Components
 import { CardComponent } from './card/card.component';
 import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card/liquidity-pool-summary-card.component';
+import { LiquidityPoolTokenCardComponent } from './liquidity-pool-token-card/liquidity-pool-token-card.component';
 
 @NgModule({
   declarations: [
     CardComponent,
     LiquidityPoolSummaryCardComponent,
+    LiquidityPoolTokenCardComponent,
     StakingPoolCardComponent
   ],
   imports: [
@@ -38,6 +40,7 @@ import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card
   exports: [
     CardComponent,
     LiquidityPoolSummaryCardComponent,
+    LiquidityPoolTokenCardComponent,
     StakingPoolCardComponent
   ]
 })

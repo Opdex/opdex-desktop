@@ -8,7 +8,8 @@
   #tooltip="matTooltip"
   (click)="copyHandler($event)">
 
-  <span class="prefix" *ngIf="prefix">{{prefix}}</span>
+  <span class="prefix" *ngIf="prefix && !prefix.startsWith('&')">{{prefix}}</span>
+  <span class="prefix" *ngIf="prefix && prefix.startsWith('&')" [innerHtml]="prefix"></span>
 
   <ng-container *ngIf="!!short === true; else format">
     <span class="short">{{fixed | shortNumber}}</span>

@@ -39,7 +39,7 @@ export class Token {
   }
 }
 
-class WrappedToken {
+export class WrappedToken {
   private _custodian: string;
   private _chain: string;
   private _address: string;

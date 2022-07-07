@@ -1,3 +1,4 @@
+import { Icons } from '@enums/icons';
 import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +11,7 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
 })
 export class PoolComponent implements OnInit {
   pool: LiquidityPool;
+  icons = Icons;
 
   constructor(
     private _route: ActivatedRoute,

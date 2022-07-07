@@ -22,6 +22,7 @@ import { TokenIconsComponent } from './token-icons/token-icons.component';
 import { NumberComponent } from './number/number.component';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 import { CurrencySelectComponent } from './currency-select/currency-select.component';
+import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token-native-chain-badge.component';
 
 // Other Imports
 
@@ -33,7 +34,8 @@ import { CurrencySelectComponent } from './currency-select/currency-select.compo
     TokenIconsComponent,
     NumberComponent,
     ThemeToggleComponent,
-    CurrencySelectComponent
+    CurrencySelectComponent,
+    TokenNativeChainBadgeComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +56,8 @@ import { CurrencySelectComponent } from './currency-select/currency-select.compo
     TokenIconsComponent,
     NumberComponent,
     ThemeToggleComponent,
-    CurrencySelectComponent
+    CurrencySelectComponent,
+    TokenNativeChainBadgeComponent
   ]
 })
 export class SharedModule { }

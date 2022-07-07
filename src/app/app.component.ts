@@ -1,6 +1,5 @@
 import { IndexerService } from './services/platform/indexer.service';
 import { ThemeService } from './services/utility/theme.service';
-import { ICurrencyPricing } from './interfaces/coin-gecko.interface';
 import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
@@ -21,7 +20,6 @@ import { FadeAnimation } from '@animations/fade-animation';
 export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: string;
   nodeStatus: INodeStatus;
-  prices: ICurrencyPricing;
   theme: string;
   icons = Icons;
   menuOpen = false;
@@ -42,10 +40,8 @@ export class AppComponent implements OnInit {
     timer(0, 60000)
       .pipe(
         switchMap(_ => this._coinGecko.getLatestPrice()),
-        tap(pricing => this._currencyService.setPricing(pricing.stratis)),
-        switchMap(_ => this._currencyService.prices$)
-      )
-      .subscribe(prices => this.prices = prices)
+        tap(pricing => this._currencyService.setPricing(pricing.stratis)))
+      .subscribe()
 
     timer(0, 10000)
       .pipe(

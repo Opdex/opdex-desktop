@@ -14,10 +14,6 @@
         </div>
 
         <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
-          <div class="pricing">
-            CRS &#36;{{prices?.usd}}
-          </div>
-
           <router-outlet #outlet="outlet"></router-outlet>
         </div>
 
