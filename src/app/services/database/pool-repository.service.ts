@@ -10,8 +10,8 @@ export class PoolRepositoryService {
     return await this._db.liquidityPool.get({ address });
   }
 
-  async getPools(): Promise<ILiquidityPoolEntity[]> {
-    return await this._db.liquidityPool.toArray();
+  async getPools(skip: number = 0, take: number = 10): Promise<ILiquidityPoolEntity[]> {
+    return await this._db.liquidityPool.offset(skip).limit(take).toArray();
   }
 
   async persistPools(pools: ILiquidityPoolEntity[]) {

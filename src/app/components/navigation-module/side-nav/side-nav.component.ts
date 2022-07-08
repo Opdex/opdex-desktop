@@ -6,6 +6,7 @@ import { Icons } from '@enums/icons';
 import { MatDialog } from '@angular/material/dialog';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Router } from '@angular/router';
+import { BugReportModalComponent } from '@components/modals-module/bug-report-modal/bug-report-modal.component';
 
 @Component({
   selector: 'opdex-side-nav',
@@ -55,7 +56,7 @@ export class SideNavComponent implements OnDestroy {
   }
 
   openBugReport(): void {
-    // this.dialog.open(BugReportModalComponent, { width: '500px' });
+    this.dialog.open(BugReportModalComponent, { width: '500px' });
   }
 
   logout(): void {

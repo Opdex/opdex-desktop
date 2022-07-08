@@ -1,6 +1,7 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { NavigationModule } from './components/navigation-module/navigation.module';
 import { SharedModule } from '@components/shared-module/shared.module';
+import { ModalsModule } from '@components/modals-module/modals.module';
 import { CardsModule } from './components/cards-module/cards.module';
 import { SharedPipesModule } from './pipes/shared-pipes.module';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
@@ -60,7 +61,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     SharedPipesModule,
     CardsModule,
     SharedModule,
-    NavigationModule
+    NavigationModule,
+    ModalsModule
   ],
   providers: [
     {

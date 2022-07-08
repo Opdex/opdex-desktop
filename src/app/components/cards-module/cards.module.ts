@@ -1,3 +1,4 @@
+import { MarketTokenCardComponent } from './market-token-card/market-token-card.component';
 import { StakingPoolCardComponent } from './staking-pool-card/staking-pool-card.component';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { MatDividerModule } from '@angular/material/divider';
@@ -23,7 +24,8 @@ import { LiquidityPoolTokenCardComponent } from './liquidity-pool-token-card/liq
     CardComponent,
     LiquidityPoolSummaryCardComponent,
     LiquidityPoolTokenCardComponent,
-    StakingPoolCardComponent
+    StakingPoolCardComponent,
+    MarketTokenCardComponent,
   ],
   imports: [
     CommonModule,
@@ -41,7 +43,8 @@ import { LiquidityPoolTokenCardComponent } from './liquidity-pool-token-card/liq
     CardComponent,
     LiquidityPoolSummaryCardComponent,
     LiquidityPoolTokenCardComponent,
-    StakingPoolCardComponent
+    StakingPoolCardComponent,
+    MarketTokenCardComponent
   ]
 })
 export class CardsModule { }

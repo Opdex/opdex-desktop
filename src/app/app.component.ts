@@ -4,7 +4,7 @@ import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { timer, switchMap, tap } from 'rxjs';
+import { timer, switchMap, tap, filter } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { RouterOutlet } from '@angular/router';
 import { Icons } from '@enums/icons';
@@ -62,6 +62,7 @@ export class AppComponent implements OnInit {
       });
 
     this._nodeService.latestBlock$
+      .pipe(filter(_ => this.nodeStatus?.state === 'Started'))
       .subscribe(async block => {
         // Todo: If initial index - show loader (it can take a while)
         await this._indexerService.index();

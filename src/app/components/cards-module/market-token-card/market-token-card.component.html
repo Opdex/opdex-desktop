@@ -1,0 +1,39 @@
+<opdex-card>
+  <ng-container *ngIf="token; else loading">
+    <small class="light">{{token.name}}</small>
+    <div class="flex-row-center-between">
+      <div class="flex-row-center">
+        <opdex-token-icon [token]="token"></opdex-token-icon>
+
+        <a class="title no-decoration ml-2" href="javascript:void(0)" routerLink="/tokens/{{token.address}}">
+          <h2 class="mb-0">{{token.symbol}}</h2>
+        </a>
+      </div>
+
+      <div class="flex-row-center-end">
+        <!-- <opdex-change-indicator
+          [value]="token.summary.dailyPriceChangePercent"
+          *ngIf="!!token.summary.dailyPriceChangePercent">
+        </opdex-change-indicator>
+
+        <h3 class="mb-0 ml-2 b-300">
+          <opdex-number prefix="$" [value]="token.summary.priceUsd" [short]="true"></opdex-number>
+        </h3> -->
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="skeleton-bg w-50 mb-1"></div>
+
+    <div class="flex-row-center">
+      <div class="w-50">
+        <div class="skeleton-bg w-75"></div>
+      </div>
+
+      <div class="w-50 flex-column-end">
+        <div class="skeleton-bg w-75"></div>
+      </div>
+    </div>
+  </ng-template>
+</opdex-card>

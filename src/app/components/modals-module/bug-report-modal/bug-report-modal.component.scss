@@ -1,0 +1,31 @@
+@import '/src/scss/colors.scss';
+@import 'src/scss/bootstrap-grid';
+
+.mat-button {
+  width: 100%;
+
+  .social-icon {
+    max-width: 18px;
+    max-height: 18px;
+    margin: 0 5px 0;
+  }
+
+  &.discord {
+    background: $discord !important;
+    color: white;
+    margin-bottom: 15px;
+  }
+
+  &.github {
+    background: #000 !important;
+    color: white;
+  }
+}
+
+@media (min-width: map_get($grid-breakpoints, sm)) {
+  .mat-button {
+    &.discord {
+      margin-bottom: 0px;
+    }
+  }
+}
