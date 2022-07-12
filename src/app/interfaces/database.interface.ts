@@ -11,6 +11,7 @@ export interface ILiquidityPoolEntity {
   miningPool: string;
   transactionFee: number;
   isNominated: number;
+  miningPeriodEndBlock: number;
 }
 
 export interface ITokenEntity {

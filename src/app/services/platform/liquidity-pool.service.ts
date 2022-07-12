@@ -1,12 +1,9 @@
-import { MiningGovernanceMethods } from './../../enums/contracts/methods/mining-governance-methods';
 import { MiningPoolStateKeys } from '@enums/contracts/state-keys/mining-pool-state-keys';
 import { ParameterType } from '@enums/parameter-type';
 import { map } from 'rxjs/operators';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
-import { combineLatest, Observable, tap, switchMap, of } from 'rxjs';
-import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
-import { Parameter } from '@models/cirrusApi/contract-calls/parameter';
+import { combineLatest, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs';
 import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-pool-state-keys';
 import { EnvironmentsService } from '@services/utility/environments.service';
@@ -38,36 +35,27 @@ export class LiquidityPoolService {
     const properties = [
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.Token, ParameterType.Address),
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TransactionFee, ParameterType.UInt),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.MiningPool, ParameterType.Address),
     ];
-
-    const miningPoolRequest = new LocalCallPayload(this._env.contracts.miningGovernance, MiningGovernanceMethods.GetMiningPool, address, [new Parameter(ParameterType.Address, address)]);
-    const miningPool$ = this._cirrus.localCall(miningPoolRequest);
-    let pool: IBaseLiquidityPoolDetailsDto;
 
     return combineLatest(properties)
       .pipe(
-        map(([token, transactionFee]) => {
-          pool = {
+        map(([token, transactionFee, miningPool]) => {
+          return {
             address,
             token,
             transactionFee: parseFloat(transactionFee),
-            miningPool: null
+            miningPool
           };
-          return pool;
-        }),
-        switchMap((pool: any) => miningPool$
-          .pipe(tap(response => pool.miningPool = response.return),
-          catchError(_ => pool))
-        ),
-        map(_ => pool)
+        })
       );
   }
 
   getHydratedPool(address: string, miningPool: string): Observable<IHydratedLiquidityPoolDetailsDto> {
     const properties = [
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))),
+      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TotalStaked, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
       this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong).pipe(catchError(_ => of('0')))
     ];

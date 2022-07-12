@@ -1,3 +1,5 @@
+import { ILiquidityPoolEntity } from '@interfaces/database.interface';
+import { MiningPoolService } from './mining-pool.service';
 import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
@@ -22,6 +24,7 @@ export class IndexerService {
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
     private _miningGovernanceService: MiningGovernanceService,
+    private _miningPoolService: MiningPoolService,
     private _db: OpdexDB
   ) { }
 
@@ -59,7 +62,8 @@ export class IndexerService {
           srcToken: token.address,
           miningPool: pool.miningPool,
           transactionFee: pool.transactionFee,
-          isNominated: 0 // false by default
+          isNominated: 0,
+          miningPeriodEndBlock: 0 // false by default
         }
       }));
 
@@ -77,17 +81,26 @@ export class IndexerService {
           symbol: token.symbol,
           decimals: decimals,
           nativeChain: token.nativeChain || 'Cirrus',
-          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress('0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1') : undefined
+          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress(token.nativeChainAddress) : undefined
         }
       }));
     }
 
-    // Todo: Persist active mining pools
-    // -- Get mining period end block from each of mining pools
-    // -- Persist affected pools
-    console.log(rewardedMiningPools); // { stakingPool, miningPool, amount }
+    // Persist active mining pools
+    // console.log(rewardedMiningPools); // { stakingPool, miningPool, amount }
+    if (rewardedMiningPools.length) {
+      const miningPoolEndBlocks = await lastValueFrom(this._miningPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
+      const miningPoolEntities = await this._poolsRepository.getPoolsByMiningPoolAddress(miningPoolEndBlocks.map(pool => pool.miningPool));
 
-    // Todo: Persist nominations
+      await this._poolsRepository.persistPools(miningPoolEntities.map((entity: ILiquidityPoolEntity) => {
+        return {
+          ...entity,
+          miningPeriodEndBlock: miningPoolEndBlocks.find(pool => pool.miningPool === entity.miningPool).miningPeriodEndBlock
+        }
+      }));
+    }
+
+    // Persist nominations
     await this._poolsRepository.setNominations(nominations.map(({stakingPool}) => stakingPool));
 
     // Todo: Refresh vault proposals

@@ -4,7 +4,7 @@ import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { timer, switchMap, tap, filter } from 'rxjs';
+import { timer, switchMap, tap, filter, lastValueFrom } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { RouterOutlet } from '@angular/router';
 import { Icons } from '@enums/icons';
@@ -24,6 +24,7 @@ export class AppComponent implements OnInit {
   icons = Icons;
   menuOpen = false;
   isPinned = true;
+  hasIndexed = false;
 
   constructor(
     public overlayContainer: OverlayContainer,
@@ -34,7 +35,10 @@ export class AppComponent implements OnInit {
     private _indexerService: IndexerService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await lastValueFrom(this._nodeService.refreshStatus$());
+    this.nodeStatus = this._nodeService.status;
+
     this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
 
     timer(0, 60000)
@@ -43,29 +47,18 @@ export class AppComponent implements OnInit {
         tap(pricing => this._currencyService.setPricing(pricing.stratis)))
       .subscribe()
 
-    timer(0, 10000)
+    // intentionally offset 10 seconds
+    timer(10000, 10000)
       .pipe(
-        switchMap(_ => this._nodeService.refreshStatus$())
-      )
-      .subscribe(status => {
-        this.nodeStatus = status;
-
-        // Node is not finished starting
-        if (status?.state !== 'Started') {
-          return;
-        }
-
-        // Todo: node is syncing, wait
-        if (status?.inIbd) {
-          return;
-        }
-      });
+        switchMap(_ => this._nodeService.refreshStatus$()),
+        tap(status => this.nodeStatus = status))
+      .subscribe();
 
     this._nodeService.latestBlock$
-      .pipe(filter(_ => this.nodeStatus?.state === 'Started'))
+      .pipe(filter(_ => !!this.nodeStatus && this.nodeStatus.state === 'Started' && !this.nodeStatus.inIbd && !this._indexerService.indexing))
       .subscribe(async block => {
-        // Todo: If initial index - show loader (it can take a while)
         await this._indexerService.index();
+        this.hasIndexed = true;
       });
   }
 

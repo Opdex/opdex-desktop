@@ -1,27 +1,29 @@
 <main>
   <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}" *ngIf="nodeStatus && nodeStatus.state === 'Started'; else disconnected">
-    <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
-      <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>
-    </aside>
+    <ng-container *ngIf="hasIndexed; else indexing">
+      <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
+        <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>
+      </aside>
 
-    <div class="animation-container">
-      <div id="page-content">
-        <div class="mobile-nav" [ngClass]="{'open': menuOpen}">
-          <opdex-side-nav (onRouteChanged)="handleRouteChanged($event)" [mobileMenuOpen]="menuOpen"></opdex-side-nav>
-          <button mat-icon-button class="small close-button" (click)="handleToggleMenu()" *ngIf="menuOpen">
-            <mat-icon>{{icons.close}}</mat-icon>
-          </button>
-        </div>
+      <div class="animation-container">
+        <div id="page-content">
+          <div class="mobile-nav" [ngClass]="{'open': menuOpen}">
+            <opdex-side-nav (onRouteChanged)="handleRouteChanged($event)" [mobileMenuOpen]="menuOpen"></opdex-side-nav>
+            <button mat-icon-button class="small close-button" (click)="handleToggleMenu()" *ngIf="menuOpen">
+              <mat-icon>{{icons.close}}</mat-icon>
+            </button>
+          </div>
 
-        <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
-          <router-outlet #outlet="outlet"></router-outlet>
-        </div>
+          <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
+            <router-outlet #outlet="outlet"></router-outlet>
+          </div>
 
-        <div class="mobile-navbar">
-          <opdex-mobile-nav (onToggleMenu)="handleToggleMenu()"></opdex-mobile-nav>
+          <div class="mobile-navbar">
+            <opdex-mobile-nav (onToggleMenu)="handleToggleMenu()"></opdex-mobile-nav>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-container>
   </div>
 
   <ng-template #disconnected>
@@ -31,6 +33,20 @@
           <opdex-card>
             <h2 class="mb-2">Connecting to Cirrus</h2>
             <p>Waiting for a connection to Cirrus blockchain.</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </opdex-card>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #indexing>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
+          <opdex-card>
+            <h2 class="mb-2">Indexing Data</h2>
+            <p>Waiting for Opdex data to be indexed. This may take a few minutes...</p>
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </opdex-card>
         </div>

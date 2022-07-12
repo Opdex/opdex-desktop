@@ -135,7 +135,7 @@
     <!-- End Volume -->
 
     <!-- Mining -->
-    <!-- <ng-container *ngIf="pool?.miningPool">
+    <ng-container *ngIf="pool?.miningPool">
       <mat-divider class="mb-2 mt-2" style="position:relative;"></mat-divider>
 
       <div class="flex-row-center-between mb-1">
@@ -144,11 +144,11 @@
           <p class="mb-0">Mining</p>
         </div>
 
-        <opdex-number
+        <!-- <opdex-number
           prefix="$"
           [value]="miningUsd"
           [short]="true">
-        </opdex-number>
+        </opdex-number> -->
       </div>
 
       <div class="flex-row-center-between">
@@ -157,18 +157,19 @@
         <opdex-number
           [value]="pool?.miningPool?.tokensMining"
           [short]="true"
-          [suffix]="pool?.tokens?.lp?.symbol">
+          suffix="OLPT">
         </opdex-number>
       </div>
 
-      <ng-container *ngIf="pool?.miningPool?.isActive && pool?.miningPool?.miningPeriodEndBlock >= latestBlock">
+      <!-- <ng-container *ngIf="pool?.miningPool?.isActive && pool?.miningPool?.miningPeriodEndBlock >= latestBlock"> -->
+      <ng-container *ngIf="pool?.miningPool?.miningPeriodEndBlock >= latestBlock">
         <div class="flex-row-center-between">
           <p class="mb-0 sub-heading">Block Reward</p>
 
           <opdex-number
             [value]="pool?.miningPool?.rewardPerBlock"
             [short]="true"
-            [suffix]="pool?.tokens?.staking?.symbol">
+            [suffix]="pool?.stakingToken?.symbol">
           </opdex-number>
         </div>
 
@@ -195,7 +196,7 @@
           [value]="100 - ((pool?.miningPool?.miningPeriodEndBlock - latestBlock) / 164250 * 100)">
         </mat-progress-bar>
       </ng-container>
-    </ng-container> -->
+    </ng-container>
     <!-- End Mining -->
   </ng-container>
 

@@ -1,0 +1,68 @@
+<opdex-card class="pool-card" *ngIf="pool">
+  <ng-container *ngIf="!!pool; else loading">
+    <div class="top-details mb-2">
+      <div class="flex-row-center">
+        <opdex-token-icons [tokens]="[pool.crsToken, pool.srcToken]"></opdex-token-icons>
+
+        <a class="title mb-0 ml-2" href="javascript:void(0)" [routerLink]="['/pools', pool.address]">
+          <h4>{{pool.name}}</h4>
+        </a>
+      </div>
+
+      <!-- <button mat-icon-button color="primary" [ngClass]="iconSizes.small" [matMenuTriggerFor]="beforeMenu">
+        <mat-icon>{{icons.more}}</mat-icon>
+      </button>
+
+      <mat-menu #beforeMenu="matMenu" xPosition="before" class="w-100">
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact('start')">
+          <mat-icon class="add">{{icons.add}}</mat-icon>
+          Start Mining
+        </button>
+
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact('stop')">
+          <mat-icon class="remove">{{icons.remove}}</mat-icon>
+          Stop Mining
+        </button>
+
+        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact('collect')">
+          <mat-icon class="purple">{{icons.rewards}}</mat-icon>
+          Collect Rewards
+        </button>
+      </mat-menu> -->
+    </div>
+
+    <div class="flex-row-center-between">
+      <div class="flex-row-center-center">
+        <mat-icon class="tiny mr-1 red">{{icons.mining}}</mat-icon>
+        <p class="mb-0">Mining</p>
+      </div>
+      <!-- <opdex-number [short]="true" prefix="$" [value]="miningUsd"></opdex-number> -->
+    </div>
+
+    <div class="flex-row-center-between">
+      <p class="mb-0 sub-heading">Weight</p>
+      <opdex-number [short]="true" suffix="OLPT" [value]="pool.miningPool?.tokensMining"></opdex-number>
+    </div>
+
+    <div class="flex-row-center-between">
+      <p class="mb-0 sub-heading">Block Reward</p>
+      <opdex-number [short]="true" [suffix]="pool.stakingToken?.symbol" [value]="pool.miningPool?.rewardPerBlock"></opdex-number>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="skeleton-bg w-50 mb-3"></div>
+
+    <div class="flex-row-center">
+      <div class="w-50">
+        <div class="skeleton-bg w-75 mb-1"></div>
+        <div class="skeleton-bg w-75 mb-1"></div>
+      </div>
+
+      <div class="w-50 flex-column-end">
+        <div class="skeleton-bg w-75 mb-1"></div>
+        <div class="skeleton-bg w-75 mb-1"></div>
+      </div>
+    </div>
+  </ng-template>
+</opdex-card>

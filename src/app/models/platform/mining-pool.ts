@@ -1,13 +1,21 @@
-import { Token } from './token';
+import { FixedDecimal } from '@models/types/fixed-decimal';
+import { IMiningPoolDetailsDto } from '@services/platform/mining-pool.service';
 
 export class MiningPool {
   address: string;
-  stakingToken: Token;
-  minedToken: Token;
+  stakingToken: string;
+  minedToken: string;
   miningPeriodEndBlock: number;
   isActive: boolean;
+  rewardPerBlock: FixedDecimal;
+  tokensMining: FixedDecimal;
 
-  constructor() {
-
+  constructor(data: IMiningPoolDetailsDto) {
+    this.address = data.address;
+    this.stakingToken = data.stakingToken;
+    // this.minedToken = data.
+    this.miningPeriodEndBlock = data.miningPeriodEndBlock;
+    this.rewardPerBlock = FixedDecimal.FromBigInt(data.rewardRate, 8);
+    this.tokensMining = FixedDecimal.FromBigInt(data.totalSupply, 8);
   }
 }

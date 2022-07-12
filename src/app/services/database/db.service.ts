@@ -20,7 +20,7 @@ export class OpdexDB extends Dexie {
 
     this.version(1).stores({
       indexer: '++id, lastUpdateBlock',
-      liquidityPool: '++id, &address, name, srcToken, miningPool, transactionFee, isNominated',
+      liquidityPool: '++id, &address, name, srcToken, miningPool, transactionFee, isNominated, miningPeriodEndBlock',
       token: '++id, &address, symbol, name, decimals, nativeChain, nativeChainAddress'
     });
   }

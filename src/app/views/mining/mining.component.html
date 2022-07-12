@@ -111,6 +111,12 @@
     <div class="row mb-4">
       <div class="col-12">
         <h3>Mining Pools</h3>
+
+        <div class="scrollable-row">
+          <div class="scrollable-card" *ngFor="let pool of miningPools; trackBy: poolsTrackBy">
+            <opdex-mining-pool-card [pool]="pool"></opdex-mining-pool-card>
+          </div>
+        </div>
       </div>
     </div>
 

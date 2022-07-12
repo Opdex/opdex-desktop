@@ -1,7 +1,7 @@
 import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
 import { MiningGovernance } from '@models/platform/mining-governance';
 import { NodeService } from '@services/platform/node.service';
-import { Subscription, switchMap } from 'rxjs';
+import { Subscription, switchMap, tap } from 'rxjs';
 import { MiningGovernanceFactoryService } from '@services/factory/mining-governance-factory.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Icons } from '@enums/icons';
@@ -14,9 +14,10 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
 })
 export class MiningComponent implements OnInit, OnDestroy {
   miningGovernance: MiningGovernance;
+  nominatedPools: LiquidityPool[];
+  miningPools: LiquidityPool[];
   subscription = new Subscription();
   icons = Icons;
-  nominatedPools: LiquidityPool[];
 
   constructor(
     private _miningGovernanceFactory: MiningGovernanceFactoryService,
@@ -35,8 +36,11 @@ export class MiningComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
         .pipe(
-          switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools())
-        ).subscribe(pools => this.nominatedPools = pools)
+          switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools()),
+          tap(pools => this.nominatedPools = pools),
+          switchMap(_ => this._liquidityPoolFactory.buildActiveMiningPools()),
+          tap(pools => this.miningPools = pools)
+        ).subscribe()
     )
   }
 

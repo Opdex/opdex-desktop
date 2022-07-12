@@ -1,3 +1,4 @@
+import { MiningPool } from './mining-pool';
 import { ILiquidityPoolEntity, ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { IHydratedLiquidityPoolDetailsDto } from '@services/platform/liquidity-pool.service';
@@ -6,7 +7,6 @@ import { Token } from './token';
 export class LiquidityPool {
   address: string;
   name: string;
-  miningPool: string;
   transactionFee: FixedDecimal;
   totalSupply: FixedDecimal;
   reserveCrs: FixedDecimal;
@@ -18,11 +18,12 @@ export class LiquidityPool {
   stakingToken: Token;
   crsPerSrc: FixedDecimal;
   srcPerCrs: FixedDecimal;
+  miningPool?: MiningPool;
 
-  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, srcToken: ITokenEntity, stakingToken: ITokenEntity) {
+  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, miningPool: MiningPool, srcToken: ITokenEntity, stakingToken: ITokenEntity) {
     this.address = entity.address;
     this.name = entity.name;
-    this.miningPool = entity.miningPool;
+    this.miningPool = miningPool;
     this.transactionFee = FixedDecimal.FromBigInt(BigInt(entity.transactionFee), 1);
     this.totalSupply = FixedDecimal.FromBigInt(hydrated.totalSupply, 8);
     this.reserveCrs = FixedDecimal.FromBigInt(hydrated.reserveCrs, 8);
