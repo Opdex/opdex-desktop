@@ -10,6 +10,10 @@ export class TokenRepositoryService {
     return await this._db.token.get({ address });
   }
 
+  async getTokens() {
+    return await this._db.token.toArray();
+  }
+
   async persistTokens(tokens: ITokenEntity[]) {
     console.log(tokens)
     const entities = await this._db.token.toArray();

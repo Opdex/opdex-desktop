@@ -26,6 +26,11 @@ export class LiquidityPoolFactoryService {
     return await this._buildLiquidityPool(entity);
   }
 
+  public async buildLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
+    const entity = await this._poolRepository.getPoolBySrcAddress(address);
+    return await this._buildLiquidityPool(entity);
+  }
+
   public async buildLiquidityPools(): Promise<LiquidityPool[]> {
     const entities = await this._poolRepository.getPools(0, 20);
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));

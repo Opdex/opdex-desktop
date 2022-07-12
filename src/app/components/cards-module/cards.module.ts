@@ -13,12 +13,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 
 // Module Components
 import { CardComponent } from './card/card.component';
 import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card/liquidity-pool-summary-card.component';
 import { LiquidityPoolTokenCardComponent } from './liquidity-pool-token-card/liquidity-pool-token-card.component';
 import { MiningPoolCardComponent } from './mining-pool-card/mining-pool-card.component';
+import { TokenSummaryCardComponent } from './token-summary-card/token-summary-card.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,7 @@ import { MiningPoolCardComponent } from './mining-pool-card/mining-pool-card.com
     StakingPoolCardComponent,
     MiningPoolCardComponent,
     MarketTokenCardComponent,
+    TokenSummaryCardComponent
   ],
   imports: [
     CommonModule,
@@ -39,6 +42,7 @@ import { MiningPoolCardComponent } from './mining-pool-card/mining-pool-card.com
     MatMenuModule,
     MatProgressBarModule,
     MatDividerModule,
+    MatBottomSheetModule,
     SharedModule
   ],
   exports: [
@@ -47,7 +51,8 @@ import { MiningPoolCardComponent } from './mining-pool-card/mining-pool-card.com
     LiquidityPoolTokenCardComponent,
     StakingPoolCardComponent,
     MarketTokenCardComponent,
-    MiningPoolCardComponent
+    MiningPoolCardComponent,
+    TokenSummaryCardComponent
   ]
 })
 export class CardsModule { }

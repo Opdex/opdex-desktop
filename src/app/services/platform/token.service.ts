@@ -54,4 +54,39 @@ export class TokenService {
         }
       }));
   }
+
+  // Todo: Consider calculating FIAT pricing here
+  getHydratedToken(address: string): Observable<any> {
+    const isODX = address === this._env.contracts.odx;
+    const totalSupplyKey = isODX ? OdxStateKeys.TotalSupply : StandardTokenStateKeys.TotalSupply
+
+    const properties = [
+      this._cirrus.getContractStorageItem(address, totalSupplyKey, ParameterType.UInt256)
+    ];
+
+    if (isODX) {
+      properties.push(
+        this._cirrus.getContractStorageItem(address, OdxStateKeys.NextDistributionBlock, ParameterType.ULong),
+        this._cirrus.getContractStorageItem(address, OdxStateKeys.PeriodDuration, ParameterType.ULong),
+        this._cirrus.getContractStorageItem(address, OdxStateKeys.PeriodIndex, ParameterType.UInt)
+      );
+    }
+
+    return combineLatest(properties)
+      .pipe(
+        map(values => {
+          let data: any = {
+            totalSupply: BigInt(values[0])
+          };
+
+          if (isODX) {
+            data.nextDistributionBlock = parseFloat(values[1]);
+            data.periodDuration = parseFloat(values[2]);
+            data.periodIndex = parseFloat(values[3]);
+          }
+
+          return data;
+        })
+      )
+  }
 }

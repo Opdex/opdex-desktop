@@ -10,7 +10,7 @@ import { Token } from '@models/platform/token';
 export class DashboardComponent implements OnInit {
   pools: any[];
   odx: Token;
-  crs = Token.Crs();
+  crs = Token.CRS();
 
   constructor(
     private _poolsFactory: LiquidityPoolFactoryService

@@ -31,7 +31,7 @@ export class LiquidityPool {
     this.totalStaked = FixedDecimal.FromBigInt(hydrated.totalStaked, 8);
     this.isNominated = entity.isNominated === 1;
     this.srcToken = new Token(srcToken);
-    this.crsToken = Token.Crs();
+    this.crsToken = Token.CRS();
     this.stakingToken = new Token(stakingToken);
     this.crsPerSrc = this.reserveCrs.divide(this.reserveSrc);
     this.srcPerCrs = this.reserveSrc.divide(this.reserveCrs);
