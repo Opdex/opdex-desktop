@@ -48,16 +48,16 @@
           <div class="col-12 col-sm-6 col-lg-12">
             <opdex-token-summary-card [token]="token"></opdex-token-summary-card>
 
-            <!-- <opdex-card *ngIf="token && token.address === liquidityPool?.address">
+            <opdex-card *ngIf="token && token.address === pool?.address">
               <div class="flex-row-center mb-2">
-                <opdex-token-icons [tokens]="[liquidityPool?.tokens?.crs, liquidityPool?.tokens?.src]"></opdex-token-icons>
-                <a class="b-400 no-decoration ml-2" routerLink="/pools/{{liquidityPool?.address}}">{{liquidityPool?.name}}</a>
+                <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
+                <a class="b-400 no-decoration ml-2" routerLink="/pools/{{pool?.address}}">{{pool?.name}}</a>
               </div>
 
               <div class="flex-row-center-between">
                 <div class="flex-column">
-                  <opdex-number [value]="one" [suffix]="liquidityPool?.tokens?.lp?.symbol"></opdex-number>
-                  <opdex-number [value]="one" [suffix]="liquidityPool?.tokens?.lp?.symbol"></opdex-number>
+                  <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
+                  <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
                 </div>
 
                 <div class="flex-column">
@@ -66,11 +66,11 @@
                 </div>
 
                 <div class="flex-column">
-                  <opdex-number [value]="crsPerOlpt" [short]="true" [suffix]="liquidityPool?.tokens?.crs?.symbol"></opdex-number>
-                  <opdex-number [value]="srcPerOlpt" [short]="true" [suffix]="liquidityPool?.tokens?.src?.symbol"></opdex-number>
+                  <opdex-number [value]="crsPerOlpt" [short]="true" [suffix]="pool?.crsToken?.symbol"></opdex-number>
+                  <opdex-number [value]="srcPerOlpt" [short]="true" [suffix]="pool?.srcToken?.symbol"></opdex-number>
                 </div>
               </div>
-            </opdex-card>  -->
+            </opdex-card>
           </div>
 
           <div class="col-12 col-sm-6 col-lg-12">

@@ -70,7 +70,7 @@
     <!-- End Cost -->
 
     <!-- Staking -->
-    <ng-container *ngIf="pool?.totalStaked">
+    <ng-container *ngIf="pool?.stakingToken?.address !== pool?.srcToken?.address">
       <mat-divider class="mb-2 mt-2" style="position:relative;"></mat-divider>
 
       <div class="flex-row-center-between mb-1">

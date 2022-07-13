@@ -15,6 +15,13 @@ export interface ITokenDetailsDto {
   nativeChainAddress: string;
 }
 
+export interface IHydratedTokenDetailsDto {
+  totalSupply: BigInt;
+  nextDistributionBlock?: number;
+  periodDuration?: number;
+  periodIndex?: number;
+}
+
 @Injectable({providedIn: 'root'})
 export class TokenService {
   constructor(
@@ -56,7 +63,7 @@ export class TokenService {
   }
 
   // Todo: Consider calculating FIAT pricing here
-  getHydratedToken(address: string): Observable<any> {
+  getHydratedToken(address: string): Observable<IHydratedTokenDetailsDto> {
     const isODX = address === this._env.contracts.odx;
     const totalSupplyKey = isODX ? OdxStateKeys.TotalSupply : StandardTokenStateKeys.TotalSupply
 

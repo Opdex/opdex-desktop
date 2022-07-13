@@ -1,3 +1,4 @@
+import { TokenFactoryService } from '@services/factory/token-factory.service';
 import { MiningPoolService } from '@services/platform/mining-pool.service';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
@@ -17,6 +18,7 @@ export class LiquidityPoolFactoryService {
     private _poolRepository: PoolRepositoryService,
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
+    private _tokenFactory: TokenFactoryService,
     private _env: EnvironmentsService,
     private _miningPoolService: MiningPoolService
   ) { }
@@ -47,6 +49,8 @@ export class LiquidityPoolFactoryService {
   }
 
   private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
+    if (!entity) return undefined;
+
     const hydrated = await lastValueFrom(this._liquidityPoolService.getHydratedPool(entity.address, entity.miningPool));
 
     let miningPool = null;
@@ -55,9 +59,11 @@ export class LiquidityPoolFactoryService {
       miningPool = new MiningPool(miningPoolDto);
     }
 
-    const srcTokenEntity = await this._tokenRepository.getTokenByAddress(entity.srcToken);
-    const stakingTokenEntity = await this._tokenRepository.getTokenByAddress(this._env.contracts.odx);
+    hydrated.totalSupply
 
-    return new LiquidityPool(entity, hydrated, miningPool, srcTokenEntity, stakingTokenEntity);
+    const srcToken = await this._tokenFactory.buildToken(entity.srcToken);
+    const stakingToken = await this._tokenFactory.buildToken(this._env.contracts.odx);
+
+    return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken);
   }
 }

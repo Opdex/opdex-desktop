@@ -1,6 +1,7 @@
 import { Icons } from '@enums/icons';
 import { ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
+import { IHydratedTokenDetailsDto } from '@services/platform/token.service';
 
 export class Token {
   address: string;
@@ -16,13 +17,13 @@ export class Token {
     return this.address === 'CRS';
   }
 
-  constructor(entity: ITokenEntity) {
+  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto) {
     this.address = entity.address;
     this.name = entity.name;
     this.symbol = entity.symbol;
     this.decimals = entity.decimals;
     this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'));
-    this.totalSupply = FixedDecimal.FromBigInt(BigInt(0), entity.decimals);
+    this.totalSupply = FixedDecimal.FromBigInt(hydrated.totalSupply, entity.decimals);
 
     if (entity.nativeChain !== 'Cirrus') {
       this.wrappedToken = new WrappedToken({
@@ -43,16 +44,20 @@ export class Token {
       address: 'CRS',
       decimals: 8,
       nativeChain: 'Cirrus'
+    }, {
+      totalSupply: BigInt('10000000000000000')
     })
   }
 
-  static OLPT(address: string): Token {
+  static OLPT(address: string, totalSupply: BigInt): Token {
     return new Token({
       name: 'Liquidity Pool Token',
       symbol: 'OLPT',
       address,
       decimals: 8,
       nativeChain: 'Cirrus'
+    }, {
+      totalSupply
     })
   }
 }

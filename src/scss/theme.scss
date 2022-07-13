@@ -58,27 +58,32 @@ $theme: mat.define-light-theme($theme-primary, $theme-accent, $theme-warn);
 $altTheme: mat.define-dark-theme($theme-primary, $theme-accent, $theme-warn);
 
 .light-mode {
-  color-scheme: light;
   @include mat.all-component-themes($theme);
+  color-scheme: light;
 
-  $primary: map-get($theme, primary);
-  $primaryDarkerColor: mat.get-color-from-palette($primary, darker);
+  main {
+    background: $white;
+  }
 
   a {
+    $primary: map-get($theme, primary);
+    $primaryDarkerColor: mat.get-color-from-palette($primary, darker);
     color: $primaryDarkerColor;
   }
 }
 
 .dark-mode {
-  color-scheme: dark;
-  // background: $dark-primary;
-  color: #fff;
   @include mat.all-component-themes($altTheme);
+  color-scheme: dark;
+  color: #fff;
 
-  $primary: map-get($altTheme, primary);
-  $primaryLighterColor: mat.get-color-from-palette($primary, lighter);
+  main {
+    background: $dark-primary;
+  }
 
   a {
+    $primary: map-get($altTheme, primary);
+    $primaryLighterColor: mat.get-color-from-palette($primary, lighter);
     color: $primaryLighterColor;
   }
 }
@@ -86,36 +91,30 @@ $altTheme: mat.define-dark-theme($theme-primary, $theme-accent, $theme-warn);
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 
-
-main {
-  overscroll-behavior-y: none;
-  min-height: 100vh;
-
-  &.dark-mode {
-    background: $dark-primary;
+  main {
+    overscroll-behavior-y: none;
+    min-height: 100vh;
   }
 
-  &.light-mode {
-    background: #ffff;
+  .number-tooltip {
+    font-family: 'Inconsolata', monospace !important;
   }
-}
 
-.space-between {
-  flex: 1;
-}
+  .space-between {
+    flex: 1;
+  }
 
-.no-wrap {
-  white-space: nowrap;
-}
+  .no-wrap {
+    white-space: nowrap;
+  }
 
-.overflow-ellipsis {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.number-tooltip {
-  font-family: 'Inconsolata', monospace !important;
+  .overflow-ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }

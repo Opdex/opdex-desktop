@@ -5,15 +5,44 @@
         <h1>Dashboard</h1>
       </div>
 
-      <div class="col-12 col-sm-6 col-lg-3">
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
         <opdex-market-token-card [token]="crs"></opdex-market-token-card>
       </div>
-      <div class="col-12 col-sm-6 col-lg-3">
-        <!-- <opdex-market-token-card [token]="market?.tokens?.staking" [icon]="icons.staking" iconColor="stake"></opdex-market-token-card> -->
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <opdex-market-token-card [token]="odx"></opdex-market-token-card>
       </div>
     </div>
   </div>
 </div>
+
+<div class="standard-section">
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h3>Mining Pools</h3>
+
+        <div class="scrollable-row">
+          <div class="scrollable-card" *ngFor="let pool of miningPools; trackBy: poolsTrackBy">
+            <opdex-mining-pool-card [pool]="pool"></opdex-mining-pool-card>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <h3>Nominated Pools</h3>
+
+        <div class="scrollable-row">
+          <div class="scrollable-card" *ngFor="let pool of nominatedPools; trackBy: poolsTrackBy">
+            <opdex-staking-pool-card [pool]="pool"></opdex-staking-pool-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="offset-section">
   <div class="container">

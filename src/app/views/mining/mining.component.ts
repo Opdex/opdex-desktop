@@ -29,19 +29,13 @@ export class MiningComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
         .pipe(
-          switchMap(latestBlock => this._miningGovernanceFactory.buildMiningGovernance(latestBlock))
-        )
-    .subscribe(gov => this.miningGovernance = gov));
-
-    this.subscription.add(
-      this._nodeService.latestBlock$
-        .pipe(
+          switchMap(latestBlock => this._miningGovernanceFactory.buildMiningGovernance(latestBlock)),
+          tap(gov => this.miningGovernance = gov),
           switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
           switchMap(_ => this._liquidityPoolFactory.buildActiveMiningPools()),
-          tap(pools => this.miningPools = pools)
-        ).subscribe()
-    )
+          tap(pools => this.miningPools = pools))
+        .subscribe());
   }
 
   poolsTrackBy(index: number, pool: LiquidityPool): string {
