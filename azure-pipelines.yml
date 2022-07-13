@@ -19,5 +19,5 @@ stages:
             displayName: "Install dependencies"
           - script: npm run build:electron
             displayName: "Build"
-          - script: npm run test -- --browsers ChromeNoSandboxHeadless
+          - script: npm run test -- --browsers ChromeNoSandboxHeadless --watch=false
             displayName: "Run tests"
