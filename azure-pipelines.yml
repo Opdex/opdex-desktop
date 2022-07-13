@@ -17,7 +17,7 @@ stages:
           displayName: 'Install Node.js'
         - script: npm i
           displayName: 'Install dependencies'
-        - script: ng build -c production
+        - script: npm run build:electron
           displayName: 'Build'
         - script: npm run test
           displayName: 'Run tests'
