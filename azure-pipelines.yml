@@ -1,5 +1,5 @@
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-20.04
@@ -11,13 +11,13 @@ stages:
       - job: Build
         displayName: Build and test
         steps:
-        - task: NodeTool@0
-          inputs:
-            versionSpec: '16.x'
-          displayName: 'Install Node.js'
-        - script: npm i
-          displayName: 'Install dependencies'
-        - script: npm run build:electron
-          displayName: 'Build'
-        - script: npm run test -- --browsers ChromeHeadless --no-sandbox
-          displayName: 'Run tests'
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "16.x"
+            displayName: "Install Node.js"
+          - script: npm i
+            displayName: "Install dependencies"
+          - script: npm run build:electron
+            displayName: "Build"
+          - script: npm run test -- --browsers ChromeNoSandboxHeadless
+            displayName: "Run tests"
