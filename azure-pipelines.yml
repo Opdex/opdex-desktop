@@ -1,0 +1,23 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-20.04
+
+stages:
+  - stage: CI
+    displayName: Continuous integration
+    jobs:
+      - job: Build
+        displayName: Build and test
+        steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '16.x'
+          displayName: 'Install Node.js'
+        - script: npm i
+          displayName: 'Install dependencies'
+        - script: ng build -c production
+          displayName: 'Build'
+        - script: npm run test
+          displayName: 'Run tests'
