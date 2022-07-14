@@ -28,6 +28,7 @@ stages:
             inputs:
               targetPath: "$(Build.SourcesDirectory)/dist"
               publishLocation: "pipeline"
+              artifact: "application"
   - stage: Deployment
     displayName: Deployment
     dependsOn: CI
@@ -76,6 +77,6 @@ stages:
                     tag: "$(RELEASE_VERSION)"
                     isDraft: true
                     isPreRelease: true
-                    assets: "$(Build.ArtifactStagingDirectory)/*"
+                    assets: "$(Build.ArtifactStagingDirectory)/application/*"
                     assetUploadMode: replace
                     addChangeLog: false
