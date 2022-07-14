@@ -29,6 +29,8 @@ stages:
         displayName: Testnet release
         condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
         environment: test
+        pool: server
+        timeoutInMinutes: 4320 # job times out in 3 days
         strategy:
           runOnce:
             preDeploy:
