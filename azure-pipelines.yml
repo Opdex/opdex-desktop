@@ -25,28 +25,39 @@ stages:
     displayName: Testnet
     dependsOn: CI
     jobs:
+      - job: PreValidation
+        displayName: Pre-validation
+        steps:
+          - task: Bash@3
+            displayName: Retrieve version number
+            name: retrieveVersion
+            inputs:
+              targetType: "inline"
+              script: |
+                echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true;isoutput=true]$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')"
+      - job: WaitForValidation
+        displayName: Wait for validation
+        dependsOn: PreValidation
+        pool: server
+        timeoutInMinutes: 4320 # wait 3 days
+        variables:
+          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
+        steps:
+          - task: ManualValidation@0
+            displayName: Wait for approval
+            inputs:
+              notifyUsers: "*"
+              instructions: "Awaiting approval to build an official Testnet release with version $(RELEASE_VERSION)."
       - deployment: ReleaseForTestnet
         displayName: Testnet release
+        dependsOn: WaitForValidation
         condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
         environment: test
-        pool: server
-        timeoutInMinutes: 4320 # job times out in 3 days
+        variables:
+          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
             preDeploy:
-              steps:
-                - task: Bash@3
-                  displayName: Retrieve version number
-                  name: retrieveVersion
-                  inputs:
-                    targetType: "inline"
-                    script: |
-                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')"
-                - task: ManualValidation@0
-                  displayName: Wait for validation
-                  inputs:
-                    notifyUsers: "*"
-                    instructions: "Awaiting approval to build an official Testnet release with version $(RELEASE_VERSION)."
             deploy:
               steps:
                 - script: npm run pack
