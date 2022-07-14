@@ -21,8 +21,15 @@ stages:
             displayName: "Build"
           - script: npm run test -- --browsers ChromeNoSandboxHeadless --watch=false
             displayName: "Run tests"
-  - stage: Testnet
-    displayName: Testnet
+          - script: npm run pack
+            displayName: "Pack"
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish"
+            inputs:
+              targetPath: "$(Pipeline.Workspace)/dist"
+              publishLocation: "pipeline"
+  - stage: Deployment
+    displayName: Deployment
     dependsOn: CI
     condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
     jobs:
@@ -49,27 +56,25 @@ stages:
             inputs:
               notifyUsers: "*"
               instructions: "Resume to create a release of version $(RELEASE_VERSION)."
-      - deployment: ReleaseForTestnet
-        displayName: Testnet release
+      - deployment: Release
+        displayName: Create release
         dependsOn: WaitForValidation
-        environment: test
         variables:
           RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
             deploy:
               steps:
-                - script: npm run pack
-                  displayName: "Pack"
                 - task: GitHubRelease@1
                   inputs:
-                    gitHubConnection: 'Opdex Desktop Releases'
-                    repositoryName: 'Opdex/opdex-desktop'
-                    action: 'create'
-                    target: '$(Build.SourceVersion)'
-                    tagSource: 'userSpecifiedTag'
-                    tag: '$(RELEASE_VERSION)'
+                    gitHubConnection: "Opdex Desktop Releases"
+                    repositoryName: "Opdex/opdex-desktop"
+                    action: "create"
+                    target: "$(Build.SourceVersion)"
+                    tagSource: "userSpecifiedTag"
+                    tag: "$(RELEASE_VERSION)"
                     isDraft: true
                     isPreRelease: true
-                    changeLogCompareToRelease: 'lastFullRelease'
-                    changeLogType: 'commitBased'
+                    assets: "$(Build.ArtifactStagingDirectory)/*"
+                    assetUploadMode: replace
+                    addChangeLog: false
