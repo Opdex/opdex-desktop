@@ -20,7 +20,7 @@ export class LiquidityPool {
   srcPerCrs: FixedDecimal;
   miningPool?: MiningPool;
 
-  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, miningPool: MiningPool, srcToken: Token, stakingToken: Token) {
+  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, miningPool: MiningPool, srcToken: Token, stakingToken: Token, crsToken: Token) {
     this.address = entity.address;
     this.name = entity.name;
     this.miningPool = miningPool;
@@ -30,7 +30,7 @@ export class LiquidityPool {
     this.totalStaked = FixedDecimal.FromBigInt(hydrated.totalStaked, 8);
     this.isNominated = entity.isNominated === 1;
     this.srcToken = srcToken;
-    this.crsToken = Token.CRS();
+    this.crsToken = crsToken;
     this.lpToken = Token.OLPT(entity.address, hydrated.totalSupply);
     this.stakingToken = stakingToken;
     this.crsPerSrc = this.reserveCrs.divide(this.reserveSrc);

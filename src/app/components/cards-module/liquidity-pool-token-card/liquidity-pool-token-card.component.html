@@ -21,8 +21,8 @@
           *ngIf="token?.summary?.dailyPriceChangePercent !== null && token?.summary?.dailyPriceChangePercent !== undefined">
         </opdex-change-indicator> -->
 
-        <h3 class="mb-0 ml-2 b-300">
-          <opdex-number [prefix]="tokenPrice?.htmlEntity" [value]="tokenPrice?.price" [short]="true"></opdex-number>
+        <h3 class="mb-0 ml-2 b-300" *ngIf="token.pricing">
+          <opdex-number [prefix]="currency.htmlEntity" [value]="token?.pricing[currency.abbreviation]" [short]="true"></opdex-number>
         </h3>
       </div>
     </div>

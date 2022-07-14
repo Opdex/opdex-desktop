@@ -70,7 +70,7 @@ export class IndexerService {
       await this._tokenRepository.persistTokens(poolsDetails.map(({token}) => {
         const decimals = parseInt(token.decimals);
 
-        console.log(token.nativeChain, token.nativeAddress);
+        // console.log(token.nativeChain, token.nativeAddress);
 
         // Todo: try/catch checksummed native chain address, validate against supported FN tokens
         // Todo: -- Add functionality to re-validate interflux tokens

@@ -1,8 +1,8 @@
 import { ICurrency } from '@lookups/currencyDetails.lookup';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { Component, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Icons } from 'src/app/enums/icons';
 import { Token } from '@models/platform/token';
 
@@ -11,14 +11,13 @@ import { Token } from '@models/platform/token';
   templateUrl: './liquidity-pool-token-card.component.html',
   styleUrls: ['./liquidity-pool-token-card.component.scss']
 })
-export class LiquidityPoolTokenCardComponent implements OnChanges, OnInit, OnDestroy {
+export class LiquidityPoolTokenCardComponent implements OnInit, OnDestroy {
   @Input() token: Token;
   @Input() reserves: FixedDecimal;
   @Input() swapRate: FixedDecimal;
   @Input() swapToken: Token;
 
-  crsPrice: ICurrency;
-  tokenPrice: ICurrency;
+  currency: ICurrency;
   icons = Icons;
   one = FixedDecimal.One(0);
   subscription = new Subscription();
@@ -28,30 +27,11 @@ export class LiquidityPoolTokenCardComponent implements OnChanges, OnInit, OnDes
   ngOnInit() {
     this.subscription.add(
       this._currency.selectedCurrency$
-        .subscribe(price => {
-          this.crsPrice = price;
-          this._calcPrice();
-        }));
-  }
-
-  ngOnChanges() {
-    this._calcPrice();
+        .pipe(tap(currency => this.currency = currency))
+        .subscribe());
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  private _calcPrice(): void {
-    if (this.token && !!this.swapRate) {
-      if (this.token.address === 'CRS') {
-        this.tokenPrice = this.crsPrice;
-        return;
-      }
-
-      let tokenPrice = {...this.crsPrice};
-      tokenPrice.price = tokenPrice.price.multiply(this.swapRate);
-      this.tokenPrice = tokenPrice;
-    }
   }
 }

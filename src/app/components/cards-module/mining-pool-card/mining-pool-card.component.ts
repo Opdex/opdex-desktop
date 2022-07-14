@@ -20,7 +20,9 @@ export class MiningPoolCardComponent implements OnChanges {
   ) { }
 
   ngOnChanges() {
-    if (!!this.pool.miningPool === false) return;
+    if (!!this.pool?.miningPool === false) {
+      return;
+    }
 
     // this.miningUsd = this.pool.tokens.lp.summary.priceUsd.multiply(this.pool.miningPool.tokensMining);
   }

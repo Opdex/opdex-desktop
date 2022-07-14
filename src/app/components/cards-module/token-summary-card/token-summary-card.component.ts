@@ -1,9 +1,11 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { CurrencyService } from '@services/platform/currency.service';
 import { NodeService } from '@services/platform/node.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Icons } from 'src/app/enums/icons';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Token } from '@models/platform/token';
 
@@ -20,11 +22,13 @@ export class TokenSummaryCardComponent implements OnDestroy {
   quoteErrors: string[];
   subscription = new Subscription();
   icons = Icons;
+  currency: ICurrency;
 
   constructor(
     private _indexService: NodeService,
     private _userContextService: UserContextService,
-    private _bottomSheet: MatBottomSheet
+    private _bottomSheet: MatBottomSheet,
+    private _currency: CurrencyService
   ) {
     this.subscription.add(
       this._indexService.latestBlock$
@@ -33,6 +37,11 @@ export class TokenSummaryCardComponent implements OnDestroy {
     this.subscription.add(
       this._userContextService.context$
         .subscribe(context => this.context = context));
+
+    this.subscription.add(
+      this._currency.selectedCurrency$
+        .pipe(tap(currency => this.currency = currency))
+        .subscribe());
   }
 
   distribute(): void {

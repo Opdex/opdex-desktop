@@ -1,9 +1,14 @@
+import { ITokenEntity } from '@interfaces/database.interface';
+import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-pool-state-keys';
+import { PoolRepositoryService } from '@services/database/pool-repository.service';
+import { CurrencyService } from './currency.service';
 import { OdxStateKeys, StandardTokenStateKeys, InterfluxTokenStateKeys } from '@enums/contracts/state-keys/token-state-keys';
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { combineLatest, map, catchError, of, Observable } from 'rxjs';
+import { combineLatest, map, catchError, of, Observable, lastValueFrom } from 'rxjs';
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
+import { FixedDecimal } from '@models/types/fixed-decimal';
 
 export interface ITokenDetailsDto {
   address: string;
@@ -26,7 +31,9 @@ export interface IHydratedTokenDetailsDto {
 export class TokenService {
   constructor(
     private _cirrus: CirrusApiService,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    private _currency: CurrencyService,
+    private _poolRepository: PoolRepositoryService
   ) { }
 
   getToken(address: string): Observable<ITokenDetailsDto> {
@@ -95,5 +102,50 @@ export class TokenService {
           return data;
         })
       )
+  }
+
+  async getTokenPricing(token: ITokenEntity) {
+    const { pricing } = this._currency;
+    let prices: any = { }
+
+    if (token.address === 'CRS') {
+      pricing.forEach(currency => prices[currency.abbreviation] = currency.price);
+      return prices;
+    }
+
+    const pool = await this._poolRepository.getPoolBySrcAddress(token.address) ||
+                 await this._poolRepository.getPoolByAddress(token.address)
+
+    if /* LP Token */ (pool.address === token.address) {
+      const totalSupply = FixedDecimal.FromBigInt(
+        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
+        8
+      );
+
+      const reserveCrs = FixedDecimal.FromBigInt(
+        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
+        8
+      );
+
+      pricing.forEach(currency => prices[currency.abbreviation] = currency.price.multiply(reserveCrs).multiply(new FixedDecimal('2', 8)).divide(totalSupply));
+
+      return prices;
+    } else /* SRC Token */ {
+      const reserveCrs = FixedDecimal.FromBigInt(
+        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
+        8
+      );
+
+      const reserveSrc = FixedDecimal.FromBigInt(
+        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
+        token.decimals
+      );
+
+      const crsPerSrc = reserveCrs.divide(reserveSrc);
+
+      pricing.forEach(currency => prices[currency.abbreviation] = currency.price.multiply(crsPerSrc));
+
+      return prices;
+    }
   }
 }

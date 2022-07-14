@@ -1,4 +1,4 @@
-import { EnvironmentsService } from './../../services/utility/environments.service';
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenFactoryService } from '@services/factory/token-factory.service';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { NodeService } from '@services/platform/node.service';
@@ -15,9 +15,9 @@ import { Token } from '@models/platform/token';
 export class DashboardComponent implements OnInit, OnDestroy {
   pools: any[];
   odx: Token;
-  crs = Token.CRS();
-  nominatedPools: LiquidityPool[];
-  miningPools: LiquidityPool[];
+  crs: Token;
+  nominatedPools: LiquidityPool[] = [null,null,null,null];
+  miningPools: LiquidityPool[] = [null,null,null,null];
   subscription = new Subscription();
 
   constructor(
@@ -35,6 +35,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .pipe(
           switchMap(_ => this._tokenFactory.buildToken(this._env.contracts.odx)),
           tap(odx => this.odx = odx),
+          switchMap(_ => this._tokenFactory.buildToken('CRS')),
+          tap(crs => this.crs = crs),
           switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
           switchMap(_ => this._liquidityPoolFactory.buildActiveMiningPools()),

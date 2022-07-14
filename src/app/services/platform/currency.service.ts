@@ -11,6 +11,15 @@ export class CurrencyService {
   private _selectedCurrency$ = new BehaviorSubject<ICurrency>(null);
   private _pricing: ICurrencyPricing
 
+  get pricing(): ICurrency[] {
+    const currencies = [...CurrencyDetailsLookup];
+    currencies.map(currency => {
+      currency.price = new FixedDecimal(this._pricing[currency.abbreviation], 8);
+    })
+
+    return currencies;
+  }
+
   get selectedCurrency(): ICurrency {
     return this._selectedCurrency;
   }

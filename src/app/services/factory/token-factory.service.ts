@@ -18,12 +18,20 @@ export class TokenFactoryService {
   }
 
   public async buildToken(address: string): Promise<Token> {
-    const entity = await this._tokenRepository.getTokenByAddress(address);
+    const entity: ITokenEntity = address === 'CRS'
+      ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8 }
+      : await this._tokenRepository.getTokenByAddress(address);
+
     return await this._buildToken(entity);
   }
 
   private async _buildToken(entity: ITokenEntity): Promise<Token> {
-    const hydrated = await lastValueFrom(this._tokenService.getHydratedToken(entity.address));
-    return new Token(entity, hydrated);
+    const hydrated = entity.address === 'CRS'
+      ? { totalSupply: BigInt('10000000000000000') }
+      : await lastValueFrom(this._tokenService.getHydratedToken(entity.address));
+
+    const pricing = await this._tokenService.getTokenPricing(entity);
+
+    return new Token(entity, hydrated, pricing);
   }
 }

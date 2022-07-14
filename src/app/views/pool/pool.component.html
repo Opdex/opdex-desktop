@@ -14,11 +14,11 @@
         <div class="flex-row-center">
           <div class="badge blue mr-2">{{pool?.transactionFee?.bigInt > 0 ? pool.transactionFee.formattedValue : 0}}% Fee</div>
           <div class="badge purple mr-2" *ngIf="pool?.isNominated"><mat-icon class="mr-1">{{icons.staking}}</mat-icon> Nominated</div>
-          <!-- <div class="badge red mr-2" *ngIf="pool?.miningPool?.isActive"><mat-icon class="mr-1">{{icons.mining}}</mat-icon> Mining</div> -->
+          <div class="badge red" *ngIf="pool?.miningPool?.miningPeriodEndBlock > latestBlock"><mat-icon class="mr-1">{{icons.mining}}</mat-icon> Mining</div>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-lg-5 col-xl-3">
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
         <opdex-liquidity-pool-token-card
           [token]="pool?.srcToken"
           [swapToken]="pool?.crsToken"
@@ -26,7 +26,7 @@
         </opdex-liquidity-pool-token-card>
       </div>
 
-      <div class="col-12 col-sm-6 col-lg-5 col-xl-3">
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
         <opdex-liquidity-pool-token-card
           [token]="pool?.crsToken"
           [swapToken]="pool?.srcToken"

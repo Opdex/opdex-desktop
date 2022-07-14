@@ -63,7 +63,8 @@ export class LiquidityPoolFactoryService {
 
     const srcToken = await this._tokenFactory.buildToken(entity.srcToken);
     const stakingToken = await this._tokenFactory.buildToken(this._env.contracts.odx);
+    const crsToken = await this._tokenFactory.buildToken('CRS');
 
-    return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken);
+    return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken, crsToken);
   }
 }

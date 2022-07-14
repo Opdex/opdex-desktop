@@ -15,7 +15,6 @@ export class TokenRepositoryService {
   }
 
   async persistTokens(tokens: ITokenEntity[]) {
-    console.log(tokens)
     const entities = await this._db.token.toArray();
 
     await this._db.token.bulkPut(tokens.map(token => {

@@ -12,14 +12,15 @@
         <!-- <opdex-change-indicator
           [value]="token?.summary.dailyPriceChangePercent"
           *ngIf="!!token?.summary.dailyPriceChangePercent">
-        </opdex-change-indicator>
+        </opdex-change-indicator> -->
 
         <opdex-number
-          prefix="$"
-          [value]="token?.summary.priceUsd"
+          [prefix]="currency.htmlEntity"
+          [value]="token?.pricing[currency.abbreviation]"
           [short]="true"
-          class="ml-2">
-        </opdex-number> -->
+          class="ml-2"
+          *ngIf="token?.pricing">
+        </opdex-number>
       </div>
     </div>
 

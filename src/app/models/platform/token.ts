@@ -12,20 +12,22 @@ export class Token {
   totalSupply: FixedDecimal;
   wrappedToken: WrappedToken;
   distribution?: TokenDistribution;
+  pricing: any;
 
   get isCrs(): boolean {
     return this.address === 'CRS';
   }
 
-  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto) {
+  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any) {
     this.address = entity.address;
     this.name = entity.name;
     this.symbol = entity.symbol;
     this.decimals = entity.decimals;
     this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'));
     this.totalSupply = FixedDecimal.FromBigInt(hydrated.totalSupply, entity.decimals);
+    this.pricing = pricing;
 
-    if (entity.nativeChain !== 'Cirrus') {
+    if (entity.nativeChain && entity.nativeChain !== 'Cirrus') {
       this.wrappedToken = new WrappedToken({
         chain: entity.nativeChain,
         address: entity.nativeChainAddress,
