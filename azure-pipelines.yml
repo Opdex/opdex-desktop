@@ -24,6 +24,7 @@ stages:
   - stage: Testnet
     displayName: Testnet
     dependsOn: CI
+    condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
     jobs:
       - job: PreValidation
         displayName: Pre-validation
@@ -47,11 +48,10 @@ stages:
             displayName: Wait for approval
             inputs:
               notifyUsers: "*"
-              instructions: "Awaiting approval to build an official Testnet release with version $(RELEASE_VERSION)."
+              instructions: "Resume to create a release of version $(RELEASE_VERSION)."
       - deployment: ReleaseForTestnet
         displayName: Testnet release
         dependsOn: WaitForValidation
-        condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
         environment: test
         variables:
           RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
