@@ -59,6 +59,7 @@ stages:
       - deployment: Release
         displayName: Create release
         dependsOn: WaitForValidation
+        environment: main
         variables:
           RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
