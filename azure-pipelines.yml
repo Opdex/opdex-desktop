@@ -21,10 +21,10 @@ stages:
             displayName: "Build"
           - script: npm run test -- --browsers ChromeNoSandboxHeadless --watch=false
             displayName: "Run tests"
-          - script: npm run pack
+          - script: npm run pack -- --publish never
             displayName: "Pack"
           - task: PublishPipelineArtifact@1
-            displayName: "Publish"
+            displayName: "Create artifact"
             inputs:
               targetPath: "$(Pipeline.Workspace)/dist"
               publishLocation: "pipeline"
