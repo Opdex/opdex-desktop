@@ -68,13 +68,14 @@ stages:
             deploy:
               steps:
                 - task: GitHubRelease@1
+                  displayName: Create GitHub release
                   inputs:
                     gitHubConnection: "Opdex Desktop Releases"
                     repositoryName: "Opdex/opdex-desktop"
                     action: "create"
                     target: "$(Build.SourceVersion)"
                     tagSource: "userSpecifiedTag"
-                    tag: "$(RELEASE_VERSION)"
+                    tag: $(RELEASE_VERSION)
                     isDraft: true
                     isPreRelease: true
                     assets: "$(Build.ArtifactStagingDirectory)/application/*"
