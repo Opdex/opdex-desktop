@@ -2,7 +2,7 @@ trigger:
   - feature/cd
 
 pool:
-  vmImage: ubuntu-20.04
+  vmImage: macOS-12
 
 stages:
   - stage: CI
