@@ -26,7 +26,7 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: "Create artifact"
             inputs:
-              targetPath: "$(Pipeline.Workspace)/dist"
+              targetPath: "$(Build.SourcesDirectory)/dist"
               publishLocation: "pipeline"
   - stage: Deployment
     displayName: Deployment
