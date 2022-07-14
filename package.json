@@ -1,6 +1,6 @@
 {
   "name": "opdex-desktop",
-  "version": "0.9.0",
+  "version": "0.1.0-beta1",
   "description": "Opdex platform for desktop utilizing Stratis blockchain for backend data and DeFi functionality.",
   "main": "dist/out-tsc/main.js",
   "license": "MIT",

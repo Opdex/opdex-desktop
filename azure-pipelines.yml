@@ -1,5 +1,5 @@
 trigger:
-  - main
+  - feature/cd
 
 pool:
   vmImage: ubuntu-20.04
@@ -21,3 +21,31 @@ stages:
             displayName: "Build"
           - script: npm run test -- --browsers ChromeNoSandboxHeadless --watch=false
             displayName: "Run tests"
+  - stage: Testnet
+    displayName: Testnet
+    dependsOn: CI
+    jobs:
+      - deployment: ReleaseForTestnet
+        displayName: Testnet release
+        condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
+        environment: test
+        strategy:
+          runOnce:
+            preDeploy:
+              steps:
+                - task: Bash@3
+                  displayName: Retrieve version number
+                  name: retrieveVersion
+                  inputs:
+                    targetType: "inline"
+                    script: |
+                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version package.json | sed 's/.*"version": "\(.*\)".*/\1/')"
+                - task: ManualValidation@0
+                  displayName: Wait for validation
+                  inputs:
+                    notifyUsers: "*"
+                    instructions: "Awaiting approval to build an official Testnet release with version $(RELEASE_VERSION)."
+            deploy:
+              steps:
+                - script: npm run pack
+                  displayName: "Pack"
