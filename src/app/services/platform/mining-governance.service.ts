@@ -3,7 +3,7 @@ import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { ReceiptSearchRequest } from "@models/cirrusApi/requests/receipt-search.request";
-import { Observable, map, combineLatest } from "rxjs";
+import { Observable, map, zip } from "rxjs";
 import { ParameterType } from '@enums/parameter-type';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { LogTypes } from '@enums/contracts/log-types';
@@ -27,7 +27,7 @@ export class MiningGovernanceService {
       this._cirrus.getContractStorageItem(miningGovernance, MiningGovernanceStateKeys.MiningDuration, ParameterType.ULong)
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(([minedToken, nominationPeriodEnd, miningPoolsFunded, miningPoolReward, miningDuration]) => {
           return { minedToken, nominationPeriodEnd, miningPoolsFunded, miningPoolReward, miningDuration, address: miningGovernance };

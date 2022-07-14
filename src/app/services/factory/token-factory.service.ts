@@ -3,7 +3,7 @@ import { Token } from '@models/platform/token';
 import { Injectable } from "@angular/core";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
 import { TokenService } from "@services/platform/token.service";
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class TokenFactoryService {
@@ -28,7 +28,7 @@ export class TokenFactoryService {
   private async _buildToken(entity: ITokenEntity): Promise<Token> {
     const hydrated = entity.address === 'CRS'
       ? { totalSupply: BigInt('10000000000000000') }
-      : await lastValueFrom(this._tokenService.getHydratedToken(entity.address));
+      : await firstValueFrom(this._tokenService.getHydratedToken(entity.address));
 
     const pricing = await this._tokenService.getTokenPricing(entity);
 

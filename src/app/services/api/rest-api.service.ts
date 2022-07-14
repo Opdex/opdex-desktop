@@ -10,16 +10,14 @@ import { OpdexHttpError } from '@models/opdex-http-error';
 // The check will always be made, likely often will fail and are not *expecting* it to succeed.
 const retryableErrors = [401, 429, 500]
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class RestApiService {
   constructor(
     protected _http: HttpClient,
     protected _router: Router
   ) { }
 
-  protected get<T>(endpoint: string, options: object = {}): Observable<T> {
+  public get<T>(endpoint: string, options: object = {}): Observable<T> {
     return this._http.get<T>(endpoint, options)
       .pipe(
         retryWhen(err => {
@@ -40,22 +38,22 @@ export class RestApiService {
         catchError(error => this.handleError(error)));
   }
 
-  protected post<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
+  public post<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
     return this._http.post<T>(endpoint, payload, options)
       .pipe(catchError(error => this.handleError(error)));
   }
 
-  protected put<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
+  public put<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
     return this._http.put<T>(endpoint, payload, options)
       .pipe(catchError(error => this.handleError(error)));
   }
 
-  protected patch<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
+  public patch<T>(endpoint: string, payload: any, options: object = {}): Observable<T> {
     return this._http.patch<T>(endpoint, payload, options)
       .pipe(catchError(error => this.handleError(error)));
   }
 
-  protected delete<T>(endpoint: string, options: object = {}): Observable<T> {
+  public delete<T>(endpoint: string, options: object = {}): Observable<T> {
     return this._http.delete<T>(endpoint, options)
       .pipe(catchError(error => this.handleError(error)));
   }

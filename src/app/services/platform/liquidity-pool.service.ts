@@ -3,7 +3,7 @@ import { ParameterType } from '@enums/parameter-type';
 import { map } from 'rxjs/operators';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
-import { combineLatest, Observable, of } from 'rxjs';
+import { zip, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs';
 import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-pool-state-keys';
 import { EnvironmentsService } from '@services/utility/environments.service';
@@ -38,7 +38,7 @@ export class LiquidityPoolService {
       this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.MiningPool, ParameterType.Address),
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(([token, transactionFee, miningPool]) => {
           return {
@@ -60,7 +60,7 @@ export class LiquidityPoolService {
       this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong).pipe(catchError(_ => of('0')))
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(([totalSupply, reserveCrs, reserveSrc, totalStaked, miningPeriodEndBlock]) => {
           return {

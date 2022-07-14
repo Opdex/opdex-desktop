@@ -1,86 +1,91 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { Router } from '@angular/router';
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core";
 import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
-import { map, Observable } from "rxjs";
+import { catchError, map, Observable, of } from "rxjs";
 import { RestApiService } from "./rest-api.service";
-import { HttpClient } from '@angular/common/http';
 import { CallPayload } from '@models/cirrusApi/contract-calls/call';
 import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { ParameterType } from '@enums/parameter-type';
+import { CacheService } from '@services/utility/cache.service';
 
 @Injectable({providedIn: 'root'})
-export class CirrusApiService extends RestApiService {
+export class CirrusApiService extends CacheService {
   api: string = `${this._env.cirrusApi}/api`;
 
   constructor(
-    protected _http: HttpClient,
-    protected _router: Router,
+    protected _injector: Injector,
+    private _rest: RestApiService,
     private _env: EnvironmentsService
   ) {
-    super(_http, _router);
+    super(_injector);
   }
 
   // Signalr
   getConnectionInfo(): Observable<ISignalRResponse> {
-    return this.get<ISignalRResponse>(`${this.api}/SignalR/getConnectionInfo`);
+    return this._rest.get<ISignalRResponse>(`${this.api}/SignalR/getConnectionInfo`);
   }
 
   // Node
-  getNodeStatus():Observable<INodeStatus> {
-    return this.get(`${this.api}/Node/status`);
+  getNodeStatus():Observable<INodeStatus | undefined> {
+    // No caching this call
+    return this._rest
+      .get<INodeStatus>(`${this.api}/Node/status`)
+      .pipe(catchError(_ => of(undefined)));
   }
 
   // Wallets
   getWalletsList(): Observable<{walletNames: string[]}> {
-    return this.get(`${this.api}/Wallet/list-wallets`);
+    return this._rest.get(`${this.api}/Wallet/list-wallets`);
   }
 
   loadWallet(payload: { name: string, password: string }):Observable<any> {
-    return this.post(`${this.api}/Wallet/load`, payload);
+    return this._rest.post(`${this.api}/Wallet/load`, payload);
   }
 
   getAddresses(walletName: string):Observable<INodeAddressList> {
-    return this.get(`${this.api}/Wallet/addresses?walletName=${walletName}`);
+    return this._rest.get(`${this.api}/Wallet/addresses?walletName=${walletName}`);
   }
 
   getAddressBalance(address: string):Observable<number> {
-    return this.get(`${this.api}/SmartContractWallet/address-balance?address=${address}`);
+    return this._rest.get(`${this.api}/SmartContractWallet/address-balance?address=${address}`);
   }
 
   getHistory(walletName: string, address: string):Observable<ISmartContractWalletHistory[]> {
-    return this.get(`${this.api}/SmartContractWallet/history?walletName=${walletName}&address=${address}`);
+    return this._rest.get(`${this.api}/SmartContractWallet/history?walletName=${walletName}&address=${address}`);
   }
 
   // Smart Contracts
   getContractReceipt(txHash: string): Observable<IContractReceiptResult> {
-    return this.get(`${this.api}/SmartContracts/receipt?txHash=${txHash}`);
+    return this._rest.get(`${this.api}/SmartContracts/receipt?txHash=${txHash}`);
   }
 
   searchContractReceipts(request: ReceiptSearchRequest): Observable<IContractReceiptResult[]> {
-    return this.get(`${this.api}/SmartContracts/receipt-search${request.query}`);
+    return this._rest.get(`${this.api}/SmartContracts/receipt-search${request.query}`);
   }
 
   localCall(payload: LocalCallPayload): Observable<ILocalCallResult> {
-    return this.post(`${this.api}/SmartContracts/local-call`, payload);
+    return this._rest.post(`${this.api}/SmartContracts/local-call`, payload);
   }
 
   call(payload: CallPayload): Observable<IContractCallResult> {
-    return this.post(`${this.api}/SmartContractWallet/call`, payload);
+    return this._rest.post(`${this.api}/SmartContractWallet/call`, payload);
   }
 
   getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string> {
-    return this.get<string | { message: string }>(`${this.api}/SmartContracts/storage?contractAddress=${contractAddress}&storageKey=${storageKey}&dataType=${dataType}`)
+    const endpoint = `${this.api}/SmartContracts/storage?contractAddress=${contractAddress}&storageKey=${storageKey}&dataType=${dataType}`;
+    const observable$ = this._rest.get<string | { message: string }>(endpoint)
       .pipe(map(response => {
           if (typeof(response) !== 'string') throw new Error(response.message);
           return response;
         }));
+
+    return this.getItem(endpoint, observable$);
   }
 
   // Supported Contracts
   getSupportedInterfluxTokens(): Observable<ISupportedContract[]> {
     const networkType = '0'; // 0 = mainnet, 1 = testnet
-    return this.get(`${this.api}/SupportedContracts/list?networkType=${networkType}`);
+    return this._rest.get(`${this.api}/SupportedContracts/list?networkType=${networkType}`);
   }
 }

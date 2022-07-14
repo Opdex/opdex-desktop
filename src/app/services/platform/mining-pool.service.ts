@@ -2,7 +2,7 @@ import { MiningPoolStateKeys } from '@enums/contracts/state-keys/mining-pool-sta
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
-import { Observable, combineLatest, map, catchError, of } from "rxjs";
+import { Observable, map, catchError, of, zip } from "rxjs";
 
 export interface IMiningPoolDetailsDto {
   address: string;
@@ -24,7 +24,7 @@ export class MiningPoolService {
       this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0')))
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(([stakingToken, miningPeriodEndBlock, rewardRate, totalSupply]) => {
           return {
@@ -44,7 +44,7 @@ export class MiningPoolService {
     const properties = uniquePools
       .map(miningPool => this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong))
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(endBlocks => {
           return endBlocks.map((block, index) => {

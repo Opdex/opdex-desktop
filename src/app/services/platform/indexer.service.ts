@@ -4,7 +4,7 @@ import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
-import { lastValueFrom } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import { MarketService } from "./market.service";
 import { MiningGovernanceService } from "./mining-governance.service";
 import { NodeService } from "./node.service";
@@ -37,14 +37,14 @@ export class IndexerService {
     const nodeStatus = this._nodeService.status;
 
     const [pools, rewardedMiningPools, nominations] = await Promise.all([
-      lastValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
-      lastValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
-      lastValueFrom(this._miningGovernanceService.getNominatedPools())
+      firstValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceService.getNominatedPools())
     ]);
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
-      const poolDetails = await lastValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
-      const tokenDetails = await lastValueFrom(this._tokenService.getToken(pool.token));
+      const poolDetails = await firstValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
+      const tokenDetails = await firstValueFrom(this._tokenService.getToken(pool.token));
 
       const poolResponse = {
         pool: poolDetails,
@@ -89,7 +89,7 @@ export class IndexerService {
     // Persist active mining pools
     // console.log(rewardedMiningPools); // { stakingPool, miningPool, amount }
     if (rewardedMiningPools.length) {
-      const miningPoolEndBlocks = await lastValueFrom(this._miningPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
+      const miningPoolEndBlocks = await firstValueFrom(this._miningPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
       const miningPoolEntities = await this._poolsRepository.getPoolsByMiningPoolAddress(miningPoolEndBlocks.map(pool => pool.miningPool));
 
       await this._poolsRepository.persistPools(miningPoolEntities.map((entity: ILiquidityPoolEntity) => {

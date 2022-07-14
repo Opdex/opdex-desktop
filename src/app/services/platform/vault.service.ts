@@ -3,7 +3,7 @@ import { ParameterType } from "@enums/parameter-type";
 import { VaultStateKeys } from "@enums/contracts/state-keys/vault-state-keys";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 import { EnvironmentsService } from "@services/utility/environments.service";
-import { combineLatest, map } from "rxjs";
+import { zip, map } from "rxjs";
 
 @Injectable({providedIn: 'root'})
 export class VaultService {
@@ -24,7 +24,7 @@ export class VaultService {
       this._cirrus.getContractStorageItem(vault, VaultStateKeys.TotalVoteMinimum, ParameterType.ULong),
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(([token, totalSupply, vestingDuration, totalProposedAmount, totalPledgeMinimum, totalVoteMinimum]) => {
           return { token, totalSupply, vestingDuration, totalProposedAmount, totalPledgeMinimum, totalVoteMinimum };

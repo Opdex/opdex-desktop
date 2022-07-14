@@ -4,7 +4,7 @@ import { PoolRepositoryService } from '@services/database/pool-repository.servic
 import { CurrencyService } from './currency.service';
 import { OdxStateKeys, StandardTokenStateKeys, InterfluxTokenStateKeys } from '@enums/contracts/state-keys/token-state-keys';
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { combineLatest, map, catchError, of, Observable, lastValueFrom } from 'rxjs';
+import { zip, map, catchError, of, Observable, firstValueFrom } from 'rxjs';
 import { Injectable } from "@angular/core";
 import { ParameterType } from "@enums/parameter-type";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
@@ -55,7 +55,7 @@ export class TokenService {
       this._cirrus.getContractStorageItem(address, InterfluxTokenStateKeys.NativeAddress, ParameterType.String).pipe(catchError(_ => of(''))),
     ];
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(map(([name, symbol, decimals, totalSupply, nativeChain, nativeChainAddress]) => {
         return {
           address,
@@ -86,7 +86,7 @@ export class TokenService {
       );
     }
 
-    return combineLatest(properties)
+    return zip(properties)
       .pipe(
         map(values => {
           let data: any = {
@@ -118,12 +118,12 @@ export class TokenService {
 
     if /* LP Token */ (pool.address === token.address) {
       const totalSupply = FixedDecimal.FromBigInt(
-        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
+        BigInt(await firstValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
         8
       );
 
       const reserveCrs = FixedDecimal.FromBigInt(
-        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
+        BigInt(await firstValueFrom(this._cirrus.getContractStorageItem(token.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
         8
       );
 
@@ -132,12 +132,12 @@ export class TokenService {
       return prices;
     } else /* SRC Token */ {
       const reserveCrs = FixedDecimal.FromBigInt(
-        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
+        BigInt(await firstValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
         8
       );
 
       const reserveSrc = FixedDecimal.FromBigInt(
-        BigInt(await lastValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
+        BigInt(await firstValueFrom(this._cirrus.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
         token.decimals
       );
 

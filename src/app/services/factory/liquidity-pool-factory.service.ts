@@ -8,7 +8,7 @@ import { TokenService } from '@services/platform/token.service';
 import { PoolRepositoryService } from '@services/database/pool-repository.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { MiningPool } from '@models/platform/mining-pool';
 
 @Injectable({providedIn: 'root'})
@@ -51,11 +51,11 @@ export class LiquidityPoolFactoryService {
   private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
     if (!entity) return undefined;
 
-    const hydrated = await lastValueFrom(this._liquidityPoolService.getHydratedPool(entity.address, entity.miningPool));
+    const hydrated = await firstValueFrom(this._liquidityPoolService.getHydratedPool(entity.address, entity.miningPool));
 
     let miningPool = null;
     if (entity.srcToken !== this._env.contracts.odx) {
-      const miningPoolDto = await lastValueFrom(this._miningPoolService.getHydratedMiningPool(entity.miningPool));
+      const miningPoolDto = await firstValueFrom(this._miningPoolService.getHydratedMiningPool(entity.miningPool));
       miningPool = new MiningPool(miningPoolDto);
     }
 

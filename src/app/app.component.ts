@@ -4,12 +4,13 @@ import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { timer, switchMap, tap, filter, lastValueFrom } from 'rxjs';
+import { timer, switchMap, tap, filter, firstValueFrom } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { RouterOutlet } from '@angular/router';
 import { Icons } from '@enums/icons';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { FadeAnimation } from '@animations/fade-animation';
+import { CirrusApiService } from '@services/api/cirrus-api.service';
 
 @Component({
   selector: 'opdex-root',
@@ -28,6 +29,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     public overlayContainer: OverlayContainer,
+    private _cirrusApi: CirrusApiService,
     private _nodeService: NodeService,
     private _coinGecko: CoinGeckoApiService,
     private _currencyService: CurrencyService,
@@ -36,8 +38,7 @@ export class AppComponent implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    await lastValueFrom(this._nodeService.refreshStatus$());
-    this.nodeStatus = this._nodeService.status;
+    this.nodeStatus = await this._refreshNodeStatus();
 
     this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
 
@@ -50,7 +51,7 @@ export class AppComponent implements OnInit {
     // intentionally offset 10 seconds
     timer(10000, 10000)
       .pipe(
-        switchMap(_ => this._nodeService.refreshStatus$()),
+        switchMap(_ => this._refreshNodeStatus()),
         tap(status => this.nodeStatus = status))
       .subscribe();
 
@@ -94,5 +95,11 @@ export class AppComponent implements OnInit {
 
     const metaThemeColor = document.querySelector("meta[name=theme-color]");
     metaThemeColor.setAttribute("content", this.theme === 'light-mode' ? '#ffffff' : '#1b192f');
+  }
+
+  private async _refreshNodeStatus(): Promise<INodeStatus> {
+    const status = await firstValueFrom(this._cirrusApi.getNodeStatus());
+    this._nodeService.setStatus(status);
+    return status;
   }
 }
