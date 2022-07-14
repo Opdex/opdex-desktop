@@ -57,7 +57,6 @@ stages:
           RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
-            preDeploy:
             deploy:
               steps:
                 - script: npm run pack
