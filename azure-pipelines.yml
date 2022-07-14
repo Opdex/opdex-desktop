@@ -57,8 +57,19 @@ stages:
           RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
-            preDeploy:
             deploy:
               steps:
                 - script: npm run pack
                   displayName: "Pack"
+                - task: GitHubRelease@1
+                  inputs:
+                    gitHubConnection: 'Opdex Desktop Releases'
+                    repositoryName: 'Opdex/opdex-desktop'
+                    action: 'create'
+                    target: '$(Build.SourceVersion)'
+                    tagSource: 'userSpecifiedTag'
+                    tag: '$(RELEASE_VERSION)'
+                    isDraft: true
+                    isPreRelease: true
+                    changeLogCompareToRelease: 'lastFullRelease'
+                    changeLogType: 'commitBased'
