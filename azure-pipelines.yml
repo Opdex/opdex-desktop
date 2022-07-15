@@ -62,7 +62,7 @@ stages:
         dependsOn: WaitForValidation
         environment: main
         variables:
-          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['PreValidation.retrieveVersion.RELEASE_VERSION'] ]
+          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
             deploy:
@@ -76,6 +76,7 @@ stages:
                     target: "$(Build.SourceVersion)"
                     tagSource: "userSpecifiedTag"
                     tag: "1.0.0-beta1"
+                    title: "Opdex Desktop $(RELEASE_VERSION)"
                     isDraft: true
                     isPreRelease: true
                     assets: "$(Pipeline.Workspace)/application/*"
