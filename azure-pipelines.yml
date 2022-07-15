@@ -78,6 +78,6 @@ stages:
                     tag: "1.0.0-beta1"
                     isDraft: true
                     isPreRelease: true
-                    assets: "$(Build.ArtifactStagingDirectory)/application/*"
+                    assets: "$(Pipeline.Workspace)/application/*"
                     assetUploadMode: replace
                     addChangeLog: false
