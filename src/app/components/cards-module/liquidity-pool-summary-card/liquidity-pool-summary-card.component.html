@@ -12,19 +12,18 @@
         <p class="mb-0">Liquidity</p>
       </div>
 
-      <!-- <div class="flex-row-center">
-        <opdex-change-indicator
+      <div class="flex-row-center">
+        <!-- <opdex-change-indicator
           [value]="pool?.summary?.reserves?.dailyUsdChangePercent"
           *ngIf="!!pool?.summary?.reserves?.dailyUsdChangePercent">
-        </opdex-change-indicator>
+        </opdex-change-indicator> -->
 
         <opdex-number
-          class="ml-2"
-          prefix="$"
-          [value]="pool?.summary?.reserves?.usd"
-          [short]="true">
+          [short]="true"
+          [prefix]="selectedCurrency.htmlEntity"
+          [value]="pool.crsToken.pricing[selectedCurrency.abbreviation].multiply(pool.reserveCrs).add(pool.srcToken.pricing[selectedCurrency.abbreviation].multiply(pool.reserveSrc))">
         </opdex-number>
-      </div> -->
+      </div>
     </div>
 
     <div class="flex-row-center-between">
@@ -79,11 +78,11 @@
           <p class="mb-0">Staking</p>
         </div>
 
-        <!-- <opdex-number
-          prefix="$"
-          [value]="pool?.summary?.staking?.usd"
-          [short]="true">
-        </opdex-number> -->
+        <opdex-number
+          [short]="true"
+          [prefix]="selectedCurrency.htmlEntity"
+          [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
+        </opdex-number>
       </div>
 
       <div class="flex-row-center-between">

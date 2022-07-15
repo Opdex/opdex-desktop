@@ -35,7 +35,11 @@
         <p class="mb-0">Staking</p>
       </div>
 
-      <!-- <opdex-number [short]="true" prefix="$" [value]="pool.summary.staking.usd"></opdex-number> -->
+      <opdex-number
+        [short]="true"
+        [prefix]="selectedCurrency.htmlEntity"
+        [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
+      </opdex-number>
     </div>
 
     <div class="flex-row-center-between">

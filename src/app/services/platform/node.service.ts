@@ -9,8 +9,6 @@ export class NodeService {
   private _block$ = new BehaviorSubject<number>(null);
   private _status$ = new BehaviorSubject<INodeStatus>(null);
 
-  constructor() { }
-
   public get latestBlock() {
     return this._block;
   }

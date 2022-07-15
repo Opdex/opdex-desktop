@@ -1,3 +1,5 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { CurrencyService } from '@services/platform/currency.service';
 import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Subscription } from 'rxjs';
@@ -14,6 +16,7 @@ export class LiquidityPoolSummaryCardComponent implements OnDestroy {
   @Input() pool: LiquidityPool;
   @Input() showPoolName: boolean;
   latestBlock: number;
+  selectedCurrency: ICurrency;
   icons = Icons;
   subscription = new Subscription();
   one = FixedDecimal.One(0);
@@ -27,10 +30,17 @@ export class LiquidityPoolSummaryCardComponent implements OnDestroy {
   //   return priceUsd.multiply(tokensMining);
   // }
 
-  constructor(private _nodeService: NodeService) {
+  constructor(
+    private _nodeService: NodeService,
+    private _currency: CurrencyService
+  ) {
     this.subscription.add(
       this._nodeService.latestBlock$
         .subscribe(block => this.latestBlock = block));
+
+    this.subscription.add(
+      this._currency.selectedCurrency$
+        .subscribe(currency => this.selectedCurrency = currency));
   }
 
   ngOnDestroy(): void {
