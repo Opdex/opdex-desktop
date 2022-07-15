@@ -62,7 +62,7 @@ stages:
         dependsOn: WaitForValidation
         environment: main
         variables:
-          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['retrieveVersion.RELEASE_VERSION'] ]
+          RELEASE_VERSION: $[ dependencies.PreValidation.outputs['PreValidation.retrieveVersion.RELEASE_VERSION'] ]
         strategy:
           runOnce:
             deploy:
@@ -75,7 +75,7 @@ stages:
                     action: "create"
                     target: "$(Build.SourceVersion)"
                     tagSource: "userSpecifiedTag"
-                    tag: $(RELEASE_VERSION)
+                    tag: "$(RELEASE_VERSION)"
                     isDraft: true
                     isPreRelease: true
                     assets: "$(Build.ArtifactStagingDirectory)/application/*"
