@@ -75,7 +75,7 @@ stages:
                     action: "create"
                     target: "$(Build.SourceVersion)"
                     tagSource: "userSpecifiedTag"
-                    tag: "$(RELEASE_VERSION)"
+                    tag: "1.0.0-beta1"
                     isDraft: true
                     isPreRelease: true
                     assets: "$(Build.ArtifactStagingDirectory)/application/*"
