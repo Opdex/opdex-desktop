@@ -1,4 +1,4 @@
-export enum LogTypes {
+export enum TransactionLogTypes {
   // Deployer
   ClaimPendingDeployerOwnershipLog = 'ClaimPendingDeployerOwnershipLog',
   CreateMarketLog = 'CreateMarketLog',

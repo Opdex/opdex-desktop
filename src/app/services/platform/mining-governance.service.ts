@@ -6,7 +6,7 @@ import { ReceiptSearchRequest } from "@models/cirrusApi/requests/receipt-search.
 import { Observable, map, zip } from "rxjs";
 import { ParameterType } from '@enums/parameter-type';
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { LogTypes } from '@enums/contracts/log-types';
+import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { MiningGovernanceMethods } from '@enums/contracts/methods/mining-governance-methods';
 
 @Injectable({providedIn: 'root'})
@@ -35,8 +35,8 @@ export class MiningGovernanceService {
   }
 
   getRewardedPools(fromBlock: number = 3500000): Observable<any> {
-    const type = LogTypes.RewardMiningPoolLog;
-    const request = new ReceiptSearchRequest(this._env.contracts.miningGovernance, type, fromBlock);
+    const type = TransactionLogTypes.RewardMiningPoolLog;
+    const request = new ReceiptSearchRequest(this._env.contracts.miningGovernance, fromBlock, type);
 
     return this._cirrus.searchContractReceipts(request)
       .pipe(
