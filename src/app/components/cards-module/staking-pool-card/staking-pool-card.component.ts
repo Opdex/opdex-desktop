@@ -1,8 +1,8 @@
 import { Subscription } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-// import { TransactionView } from '@sharedModels/transaction-view';
-// import { SidenavService } from '@sharedServices/utility/sidenav.service';
+// import { TransactionView } from '@models/transaction-view';
+// import { SidenavService } from '@services/utility/sidenav.service';
 import { Icons } from '@enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { ICurrency } from '@lookups/currencyDetails.lookup';

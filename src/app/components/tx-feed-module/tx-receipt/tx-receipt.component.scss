@@ -1,0 +1,16 @@
+.transaction-receipt {
+  .tx-container {
+    padding: 15px;
+
+    .icon-container {
+      min-width: 30px;
+      max-width: 30px;
+      display: flex;
+      align-items: center;
+    }
+
+    .icon-container-offset {
+      padding-left: 30px;
+    }
+  }
+}

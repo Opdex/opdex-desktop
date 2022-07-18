@@ -49,6 +49,7 @@
     "dexie": "^3.2.2",
     "electron-context-menu": "^3.3.0",
     "ethereum-checksum-address": "^0.0.8",
+    "ngx-infinite-scroll": "^14.0.0",
     "ngx-timeago": "^2.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
