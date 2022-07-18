@@ -25,10 +25,15 @@ export class TokenFactoryService {
     return await this._buildToken(entity);
   }
 
-  private async _buildToken(entity: ITokenEntity): Promise<Token> {
+  public async buildLpToken(address: string): Promise<Token> {
+    const entity: ITokenEntity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8 };
+    return await this._buildToken(entity, true);
+  }
+
+  private async _buildToken(entity: ITokenEntity, lpToken: boolean = false): Promise<Token> {
     const hydrated = entity.address === 'CRS'
       ? { totalSupply: BigInt('10000000000000000') }
-      : await firstValueFrom(this._tokenService.getHydratedToken(entity.address));
+      : await firstValueFrom(this._tokenService.getHydratedToken(entity.address, lpToken));
 
     const pricing = await this._tokenService.getTokenPricing(entity);
 

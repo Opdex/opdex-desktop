@@ -36,7 +36,12 @@
         <mat-icon class="tiny mr-1 red">{{icons.mining}}</mat-icon>
         <p class="mb-0">Mining</p>
       </div>
-      <!-- <opdex-number [short]="true" prefix="$" [value]="miningUsd"></opdex-number> -->
+
+      <opdex-number
+        [short]="true"
+        [prefix]="selectedCurrency.htmlEntity"
+        [value]="pool.lpToken.pricing[selectedCurrency.abbreviation].multiply(pool.miningPool?.tokensMining)">
+      </opdex-number>
     </div>
 
     <div class="flex-row-center-between">

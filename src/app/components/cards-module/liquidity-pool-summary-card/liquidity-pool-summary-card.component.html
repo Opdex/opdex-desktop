@@ -143,11 +143,11 @@
           <p class="mb-0">Mining</p>
         </div>
 
-        <!-- <opdex-number
-          prefix="$"
-          [value]="miningUsd"
-          [short]="true">
-        </opdex-number> -->
+        <opdex-number
+          [short]="true"
+          [prefix]="selectedCurrency.htmlEntity"
+          [value]="pool.lpToken.pricing[selectedCurrency.abbreviation].multiply(pool.miningPool?.tokensMining)">
+        </opdex-number>
       </div>
 
       <div class="flex-row-center-between">
@@ -156,7 +156,7 @@
         <opdex-number
           [value]="pool?.miningPool?.tokensMining"
           [short]="true"
-          suffix="OLPT">
+          [suffix]="pool?.lpToken?.symbol">
         </opdex-number>
       </div>
 
