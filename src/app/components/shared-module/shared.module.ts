@@ -1,3 +1,4 @@
+import { CopyButtonComponent } from './copy-button/copy-button.component';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
 
 // Angular Core Imports
@@ -35,7 +36,8 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     NumberComponent,
     ThemeToggleComponent,
     CurrencySelectComponent,
-    TokenNativeChainBadgeComponent
+    TokenNativeChainBadgeComponent,
+    CopyButtonComponent
   ],
   imports: [
     CommonModule,
@@ -57,7 +59,8 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     NumberComponent,
     ThemeToggleComponent,
     CurrencySelectComponent,
-    TokenNativeChainBadgeComponent
+    TokenNativeChainBadgeComponent,
+    CopyButtonComponent
   ]
 })
 export class SharedModule { }

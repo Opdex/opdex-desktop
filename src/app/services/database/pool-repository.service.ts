@@ -15,6 +15,10 @@ export class PoolRepositoryService {
     return await this._db.liquidityPool.get({srcToken: address});
   }
 
+  async getPoolByMiningPoolAddress(address: string) : Promise<ILiquidityPoolEntity> {
+    return await this._db.liquidityPool.get({miningPool: address});
+  }
+
   async getPools(skip: number = 0, take: number = 10): Promise<ILiquidityPoolEntity[]> {
     return await this._db.liquidityPool.offset(skip).limit(take).toArray();
   }

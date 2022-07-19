@@ -9,7 +9,7 @@
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{pool.address}}">{{pool.tokens.lp.symbol}}</a>
+      <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{pool.address}}">{{pool.lpToken.symbol}}</a>
     </div>
   </div>
 
@@ -23,7 +23,7 @@
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="no-decoration" routerLink="/tokens/{{pool.tokens.crs.address}}">{{pool.tokens.crs.symbol}}</a>
+      <a class="no-decoration" routerLink="/tokens/{{pool.crsToken.address}}">{{pool.crsToken.symbol}}</a>
     </div>
 
     <div class="col no-wrap">
@@ -35,7 +35,7 @@
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="no-decoration" routerLink="/tokens/{{pool.tokens.src.address}}">{{pool.tokens.src.symbol}}</a>
+      <a class="no-decoration" routerLink="/tokens/{{pool.srcToken.address}}">{{pool.srcToken.symbol}}</a>
     </div>
   </div>
 </ng-container>

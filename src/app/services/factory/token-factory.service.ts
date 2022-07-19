@@ -1,3 +1,4 @@
+import { PoolRepositoryService } from '@services/database/pool-repository.service';
 import { ITokenEntity } from '@interfaces/database.interface';
 import { Token } from '@models/platform/token';
 import { Injectable } from "@angular/core";
@@ -10,6 +11,7 @@ export class TokenFactoryService {
   constructor(
     private _tokenService: TokenService,
     private _tokenRepository: TokenRepositoryService,
+    private _liquidityPoolRepository: PoolRepositoryService
   ) { }
 
   public async buildTokens(): Promise<Token[]> {
@@ -18,16 +20,24 @@ export class TokenFactoryService {
   }
 
   public async buildToken(address: string): Promise<Token> {
-    const entity: ITokenEntity = address === 'CRS'
+    let entity: ITokenEntity = address === 'CRS'
       ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8 }
       : await this._tokenRepository.getTokenByAddress(address);
 
-    return await this._buildToken(entity);
-  }
+    let isLpt = false;
 
-  public async buildLpToken(address: string): Promise<Token> {
-    const entity: ITokenEntity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8 };
-    return await this._buildToken(entity, true);
+    if (entity === undefined) {
+      const pool = await this._liquidityPoolRepository.getPoolByAddress(address);
+
+      if (pool !== undefined) {
+        entity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8 }
+        isLpt = true;
+      } else {
+        return undefined;
+      }
+    }
+
+    return await this._buildToken(entity, isLpt);
   }
 
   private async _buildToken(entity: ITokenEntity, lpToken: boolean = false): Promise<Token> {

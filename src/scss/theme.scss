@@ -98,6 +98,13 @@ body {
   main {
     overscroll-behavior-y: none;
     min-height: 100vh;
+
+    .tx-bg {
+      background-image: url('/assets/Bg1@2x.png') !important;
+      background-size: cover !important;
+      background-repeat: no-repeat !important;
+      background-position: bottom !important;
+    }
   }
 
   .number-tooltip {

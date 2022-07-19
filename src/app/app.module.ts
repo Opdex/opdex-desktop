@@ -1,3 +1,4 @@
+import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { NavigationModule } from './components/navigation-module/navigation.module';
 import { SharedModule } from '@components/shared-module/shared.module';
@@ -62,7 +63,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     CardsModule,
     SharedModule,
     NavigationModule,
-    ModalsModule
+    ModalsModule,
+    TxFeedModule
   ],
   providers: [
     {

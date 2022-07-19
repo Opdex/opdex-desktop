@@ -23,7 +23,8 @@
         </small>
 
         <div class="flex-row-center">
-          <small *ngIf="showTimeAgo">{{tx?.block?.medianTime | timeago}}</small>
+          <!-- <small *ngIf="showTimeAgo">{{tx?.block?.medianTime | timeago}}</small> -->
+          <small *ngIf="showTimeAgo">#{{tx?.block?.height | formatNumber:0}}</small>
 
           <a mat-button
             color="primary"
@@ -49,7 +50,7 @@
         <opdex-create-pool-transaction-summary [transaction]="tx" *ngSwitchCase="'Create Pool'"></opdex-create-pool-transaction-summary>
         <opdex-distribute-transaction-summary [transaction]="tx" *ngSwitchCase="'Distribute'"></opdex-distribute-transaction-summary>
         <opdex-allowance-transaction-summary [transaction]="tx" *ngSwitchCase="'Allowance'"></opdex-allowance-transaction-summary>
-        <opdex-vault-proposal-transaction-summary [transaction]="tx" *ngSwitchCase="'Vault Proposal'"></opdex-vault-proposal-transaction-summary>
+        <!-- <opdex-vault-proposal-transaction-summary [transaction]="tx" *ngSwitchCase="'Vault Proposal'"></opdex-vault-proposal-transaction-summary> -->
         <opdex-vault-certificate-transaction-summary [transaction]="tx" *ngSwitchCase="'Vault Certificate'"></opdex-vault-certificate-transaction-summary>
       </ng-container>
     </div>
@@ -58,7 +59,8 @@
       <div class="icon-container-offset flex-row-center">
         <ng-container *ngIf="quote?.method !== 'CollectStakingRewards' && quote?.method !== 'CollectMiningRewards'; else noRewards">
           <span *ngIf="tx.success">Unable to read transaction summary, no transaction events found.</span>
-          <span *ngIf="!tx.success">{{tx.error.friendly}}</span>
+          <!-- <span *ngIf="!tx.success">{{tx.error.friendly}}</span> -->
+          <span *ngIf="!tx.success">{{tx.error}}</span>
         </ng-container>
 
         <ng-template #noRewards>
@@ -87,7 +89,9 @@
             [value]="tx.from"
             [icon]="icons.owner"
             size="tiny"
-            color="swap" [stopPropagation]="true"></opdex-copy-button>
+            color="swap"
+            [stopPropagation]="true">
+          </opdex-copy-button>
 
             <span class="ml-2"><small>{{tx.from | shortAddress:3}}</small></span>
         </div>

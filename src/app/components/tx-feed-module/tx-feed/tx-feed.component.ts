@@ -1,10 +1,9 @@
+import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { NodeService } from '@services/platform/node.service';
-import { ITransactionReceipts } from '@models/platform-api/responses/transactions/transaction.interface';
-import { map, switchMap, take, tap } from 'rxjs/operators';
-import { Observable, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { Subscription, tap } from 'rxjs';
 import { TransactionsService } from '@services/platform/transactions.service';
 import { Component, OnChanges, OnDestroy, ViewChild, ElementRef, Input } from '@angular/core';
-import { ITransactionsRequest, TransactionRequest } from '@models/platform-api/requests/transactions/transactions-filter';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 import { Icons } from 'src/app/enums/icons';
 
@@ -15,7 +14,7 @@ import { Icons } from 'src/app/enums/icons';
 })
 export class TxFeedComponent implements OnChanges, OnDestroy {
   @ViewChild('feedContainer') feedContainer: ElementRef;
-  @Input() transactionsRequest: ITransactionsRequest;
+  @Input() transactionsRequest: ReceiptSearchRequest;
   @Input() size: 's' | 'm' | 'l';
   copied: boolean;
   icons = Icons;
@@ -50,8 +49,13 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
       this.subscription.add(
         this._nodeService.latestBlock$
           .pipe(
-            tap(_ => this.transactionsRequest.cursor = null), // reset the cursor
-            switchMap(_ => this.getTransactions(this.transactionsRequest)))
+            // tap(_ => this.transactionsRequest.cursor = null), // reset the cursor
+            tap(latestBlock => {
+              if (this.transactions.length) {
+                this.transactionsRequest.updateBlocks(latestBlock);
+              }
+            }),
+            switchMap(_ => this.getTransactions()))
           .subscribe((transactions: TransactionReceipt[]) => {
             this.loading = false;
             if (this.transactions.length === 0) {
@@ -85,41 +89,18 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
     this.refreshAvailable = false;
   }
 
-  getTransactions(request: ITransactionsRequest): Observable<TransactionReceipt[]> {
-    return this._transactionsService.getTransactions(new TransactionRequest(request))
-      .pipe(
-        // Filter transactions
-        map((transactionsResponse: ITransactionReceipts) => {
-          // map to transaction receipt
-          var receipts = transactionsResponse.results
-              .map(transaction => new TransactionReceipt(transaction))
-              .filter(tx => tx.events.length >= 1 || !tx.success);
-
-          // Next page only set after we've gotten something. If not set - this is first load,
-          // If cursor exists, this request is getting more txs
-          // In either case, the very first load or load more set the next page cursor.
-          // Refreshing latest shouldn't set nextPage. (e.g. 3 pages down, checking for new txs,
-          // don't set next page but alert user to scroll up)
-          if (!this.nextPage || request.cursor) {
-            if (!transactionsResponse.paging.next) {
-              this.endReached = true;
-            } else {
-              this.nextPage = transactionsResponse.paging.next;
-            }
-          }
-
-          return receipts;
-        })
-      );
+  async getTransactions(): Promise<TransactionReceipt[]> {
+    const transactions = await this._transactionsService.searchTransactionReceipts(this.transactionsRequest);
+    return transactions.filter(tx => tx.events.length >= 1 || !tx.success).sort((x, y) => y.block.height - x.block.height);
   }
 
-  more() {
+  async more(): Promise<void> {
     if (this.endReached) return;
+    const lastBlock = this.transactions[this.transactions.length - 1].block.height;
+    this.transactionsRequest.updateBlocks(lastBlock - 5400, lastBlock - 1);
 
-    this.transactionsRequest.cursor = this.nextPage;
-    this.getTransactions(this.transactionsRequest)
-      .pipe(take(1))
-      .subscribe((transactions: TransactionReceipt[]) => this.transactions.push(...transactions));
+    const transactions = await this.getTransactions();
+    this.transactions.push(...transactions);
   }
 
   toggleRefresh() {

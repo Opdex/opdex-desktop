@@ -1,7 +1,7 @@
 export class ReceiptSearchRequest {
   contract: string;
   event: string;
-  fromBlock?: number;
+  fromBlock: number;
   toBlock?: number;
   topics?: string[];
 
@@ -11,6 +11,11 @@ export class ReceiptSearchRequest {
     this.event = event;
     this.toBlock = toBlock;
     this.topics = topics;
+  }
+
+  updateBlocks(fromBlock: number, toBlock?: number) {
+    this.fromBlock = fromBlock;
+    this.toBlock = toBlock || this.toBlock;
   }
 
   get query(): string {

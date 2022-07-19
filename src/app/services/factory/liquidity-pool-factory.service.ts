@@ -3,8 +3,6 @@ import { MiningPoolService } from '@services/platform/mining-pool.service';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { TokenRepositoryService } from '@services/database/token-repository.service';
-import { TokenService } from '@services/platform/token.service';
 import { PoolRepositoryService } from '@services/database/pool-repository.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Injectable } from '@angular/core';
@@ -16,8 +14,6 @@ export class LiquidityPoolFactoryService {
   constructor(
     private _liquidityPoolService: LiquidityPoolService,
     private _poolRepository: PoolRepositoryService,
-    private _tokenService: TokenService,
-    private _tokenRepository: TokenRepositoryService,
     private _tokenFactory: TokenFactoryService,
     private _env: EnvironmentsService,
     private _miningPoolService: MiningPoolService
@@ -30,6 +26,11 @@ export class LiquidityPoolFactoryService {
 
   public async buildLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
     const entity = await this._poolRepository.getPoolBySrcAddress(address);
+    return await this._buildLiquidityPool(entity);
+  }
+
+  public async buildLiquidityPoolByMiningPoolAddress(address: string): Promise<LiquidityPool> {
+    const entity = await this._poolRepository.getPoolByMiningPoolAddress(address);
     return await this._buildLiquidityPool(entity);
   }
 
@@ -64,7 +65,7 @@ export class LiquidityPoolFactoryService {
     const srcToken = await this._tokenFactory.buildToken(entity.srcToken);
     const stakingToken = await this._tokenFactory.buildToken(this._env.contracts.odx);
     const crsToken = await this._tokenFactory.buildToken('CRS');
-    const lpToken = await this._tokenFactory.buildLpToken(entity.address);
+    const lpToken = await this._tokenFactory.buildToken(entity.address);
 
     return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken, crsToken, lpToken);
   }

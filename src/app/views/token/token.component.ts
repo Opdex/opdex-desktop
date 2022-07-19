@@ -1,7 +1,11 @@
+import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { Subscription, tap, switchMap } from 'rxjs';
+import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Icons } from '@enums/icons';
 import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
 import { Token } from '@models/platform/token';
@@ -11,21 +15,56 @@ import { Token } from '@models/platform/token';
   templateUrl: './token.component.html',
   styleUrls: ['./token.component.scss']
 })
-export class TokenComponent implements OnInit {
+export class TokenComponent implements OnInit, OnDestroy {
   token: Token;
   pool: LiquidityPool;
   icons = Icons;
   one = FixedDecimal.One(0);
   crsPerOlpt: FixedDecimal;
   srcPerOlpt: FixedDecimal;
+  latestBlock: number;
+  transactionsRequest: ReceiptSearchRequest;
+  subscription = new Subscription();
+  routerSubscription = new Subscription();
 
   constructor(
     private _route: ActivatedRoute,
-    private _poolFactory: LiquidityPoolFactoryService) { }
+    private _poolFactory: LiquidityPoolFactoryService,
+    private _nodeService: NodeService,
+    private _tokenFactory: TokenFactoryService,
+    private _router: Router
+  ) { }
 
   async ngOnInit(): Promise<void> {
+    this.init();
+
+    this.routerSubscription.add(
+      this._router.events.subscribe((evt) => {
+        if (!(evt instanceof NavigationEnd)) return;
+        this.init();
+      })
+    );
+  }
+
+  async init(): Promise<void> {
     const address = this._route.snapshot.paramMap.get('address');
 
+    if (!this.subscription.closed) {
+      this.subscription.unsubscribe();
+      this.subscription = new Subscription();
+    }
+
+    this.subscription.add(
+      this._nodeService.latestBlock$
+        .pipe(
+          tap(latestBlock => this.latestBlock = latestBlock),
+          switchMap(_ => this._setPoolAndToken(address)))
+        .subscribe());
+
+    this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400);
+  }
+
+  private async _setPoolAndToken(address: string): Promise<void> {
     if (address !== 'CRS') {
       // SRC token first, fallback if not found to OLPT
       this.pool = await this._poolFactory.buildLiquidityPoolBySrcToken(address) ||
@@ -48,7 +87,12 @@ export class TokenComponent implements OnInit {
 
       this.token = address === this.pool.srcToken.address ? this.pool.srcToken : this.pool.lpToken;
     } else {
-      this.token = Token.CRS();
+      this.token = await this._tokenFactory.buildToken('CRS');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
   }
 }
