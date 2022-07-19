@@ -12,6 +12,7 @@ export interface ILiquidityPoolEntity {
   transactionFee: number;
   isNominated: number;
   miningPeriodEndBlock: number;
+  createdBlock: number;
 }
 
 export interface ITokenEntity {
@@ -22,4 +23,5 @@ export interface ITokenEntity {
   decimals: number;
   nativeChain?: string;
   nativeChainAddress?: string;
+  createdBlock: number;
 }

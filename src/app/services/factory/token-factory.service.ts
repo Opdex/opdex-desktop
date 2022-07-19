@@ -21,7 +21,7 @@ export class TokenFactoryService {
 
   public async buildToken(address: string): Promise<Token> {
     let entity: ITokenEntity = address === 'CRS'
-      ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8 }
+      ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8, createdBlock: 1 }
       : await this._tokenRepository.getTokenByAddress(address);
 
     let isLpt = false;
@@ -30,7 +30,7 @@ export class TokenFactoryService {
       const pool = await this._liquidityPoolRepository.getPoolByAddress(address);
 
       if (pool !== undefined) {
-        entity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8 }
+        entity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8, createdBlock: pool.createdBlock }
         isLpt = true;
       } else {
         return undefined;

@@ -89,6 +89,10 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
     this.refreshAvailable = false;
   }
 
+  // Todo:
+  // -- This component will also need to work with wallet history - smart contract txs => get receipt by tx hash
+  // -- Find pool/vault/token address' created block, only go back that far
+  // -- If < 10 txs are found, auto get more()
   async getTransactions(): Promise<TransactionReceipt[]> {
     const transactions = await this._transactionsService.searchTransactionReceipts(this.transactionsRequest);
     return transactions.filter(tx => tx.events.length >= 1 || !tx.success).sort((x, y) => y.block.height - x.block.height);

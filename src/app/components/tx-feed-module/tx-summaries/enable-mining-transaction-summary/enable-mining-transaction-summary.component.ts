@@ -26,7 +26,7 @@ export class EnableMiningTransactionSummaryComponent implements OnChanges {
   constructor(private _liquidityPoolService: LiquidityPoolFactoryService) { }
 
   async ngOnChanges(): Promise<void> {
-    const rewardEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.data));
+    const rewardEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
 
     if (rewardEvents.length > 4 || rewardEvents.length === 0) {
       this.error = 'Unable to read enable mining transaction.';

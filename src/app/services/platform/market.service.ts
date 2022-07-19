@@ -24,7 +24,7 @@ export class MarketService {
           response.forEach(tx => {
             tx.logs
               .filter(log => log.log.event === createPoolLog)
-              .forEach(log => pools.push(log.log.data));
+              .forEach(log => pools.push({...log.log.data, createdBlock: tx.blockNumber}));
           });
 
           return pools;

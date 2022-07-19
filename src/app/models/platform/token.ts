@@ -45,21 +45,10 @@ export class Token {
       symbol: 'CRS',
       address: 'CRS',
       decimals: 8,
-      nativeChain: 'Cirrus'
+      nativeChain: 'Cirrus',
+      createdBlock: 1
     }, {
       totalSupply: BigInt('10000000000000000')
-    })
-  }
-
-  static OLPT(address: string, totalSupply: BigInt): Token {
-    return new Token({
-      name: 'Liquidity Pool Token',
-      symbol: 'OLPT',
-      address,
-      decimals: 8,
-      nativeChain: 'Cirrus'
-    }, {
-      totalSupply
     })
   }
 }

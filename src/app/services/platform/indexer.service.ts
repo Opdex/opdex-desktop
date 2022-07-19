@@ -48,14 +48,15 @@ export class IndexerService {
 
       const poolResponse = {
         pool: poolDetails,
-        token: tokenDetails
+        token: tokenDetails,
+        createdBlock: pool.createdBlock
       };
 
       return poolResponse;
     }));
 
     if (poolsDetails.length) {
-      await this._poolsRepository.persistPools(poolsDetails.map(({pool, token}) => {
+      await this._poolsRepository.persistPools(poolsDetails.map(({pool, token, createdBlock}) => {
         return {
           address: pool.address,
           name: `${token.symbol}-${nodeStatus.coinTicker}`,
@@ -63,11 +64,12 @@ export class IndexerService {
           miningPool: pool.miningPool,
           transactionFee: pool.transactionFee,
           isNominated: 0,
-          miningPeriodEndBlock: 0 // false by default
+          miningPeriodEndBlock: 0, // false by default
+          createdBlock
         }
       }));
 
-      await this._tokenRepository.persistTokens(poolsDetails.map(({token}) => {
+      await this._tokenRepository.persistTokens(poolsDetails.map(({token, createdBlock}) => {
         const decimals = parseInt(token.decimals);
 
         // console.log(token.nativeChain, token.nativeAddress);
@@ -81,7 +83,8 @@ export class IndexerService {
           symbol: token.symbol,
           decimals: decimals,
           nativeChain: token.nativeChain || 'Cirrus',
-          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress(token.nativeChainAddress) : undefined
+          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress(token.nativeChainAddress) : undefined,
+          createdBlock
         }
       }));
     }
