@@ -1,3 +1,4 @@
+import { HelpButtonComponent } from './help-button/help-button.component';
 import { CopyButtonComponent } from './copy-button/copy-button.component';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
 
@@ -37,7 +38,8 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     ThemeToggleComponent,
     CurrencySelectComponent,
     TokenNativeChainBadgeComponent,
-    CopyButtonComponent
+    CopyButtonComponent,
+    HelpButtonComponent
   ],
   imports: [
     CommonModule,
@@ -60,7 +62,8 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     ThemeToggleComponent,
     CurrencySelectComponent,
     TokenNativeChainBadgeComponent,
-    CopyButtonComponent
+    CopyButtonComponent,
+    HelpButtonComponent
   ]
 })
 export class SharedModule { }

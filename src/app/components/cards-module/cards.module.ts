@@ -1,3 +1,4 @@
+import { VaultCertificateCardComponent } from './vault-certificate-card/vault-certificate-card.component';
 import { MarketTokenCardComponent } from './market-token-card/market-token-card.component';
 import { StakingPoolCardComponent } from './staking-pool-card/staking-pool-card.component';
 import { SharedModule } from '@components/shared-module/shared.module';
@@ -30,7 +31,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     StakingPoolCardComponent,
     MiningPoolCardComponent,
     MarketTokenCardComponent,
-    TokenSummaryCardComponent
+    TokenSummaryCardComponent,
+    VaultCertificateCardComponent
   ],
   imports: [
     CommonModule,
@@ -52,7 +54,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     StakingPoolCardComponent,
     MarketTokenCardComponent,
     MiningPoolCardComponent,
-    TokenSummaryCardComponent
+    TokenSummaryCardComponent,
+    VaultCertificateCardComponent
   ]
 })
 export class CardsModule { }

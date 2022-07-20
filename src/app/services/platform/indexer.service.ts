@@ -1,3 +1,5 @@
+import { VaultRepositoryService } from '@services/database/vault-repository.service';
+import { VaultService } from './vault.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { MiningPoolService } from './mining-pool.service';
 import { OpdexDB } from '@services/database/db.service';
@@ -25,6 +27,8 @@ export class IndexerService {
     private _tokenRepository: TokenRepositoryService,
     private _miningGovernanceService: MiningGovernanceService,
     private _miningPoolService: MiningPoolService,
+    private _vaultService: VaultService,
+    private _vaultRepository: VaultRepositoryService,
     private _db: OpdexDB
   ) { }
 
@@ -36,11 +40,22 @@ export class IndexerService {
     const indexer = await this._db.indexer.get(1);
     const nodeStatus = this._nodeService.status;
 
-    const [pools, rewardedMiningPools, nominations] = await Promise.all([
+    const [pools, rewardedMiningPools, nominations, createdProposals, createdCertificates, completedProposals, redeemedCertificates, revokedCertificates] = await Promise.all([
       firstValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
       firstValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getNominatedPools())
+      firstValueFrom(this._miningGovernanceService.getNominatedPools()),
+      firstValueFrom(this._vaultService.getCreatedVaultProposals(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCreatedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCompletedVaultProposals(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRedeemedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRevokedVaultCertificates(indexer?.lastUpdateBlock)),
     ]);
+
+    console.log(createdProposals)
+    console.log(createdCertificates)
+    console.log(completedProposals)
+    console.log(redeemedCertificates)
+    console.log(revokedCertificates)
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
       const poolDetails = await firstValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
@@ -90,7 +105,6 @@ export class IndexerService {
     }
 
     // Persist active mining pools
-    // console.log(rewardedMiningPools); // { stakingPool, miningPool, amount }
     if (rewardedMiningPools.length) {
       const miningPoolEndBlocks = await firstValueFrom(this._miningPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
       const miningPoolEntities = await this._poolsRepository.getPoolsByMiningPoolAddress(miningPoolEndBlocks.map(pool => pool.miningPool));
@@ -106,7 +120,46 @@ export class IndexerService {
     // Persist nominations
     await this._poolsRepository.setNominations(nominations.map(({stakingPool}) => stakingPool));
 
-    // Todo: Refresh vault proposals
+    // Persist created vault proposals
+    if (createdProposals.length) {
+      await this._vaultRepository.persistProposals(createdProposals.map(proposal => {
+        return {
+          proposalId: proposal.proposalId,
+          type: proposal.type,
+          description: proposal.description,
+          wallet: proposal.wallet,
+          createdBlock: proposal.blockHeight
+        }
+      }))
+    }
+
+    // persist created certificates
+    if (createdCertificates.length) {
+      await this._vaultRepository.persistCertificates(createdCertificates.map(certificate => {
+        return {
+          owner: certificate.owner,
+          amount: certificate.amount,
+          redeemed: 0, // false by default
+          revoked: 0, // false by default
+          vestedBlock: certificate.vestedBlock,
+          createdBlock: certificate.blockHeight
+        }
+      }))
+    }
+
+    // Todo: persist redemption flags
+    if (redeemedCertificates.length) {
+      await Promise.all(redeemedCertificates.map(cert => {
+        return this._vaultRepository.setCertificateRedemption(cert.vestedBlock)
+      }))
+    }
+
+    // Todo: persist revoked certificates
+    if (revokedCertificates.length) {
+      await Promise.all(revokedCertificates.map(cert => {
+        return this._vaultRepository.setCertificateRevocation(cert.vestedBlock, cert.newAmount)
+      }))
+    }
 
     await this._db.indexer.put({
       lastUpdateBlock: nodeStatus.blockStoreHeight,

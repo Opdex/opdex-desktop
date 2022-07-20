@@ -25,3 +25,22 @@ export interface ITokenEntity {
   nativeChainAddress?: string;
   createdBlock: number;
 }
+
+export interface IVaultProposalEntity {
+  id?: number;
+  proposalId: number;
+  createdBlock: number;
+  type: number;
+  description: string;
+  wallet: string;
+}
+
+export interface IVaultCertificateEntity {
+  id?: number;
+  owner: string;
+  amount: BigInt;
+  redeemed: number; // 0 false - 1 true
+  revoked: number; // 0 false - 1 true
+  createdBlock: number;
+  vestedBlock: number;
+}

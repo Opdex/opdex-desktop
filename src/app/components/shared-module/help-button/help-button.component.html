@@ -1,0 +1,9 @@
+<button
+  mat-icon-button
+  class="flex-row-center tiny"
+  (click)="openHelp()"
+  type="button"
+  color="primary"
+  [matTooltip]="info.title">
+  <mat-icon class="{{iconColor}}">{{ icon ? icon : icons.help }}</mat-icon>
+</button>

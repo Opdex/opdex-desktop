@@ -11,10 +11,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 
 import { BugReportModalComponent } from './bug-report-modal/bug-report-modal.component';
+import { HelpModalComponent } from './help-modal/help-modal.component';
 
 @NgModule({
   declarations: [
-    BugReportModalComponent
+    BugReportModalComponent,
+    HelpModalComponent
   ],
   imports: [
     CommonModule,
@@ -28,6 +30,7 @@ import { BugReportModalComponent } from './bug-report-modal/bug-report-modal.com
   ],
   exports: [
     BugReportModalComponent,
+    HelpModalComponent
   ]
 })
 export class ModalsModule { }
