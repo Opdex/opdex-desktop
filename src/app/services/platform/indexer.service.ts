@@ -128,7 +128,9 @@ export class IndexerService {
           type: proposal.type,
           description: proposal.description,
           wallet: proposal.wallet,
-          createdBlock: proposal.blockHeight
+          createdBlock: proposal.blockHeight,
+          creator: proposal.creator,
+          approved: 0 // false by default
         }
       }))
     }
@@ -145,6 +147,10 @@ export class IndexerService {
           createdBlock: certificate.blockHeight
         }
       }))
+    }
+
+    if (completedProposals.length) {
+      await this._vaultRepository.setCompletedProposals(completedProposals)
     }
 
     // Todo: persist redemption flags

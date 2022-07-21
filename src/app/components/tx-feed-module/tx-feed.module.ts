@@ -26,7 +26,7 @@ import { StakeTransactionSummaryComponent } from './tx-summaries/stake-transacti
 import { SwapTransactionSummaryComponent } from './tx-summaries/swap-transaction-summary/swap-transaction-summary.component';
 import { VaultCertificateTransactionSummaryComponent } from './tx-summaries/vault-certificate-transaction-summary/vault-certificate-transaction-summary.component';
 import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
-// import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-proposal-transaction-summary/vault-proposal-transaction-summary.component';
+import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-proposal-transaction-summary/vault-proposal-transaction-summary.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +41,7 @@ import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
     VaultCertificateTransactionSummaryComponent,
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
-    // VaultProposalTransactionSummaryComponent
+    VaultProposalTransactionSummaryComponent
   ],
   imports: [
     CommonModule,
@@ -72,7 +72,8 @@ import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
     VaultCertificateTransactionSummaryComponent,
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
-    SharedModule
+    SharedModule,
+    VaultProposalTransactionSummaryComponent
   ]
 })
 export class TxFeedModule { }

@@ -1,4 +1,5 @@
-import { VaultCertificate } from './../../models/platform/vault-certificate';
+import { EnvironmentsService } from '@services/utility/environments.service';
+import { VaultCertificate } from '@models/platform/vault-certificate';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Token } from '@models/platform/token';
 import { TokenFactoryService } from '@services/factory/token-factory.service';
@@ -11,6 +12,7 @@ import { Icons } from '@enums/icons';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { HelpInfo } from '@components/shared-module/help-button/help-button.component';
 import { UserContext } from '@models/user-context';
+import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 
 export class StatCardInfo {
   daily?: boolean;
@@ -36,6 +38,8 @@ export class VaultComponent implements OnInit, OnDestroy {
   certificates: VaultCertificate[];
   statCards: StatCardInfo[];
   context: UserContext;
+  latestBlock: number;
+  transactionsRequest: ReceiptSearchRequest;
   icons = Icons;
   subscription = new Subscription();
 
@@ -43,7 +47,8 @@ export class VaultComponent implements OnInit, OnDestroy {
     private _nodeService: NodeService,
     private _vaultFactory: VaultFactoryService,
     private _tokenFactory: TokenFactoryService,
-    private _userContextService: UserContextService
+    private _userContextService: UserContextService,
+    private _env: EnvironmentsService
   ) {
     this.statCards = this._getStatCards(null, null);
   }
@@ -54,6 +59,7 @@ export class VaultComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
         .pipe(
+          tap(latestBlock => this.latestBlock = latestBlock),
           switchMap(_ => this._vaultFactory.getVault()),
           tap(vault => this.vault = vault),
           switchMap(vault => this._tokenFactory.buildToken(vault.token)),
@@ -64,6 +70,8 @@ export class VaultComponent implements OnInit, OnDestroy {
           this.statCards = this._getStatCards(this.vault, this.token);
         })
     )
+
+    this.transactionsRequest = new ReceiptSearchRequest(this._env.contracts.vault, this.latestBlock - 5400)
   }
 
   ngOnDestroy(): void {

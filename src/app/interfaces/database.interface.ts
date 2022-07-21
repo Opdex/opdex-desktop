@@ -31,8 +31,10 @@ export interface IVaultProposalEntity {
   proposalId: number;
   createdBlock: number;
   type: number;
+  approved: number;
   description: string;
   wallet: string;
+  creator: string;
 }
 
 export interface IVaultCertificateEntity {

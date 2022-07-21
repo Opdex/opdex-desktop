@@ -199,9 +199,9 @@ export interface IRevokeVaultCertificateLog {
 export interface IVaultProposalPledgeLog {
   proposalId: number;
   pledger: string;
-  pledgeAmount: number;
-  pledgerAmount: number;
-  proposalPledgeAmount: number;
+  pledgeAmount: BigInt;
+  pledgerAmount: BigInt;
+  proposalPledgeAmount: BigInt;
   totalPledgeMinimumMet: boolean;
 }
 
@@ -209,27 +209,27 @@ export interface IVaultProposalVoteLog {
   proposalId: number;
   voter: string;
   inFavor: boolean;
-  voteAmount: number;
-  voterAmount: number;
-  proposalYesAmount: number;
+  voteAmount: BigInt;
+  voterAmount: BigInt;
+  proposalYesAmount: BigInt;
   proposalNoAmount: boolean;
 }
 
 export interface IVaultProposalWithdrawPledgeLog {
   proposalId: number;
   pledger: string;
-  withdrawAmount: number;
-  pledgerAmount: number;
-  proposalPledgeAmount: number;
+  withdrawAmount: BigInt;
+  pledgerAmount: BigInt;
+  proposalPledgeAmount: BigInt;
   pledgeWithdrawn: boolean;
 }
 
 export interface IVaultProposalWithdrawVoteLog {
   proposalId: number;
   voter: string;
-  withdrawAmount: number;
-  voterAmount: number;
-  proposalYesAmount: number;
-  proposalNoAmount: number;
+  withdrawAmount: BigInt;
+  voterAmount: BigInt;
+  proposalYesAmount: BigInt;
+  proposalNoAmount: BigInt;
   voteWithdrawn: boolean;
 }

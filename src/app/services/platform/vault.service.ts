@@ -19,6 +19,17 @@ export interface IHydratedVault {
   balance: BigInt;
 }
 
+export interface IHydratedProposal {
+  amount: BigInt;
+  type: number;
+  status: number;
+  wallet: string;
+  expiration: number;
+  pledgeAmount: BigInt;
+  noAmount: BigInt;
+  yesAmount: BigInt;
+}
+
 @Injectable({providedIn: 'root'})
 export class VaultService {
   constructor(
@@ -55,6 +66,12 @@ export class VaultService {
         }));
   }
 
+  getHydratedProposal(proposalId: number): Observable<IHydratedProposal> {
+    const vault = this._env.contracts.vault;
+    const request = new LocalCallPayload(vault, 'GetProposal', vault, [new Parameter(ParameterType.ULong, proposalId)])
+    return this._cirrus.localCall(request).pipe(map(response => response.return));
+  }
+
   getCreatedVaultProposals(fromBlock: number = 3500000): Observable<any> {
     const createProposalLog = TransactionLogTypes.CreateVaultProposalLog;
     const request = new ReceiptSearchRequest(this._env.contracts.vault, fromBlock, createProposalLog);
@@ -67,7 +84,7 @@ export class VaultService {
           response.forEach(tx => {
             tx.logs
               .filter(log => log.log.event === createProposalLog)
-              .forEach(log => proposals.push({...log.log.data, blockHeight: tx.blockNumber}));
+              .forEach(log => proposals.push({...log.log.data, creator: tx.from, blockHeight: tx.blockNumber}));
           });
 
           console.log(proposals)

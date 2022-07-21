@@ -26,6 +26,7 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
   refreshAvailable: boolean;
   loading = true;
   endReached: boolean;
+  killFeed = false;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -55,6 +56,7 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
                 this.transactionsRequest.updateBlocks(latestBlock);
               }
             }),
+            // Todo: Fix bug, first load should use request.fromBlock, subsequent refreshes should be only new unchecked blocks
             switchMap(_ => this.getTransactions()))
           .subscribe((transactions: TransactionReceipt[]) => {
             this.loading = false;
@@ -94,16 +96,37 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
   // -- Find pool/vault/token address' created block, only go back that far
   // -- If < 10 txs are found, auto get more()
   async getTransactions(): Promise<TransactionReceipt[]> {
+    const maxAge = 4200000;
+    let transactions = await this._getTransactions();
+
+    // Todo: Fix bug, first load should use request.fromBlock, subsequent refreshes should be only new unchecked blocks -- causes recursive loop
+    // Edge case where the last bit will be cut off from max age
+    // while (transactions.length < 10 && this.transactionsRequest.fromBlock < maxAge && !this.killFeed) {
+    //   this._setMoreRequest();
+    //   transactions = await this._getTransactions();
+    // }
+
+    return transactions;
+  }
+
+  private async _getTransactions(): Promise<TransactionReceipt[]> {
     const transactions = await this._transactionsService.searchTransactionReceipts(this.transactionsRequest);
     return transactions.filter(tx => tx.events.length >= 1 || !tx.success).sort((x, y) => y.block.height - x.block.height);
   }
 
+  private _setMoreRequest(): void {
+    const lastBlock = this.transactions.length > 0
+      ? this.transactions[this.transactions.length - 1].block.height
+      : this.transactionsRequest.fromBlock;
+
+    this.transactionsRequest.updateBlocks(lastBlock - 5400, lastBlock - 1);
+  }
+
   async more(): Promise<void> {
     if (this.endReached) return;
-    const lastBlock = this.transactions[this.transactions.length - 1].block.height;
-    this.transactionsRequest.updateBlocks(lastBlock - 5400, lastBlock - 1);
+    this._setMoreRequest();
 
-    const transactions = await this.getTransactions();
+    const transactions = await this._getTransactions();
     this.transactions.push(...transactions);
   }
 
@@ -125,6 +148,7 @@ export class TxFeedComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.killFeed = true;
     this.subscription.unsubscribe();
   }
 }

@@ -1,31 +1,23 @@
-import { Vault } from '@models/ui/vaults/vault';
-import { MarketToken } from '@models/ui/tokens/market-token';
-import { take } from 'rxjs/operators';
-import { IVaultProposalResponseModel } from '@models/platform-api/responses/vaults/vault-proposal-response-model.interface';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { IReceiptLogs } from '@interfaces/full-node.interface';
+import { ProposalType, VaultProposal } from '@models/platform/vault-proposal';
+import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { VaultFactoryService } from '@services/factory/vault-factory.service';
+import { Vault } from '@models/platform/vault';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { TokensService } from '@services/platform/tokens.service';
-import { VaultsService } from '@services/platform/vaults.service';
-import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
-import { ICompleteVaultProposalEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/complete-vault-proposal-event.interface';
-import { ICreateVaultProposalEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/create-vault-proposal-event.interface';
-import { IVaultProposalPledgeEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/vault-proposal-pledge-event.interface';
-import { IVaultProposalVoteEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/vault-proposal-vote-event.interface';
-import { IVaultProposalWithdrawPledgeEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/vault-proposal-withdraw-pledge-event.interface';
-import { IVaultProposalWithdrawVoteEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/vault-proposal-withdraw-vote-event.interface';
+import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
-import { Observable, of, Subscription } from 'rxjs';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
-import { IVaultProposalBaseEvent } from '@models/platform-api/responses/transactions/transaction-events/vaults/vault-proposal-base-event.interface';
 import { Token } from '@models/platform/token';
+import { ICompleteVaultProposalLog, ICreateVaultProposalLog, IVaultProposalPledgeLog,
+  IVaultProposalWithdrawPledgeLog, IVaultProposalVoteLog, IVaultProposalWithdrawVoteLog } from '@interfaces/contract-logs.interface';
 
 interface IVaultProposalSummary {
   vault: Vault,
-  proposal: IVaultProposalResponseModel;
+  proposal: VaultProposal;
   pledgeOrVote: IVaultProposalPledgeOrVoteSummary;
   createOrComplete: IVaultProposalCreateOrCompleteSummary;
   crs: Token;
-  vaultToken: MarketToken;
+  vaultToken: Token;
 }
 
 interface IVaultProposalPledgeOrVoteSummary {
@@ -45,14 +37,13 @@ interface IVaultProposalCreateOrCompleteSummary {
   templateUrl: './vault-proposal-transaction-summary.component.html',
   styleUrls: ['./vault-proposal-transaction-summary.component.scss']
 })
-export class VaultProposalTransactionSummaryComponent implements OnChanges, OnDestroy {
+export class VaultProposalTransactionSummaryComponent implements OnChanges {
   @Input() transaction: TransactionReceipt;
 
   error: string;
   summary: IVaultProposalSummary;
-  pledgeOrVoteEvents: IVaultProposalBaseEvent[];
-  createOrCompleteEvents: IVaultProposalBaseEvent[];
-  subscription = new Subscription();
+  pledgeOrVoteEvents: IReceiptLogs[];
+  createOrCompleteEvents: IReceiptLogs[];
 
   pledgeOrVoteEventTypes = [
     TransactionLogTypes.VaultProposalPledgeLog,
@@ -66,11 +57,14 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges, OnDe
     TransactionLogTypes.CompleteVaultProposalLog,
   ];
 
-  constructor(private _VaultsService: VaultsService, private _tokensService: TokensService) { }
+  constructor(
+    private _vaultFactory: VaultFactoryService,
+    private _tokenFactory: TokenFactoryService
+  ) { }
 
-  ngOnChanges() {
-    this.createOrCompleteEvents = this.transaction.events.filter(event => this.createOrCompleteEventTypes.includes(event.eventType)) as IVaultProposalBaseEvent[];
-    this.pledgeOrVoteEvents = this.transaction.events.filter(event => this.pledgeOrVoteEventTypes.includes(event.eventType)) as IVaultProposalBaseEvent[];
+  async ngOnChanges(): Promise<void> {
+    this.createOrCompleteEvents = this.transaction.events.filter(event => this.createOrCompleteEventTypes.includes(event.log.event as TransactionLogTypes));
+    this.pledgeOrVoteEvents = this.transaction.events.filter(event => this.pledgeOrVoteEventTypes.includes(event.log.event as TransactionLogTypes));
 
     if (this.createOrCompleteEvents.length > 1 ||
         this.pledgeOrVoteEvents.length > 1 ||
@@ -79,88 +73,75 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges, OnDe
       return;
     }
 
-    if (!this.subscription.closed) {
-      this.subscription.unsubscribe();
-      this.subscription = new Subscription();
-    }
+    const proposalId = this.createOrCompleteEvents.length > 0
+      ? this.createOrCompleteEvents[0].log.data.proposalId
+      : this.pledgeOrVoteEvents[0].log.data.proposalId
 
-    const proposalId = this.createOrCompleteEvents[0]?.proposalId || this.pledgeOrVoteEvents[0]?.proposalId;
-    const vault = this.createOrCompleteEvents[0]?.contract || this.pledgeOrVoteEvents[0]?.contract;
+    const proposal = await this._vaultFactory.getProposal(proposalId);
 
-    this.subscription.add(
-      this._VaultsService.getProposal(proposalId, vault)
-        .pipe(
-          catchError(_ => of({} as IVaultProposalResponseModel)),
-          map(proposal => { return { proposal } as IVaultProposalSummary }),
-          switchMap(summary => this.buildPledgeOrVoteSummary(summary)),
-          switchMap(summary => this.buildCreateOrCompleteSummary(summary)))
-        .subscribe(summary => this.summary = summary)
-    );
+    let proposalSummary = { proposal } as IVaultProposalSummary;
+    proposalSummary = await this.buildPledgeOrVoteSummary(proposalSummary);
+    this.summary = await this.buildCreateOrCompleteSummary(proposalSummary);
   }
 
-  private buildPledgeOrVoteSummary(summary: IVaultProposalSummary): Observable<IVaultProposalSummary> {
+  private async buildPledgeOrVoteSummary(summary: IVaultProposalSummary): Promise<IVaultProposalSummary> {
     if (this.pledgeOrVoteEvents.length > 0) {
-      const pledgeEvent = this.pledgeOrVoteEvents.find(event => event.eventType === TransactionLogTypes.VaultProposalPledgeLog) as IVaultProposalPledgeEvent;
-      const withdrawPledgeEvent = this.pledgeOrVoteEvents.find(event => event.eventType === TransactionLogTypes.VaultProposalWithdrawPledgeLog) as IVaultProposalWithdrawPledgeEvent;
-      const voteEvent = this.pledgeOrVoteEvents.find(event => event.eventType === TransactionLogTypes.VaultProposalVoteLog) as IVaultProposalVoteEvent;
-      const withdrawVoteEvent = this.pledgeOrVoteEvents.find(event => event.eventType === TransactionLogTypes.VaultProposalWithdrawVoteLog) as IVaultProposalWithdrawVoteEvent;
+      const pledgeEvent = this.pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalPledgeLog);
+      const pledgeLog = pledgeEvent ? <IVaultProposalPledgeLog>pledgeEvent.log.data : undefined;
 
-      return this._tokensService.getToken('CRS')
-        .pipe(
-          take(1),
-          map(crs => {
-          summary.crs = crs;
-          summary.pledgeOrVote = { inFavor: null } as IVaultProposalPledgeOrVoteSummary;
+      const withdrawPledgeEvent = this.pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalWithdrawPledgeLog);
+      const withdrawPledgeLog = withdrawPledgeEvent ? <IVaultProposalWithdrawPledgeLog>withdrawPledgeEvent.log.data : undefined;
 
-          if (pledgeEvent || voteEvent) {
-            summary.pledgeOrVote.inFavor = pledgeEvent ? null : voteEvent.inFavor;
-            summary.pledgeOrVote.amount = pledgeEvent
-              ? new FixedDecimal(pledgeEvent.pledgeAmount, crs.decimals)
-              : new FixedDecimal(voteEvent.voteAmount, crs.decimals);
-          }
-          else if (withdrawPledgeEvent || withdrawVoteEvent) {
-            summary.pledgeOrVote.withdrawal = true;
-            summary.pledgeOrVote.amount = withdrawPledgeEvent
-              ? new FixedDecimal(withdrawPledgeEvent.withdrawAmount, crs.decimals)
-              : new FixedDecimal(withdrawVoteEvent.withdrawAmount, crs.decimals);
-          }
+      const voteEvent = this.pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalVoteLog);
+      const voteLog = voteEvent ? <IVaultProposalVoteLog>voteEvent.log.data : undefined;
 
-          return summary;
-        }));
+      const withdrawVoteEvent = this.pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalWithdrawVoteLog);
+      const withdrawVoteLog = withdrawVoteEvent ? <IVaultProposalWithdrawVoteLog>withdrawVoteEvent.log.data : undefined;
+
+      const crs = await this._tokenFactory.buildToken('CRS')
+      summary.crs = crs;
+      summary.pledgeOrVote = { inFavor: null } as IVaultProposalPledgeOrVoteSummary;
+
+      if (pledgeLog || voteLog) {
+        summary.pledgeOrVote.inFavor = pledgeLog ? null : voteLog.inFavor;
+        summary.pledgeOrVote.amount = pledgeLog
+          ? FixedDecimal.FromBigInt(pledgeLog.pledgeAmount, crs.decimals)
+          : FixedDecimal.FromBigInt(voteLog.voteAmount, crs.decimals);
+      }
+      else if (withdrawPledgeLog || withdrawVoteLog) {
+        summary.pledgeOrVote.withdrawal = true;
+        summary.pledgeOrVote.amount = withdrawPledgeLog
+          ? FixedDecimal.FromBigInt(withdrawPledgeLog.withdrawAmount, crs.decimals)
+          : FixedDecimal.FromBigInt(withdrawVoteLog.withdrawAmount, crs.decimals);
+      }
     }
 
-    return of(summary);
+    return summary;
   }
 
-  private buildCreateOrCompleteSummary(summary: IVaultProposalSummary): Observable<IVaultProposalSummary> {
+  private async buildCreateOrCompleteSummary(summary: IVaultProposalSummary): Promise<IVaultProposalSummary> {
     if (this.createOrCompleteEvents.length > 0) {
-      const createEvent = this.createOrCompleteEvents.find(event => event.eventType === TransactionLogTypes.CreateVaultProposalLog) as ICreateVaultProposalEvent;
-      const completeEvent = this.createOrCompleteEvents.find(event => event.eventType === TransactionLogTypes.CompleteVaultProposalLog) as ICompleteVaultProposalEvent;
+      const createEvent = this.createOrCompleteEvents.find(event => event.log.event === TransactionLogTypes.CreateVaultProposalLog);
+      const completeEvent = this.createOrCompleteEvents.find(event => event.log.event === TransactionLogTypes.CompleteVaultProposalLog);
+      const createLog = createEvent ? <ICreateVaultProposalLog>createEvent.log.data : undefined;
+      const completeLog = completeEvent ? <ICompleteVaultProposalLog>completeEvent.log.data : undefined;
 
-      return this._VaultsService.getVault(createEvent?.contract || completeEvent?.contract)
-        .pipe(
-          tap(vault => summary.vault = vault),
-          switchMap(vault => this._tokensService.getMarketToken(vault.token)),
-          map(token => {
-            summary.vaultToken = token as MarketToken;
-            summary.createOrComplete = { approved: null };
+      const vault = await this._vaultFactory.getVault();
+      const token = await this._tokenFactory.buildToken(vault.token);
 
-            if (summary.proposal?.type === 'Create' || createEvent?.type === 'Create') summary.createOrComplete.type = 'New Certificate';
-            else if (summary.proposal?.type === 'Revoke' || createEvent?.type === 'Revoke') summary.createOrComplete.type = 'Revoke Certificate';
-            else if (summary.proposal?.type === 'TotalPledgeMinimum' || createEvent?.type === 'TotalPledgeMinimum') summary.createOrComplete.type = 'Pledge Change';
-            else if (summary.proposal?.type === 'TotalVoteMinimum' || createEvent?.type === 'TotalVoteMinimum') summary.createOrComplete.type = 'Vote Change';
+      summary.vault = vault
+      summary.vaultToken = token;
+      summary.createOrComplete = { approved: null };
 
-            if (completeEvent) summary.createOrComplete.approved = completeEvent.approved;
+      if (summary.proposal?.type === 'Create' || createLog?.type === ProposalType.Create) summary.createOrComplete.type = 'New Certificate';
+      else if (summary.proposal?.type === 'Revoke' || createLog?.type === ProposalType.Revoke) summary.createOrComplete.type = 'Revoke Certificate';
+      else if (summary.proposal?.type === 'TotalPledgeMinimum' || createLog?.type === ProposalType.TotalPledgeMinimum) summary.createOrComplete.type = 'Pledge Change';
+      else if (summary.proposal?.type === 'TotalVoteMinimum' || createLog?.type === ProposalType.TotalVoteMinimum) summary.createOrComplete.type = 'Vote Change';
 
-            return summary;
-          }));
+      if (completeLog) summary.createOrComplete.approved = completeLog.approved;
     }
 
-    return of(summary);
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
+    return summary;
   }
 }
 

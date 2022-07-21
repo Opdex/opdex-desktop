@@ -1,3 +1,4 @@
+import { ICompleteVaultProposalLog } from './../../interfaces/contract-logs.interface';
 import { IVaultProposalEntity, IVaultCertificateEntity } from '@interfaces/database.interface';
 import { Injectable } from "@angular/core";
 import { OpdexDB } from "./db.service";
@@ -20,6 +21,15 @@ export class VaultRepositoryService {
 
   async getCertificateByVestedBlock(vestedBlock: number): Promise<IVaultCertificateEntity> {
     return await this._db.certificate.get({vestedBlock});
+  }
+
+  async setCompletedProposals(completeLogs: ICompleteVaultProposalLog[]): Promise<void> {
+    const proposals = await this._db.proposal.where('proposalId').anyOf(completeLogs.map(log => log.proposalId)).toArray();
+
+    this._db.proposal.bulkPut(proposals.map(proposal => {
+      proposal.approved = completeLogs.find(log => log.proposalId === proposal.proposalId).approved ? 1 : 0;
+      return proposal;
+    }));
   }
 
   async persistProposals(proposals: IVaultProposalEntity[]): Promise<void> {
