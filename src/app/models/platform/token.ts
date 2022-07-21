@@ -18,6 +18,10 @@ export class Token {
     return this.address === 'CRS';
   }
 
+  get isStaking(): boolean {
+    return !!this.distribution;
+  }
+
   constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any) {
     this.address = entity.address;
     this.name = entity.name;
@@ -36,6 +40,10 @@ export class Token {
         // Validate supported tokens via Cirrus FN API
         trusted: true
       } as IWrappedToken);
+    }
+
+    if (hydrated.nextDistributionBlock) {
+      this.distribution = new TokenDistribution(hydrated.nextDistributionBlock);
     }
   }
 
@@ -105,62 +113,21 @@ export class WrappedToken {
 }
 
 export class TokenDistribution {
-  private _vault: string;
-  private _miningGovernance: string;
   private _nextDistributionBlock: number;
-  private _history: TokenDistributionHistory[];
-
-  public get vault(): string {
-    return this._vault;
-  }
-
-  public get miningGovernance(): string {
-    return this._miningGovernance;
-  }
 
   public get nextDistributionBlock(): number {
     return this._nextDistributionBlock;
   }
-
-  public get history(): TokenDistributionHistory[] {
-    return this._history || [];
+  public get distributionPeriodBlockDuration(): number {
+    return 1971000; // Cirrus blocks per year
   }
 
-  constructor(distribution: ITokenDistribution) {
-    if (!!distribution === false) return;
-
-    this._vault = distribution.vault;
-    this._miningGovernance = distribution.miningGovernance;
-    this._nextDistributionBlock = distribution.nextDistributionBlock;
-    this._history = distribution.history.map(history => new TokenDistributionHistory(history));
+  constructor(nextDistributionBlock: number) {
+    this._nextDistributionBlock = nextDistributionBlock;
   }
 
   isReady(latestBlock: number): boolean {
     return this._nextDistributionBlock <= latestBlock;
-  }
-}
-
-export class TokenDistributionHistory {
-  private _vault: FixedDecimal;
-  private _miningGovernance: FixedDecimal;
-  private _block: number;
-
-  public get vault(): FixedDecimal {
-    return this._vault;
-  }
-
-  public get miningGovernance(): FixedDecimal {
-    return this._miningGovernance;
-  }
-
-  public get block(): number {
-    return this._block;
-  }
-
-  constructor(history: ITokenDistributionHistory) {
-    this._vault = new FixedDecimal(history.vault, history.vault.split('.')[0].length);
-    this._miningGovernance = new FixedDecimal(history.miningGovernance, history.miningGovernance.split('.')[0].length);
-    this._block = history.block;
   }
 }
 
