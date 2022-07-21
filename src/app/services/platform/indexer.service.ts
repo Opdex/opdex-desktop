@@ -51,12 +51,6 @@ export class IndexerService {
       firstValueFrom(this._vaultService.getRevokedVaultCertificates(indexer?.lastUpdateBlock)),
     ]);
 
-    console.log(createdProposals)
-    console.log(createdCertificates)
-    console.log(completedProposals)
-    console.log(redeemedCertificates)
-    console.log(revokedCertificates)
-
     const poolsDetails = await Promise.all(pools.map(async pool => {
       const poolDetails = await firstValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
       const tokenDetails = await firstValueFrom(this._tokenService.getToken(pool.token));
@@ -153,14 +147,12 @@ export class IndexerService {
       await this._vaultRepository.setCompletedProposals(completedProposals)
     }
 
-    // Todo: persist redemption flags
     if (redeemedCertificates.length) {
       await Promise.all(redeemedCertificates.map(cert => {
         return this._vaultRepository.setCertificateRedemption(cert.vestedBlock)
       }))
     }
 
-    // Todo: persist revoked certificates
     if (revokedCertificates.length) {
       await Promise.all(revokedCertificates.map(cert => {
         return this._vaultRepository.setCertificateRevocation(cert.vestedBlock, cert.newAmount)

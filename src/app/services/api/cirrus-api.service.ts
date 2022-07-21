@@ -44,7 +44,7 @@ export class CirrusApiService extends CacheService {
   }
 
   getAddresses(walletName: string):Observable<INodeAddressList> {
-    return this._rest.get(`${this.api}/Wallet/addresses?walletName=${walletName}`);
+    return this._rest.get(`${this.api}/Wallet/addresses?walletName=${walletName}&account=account%200`);
   }
 
   getAddressBalance(address: string):Observable<number> {

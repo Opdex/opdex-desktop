@@ -42,10 +42,6 @@ export class SideNavComponent implements OnDestroy {
     // this.network = network;
   }
 
-  login(): void {
-    // this._authService.prepareLogin();
-  }
-
   togglePin(): void {
     this.isPinned = !this.isPinned;
     this.onPinnedToggle.emit(this.isPinned);

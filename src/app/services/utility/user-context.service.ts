@@ -19,11 +19,13 @@ export class UserContextService {
   }
 
   set(wallet: string): void {
+    this._storage.setSessionStorage('user', wallet)
     this._context = this._buildUserContext();
     this._context$.next(this._context)
   }
 
   remove(): void {
+    this._storage.removeSessionStorage('user');
     this._context = new UserContext();
     this._context$.next(this._context);
   }
@@ -34,11 +36,7 @@ export class UserContextService {
   }
 
   private _buildUserContext(): UserContext {
-    // Todo: Need to use session storage to retrieve teh current logged in user
-    // if (!this._jwtService.jwt) return new UserContext();
-
-    // const { wallet } = this._jwtService.jwt;
-    let wallet = '';
+    const wallet = this._storage.getSessionStorage<string>('user');
 
     let preferences = new UserContextPreferences();
 

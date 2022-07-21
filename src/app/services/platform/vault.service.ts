@@ -87,8 +87,6 @@ export class VaultService {
               .forEach(log => proposals.push({...log.log.data, creator: tx.from, blockHeight: tx.blockNumber}));
           });
 
-          console.log(proposals)
-
           return proposals;
       }));
   }
@@ -107,8 +105,6 @@ export class VaultService {
               .filter(log => log.log.event === completeProposalLog)
               .forEach(log => proposals.push({...log.log.data, blockHeight: tx.blockNumber}));
           });
-
-          console.log(proposals)
 
           return proposals;
       }));
@@ -129,8 +125,6 @@ export class VaultService {
               .forEach(log => certificates.push({...log.log.data, blockHeight: tx.blockNumber}));
           });
 
-          console.log(certificates)
-
           return certificates;
       }));
   }
@@ -150,8 +144,6 @@ export class VaultService {
               .forEach(log => certificates.push({...log.log.data, blockHeight: tx.blockNumber}));
           });
 
-          console.log(certificates)
-
           return certificates;
       }));
   }
@@ -170,8 +162,6 @@ export class VaultService {
               .filter(log => log.log.event === redeemCertificateLog)
               .forEach(log => certificates.push({...log.log.data, blockHeight: tx.blockNumber}));
           });
-
-          console.log(certificates)
 
           return certificates;
       }));
