@@ -1,3 +1,4 @@
+import { UserContextService } from '@services/utility/user-context.service';
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ICurrencyPricing } from '@interfaces/coin-gecko.interface';
@@ -7,9 +8,15 @@ import { Currencies } from "@enums/currencies";
 
 @Injectable({providedIn: 'root'})
 export class CurrencyService {
-  private _selectedCurrency: ICurrency = CurrencyDetailsLookup.find(c => c.abbreviation === Currencies.USD);
+  private _selectedCurrency: ICurrency;
   private _selectedCurrency$ = new BehaviorSubject<ICurrency>(null);
-  private _pricing: ICurrencyPricing
+  private _pricing: ICurrencyPricing;
+
+  constructor(private _userContext: UserContextService) {
+    const { userContext } = this._userContext;
+    const currency = userContext.wallet ? userContext.preferences.currency : Currencies.USD;
+    this._selectedCurrency = CurrencyDetailsLookup.find(c => c.abbreviation === currency);;
+  }
 
   get pricing(): ICurrency[] {
     const currencies = [...CurrencyDetailsLookup];
@@ -29,6 +36,13 @@ export class CurrencyService {
   }
 
   setSelectedCurrency(currency: ICurrency) {
+    const context = this._userContext.userContext;
+
+    if (context.wallet) {
+      context.preferences.currency = currency.abbreviation;
+      this._userContext.setUserPreferences(context.wallet, context.preferences);
+    }
+
     currency.price = new FixedDecimal(this._pricing[currency.abbreviation], 8);
     this._selectedCurrency = currency;
     this._selectedCurrency$.next(this._selectedCurrency);

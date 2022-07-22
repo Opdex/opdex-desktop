@@ -11,7 +11,9 @@ export class CurrencySelectComponent {
   currencies = CurrencyDetailsLookup;
   currency = this.currencies[0];
 
-  constructor(private _currencyService: CurrencyService) { }
+  constructor(private _currencyService: CurrencyService) {
+    this.currency = this._currencyService.selectedCurrency;
+  }
 
   public select(currency: any) {
     this.currency = this.currencies.find(item => item.abbreviation === currency.abbreviation);
