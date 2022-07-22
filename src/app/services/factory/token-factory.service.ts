@@ -1,5 +1,5 @@
 import { PoolRepositoryService } from '@services/database/pool-repository.service';
-import { ITokenEntity } from '@interfaces/database.interface';
+import { IPagination, ITokenEntity } from '@interfaces/database.interface';
 import { Token } from '@models/platform/token';
 import { Injectable } from "@angular/core";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
@@ -14,9 +14,10 @@ export class TokenFactoryService {
     private _liquidityPoolRepository: PoolRepositoryService
   ) { }
 
-  public async buildTokens(): Promise<Token[]> {
-    const entities = await this._tokenRepository.getTokens();
-    return await Promise.all(entities.map(entity => this._buildToken(entity)));
+  public async buildTokens(skip: number, take: number): Promise<IPagination<Token>> {
+    const result = await this._tokenRepository.getTokens(skip, take);
+    const tokens = await Promise.all(result.results.map(entity => this._buildToken(entity)));
+    return { skip: result.skip, take: result.take, results: tokens, count: result.count }
   }
 
   public async buildToken(address: string): Promise<Token> {

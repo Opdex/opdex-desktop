@@ -1,4 +1,4 @@
-import { ITokenEntity } from '@interfaces/database.interface';
+import { IPagination, ITokenEntity } from '@interfaces/database.interface';
 import { Injectable } from "@angular/core";
 import { OpdexDB } from "./db.service";
 
@@ -10,8 +10,10 @@ export class TokenRepositoryService {
     return await this._db.token.get({ address });
   }
 
-  async getTokens() {
-    return await this._db.token.toArray();
+  async getTokens(skip: number = 0, take: number = 10): Promise<IPagination<ITokenEntity>> {
+    const count = await this._db.token.count();
+    const results = await this._db.token.offset(skip).limit(take).toArray();
+    return { skip, take, results, count };
   }
 
   async persistTokens(tokens: ITokenEntity[]) {

@@ -1,5 +1,5 @@
 import { NodeService } from '@services/platform/node.service';
-import { ILiquidityPoolEntity } from '@interfaces/database.interface';
+import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
 import { OpdexDB } from './db.service';
 import { Injectable } from "@angular/core";
 
@@ -19,8 +19,10 @@ export class PoolRepositoryService {
     return await this._db.liquidityPool.get({miningPool: address});
   }
 
-  async getPools(skip: number = 0, take: number = 10): Promise<ILiquidityPoolEntity[]> {
-    return await this._db.liquidityPool.offset(skip).limit(take).toArray();
+  async getPools(skip: number = 0, take: number = 10): Promise<IPagination<ILiquidityPoolEntity>> {
+    const count = await this._db.liquidityPool.count();
+    const results = await this._db.liquidityPool.offset(skip).limit(take).toArray();
+    return { skip, take, results, count };
   }
 
   async getPoolsByMiningPoolAddress(miningPools: string[]): Promise<ILiquidityPoolEntity[]> {

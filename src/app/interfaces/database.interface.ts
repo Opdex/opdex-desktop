@@ -46,3 +46,10 @@ export interface IVaultCertificateEntity {
   createdBlock: number;
   vestedBlock: number;
 }
+
+export interface IPagination<T> {
+  skip: number;
+  take: number;
+  count: number;
+  results: T[];
+}

@@ -43,22 +43,20 @@
   </div>
 </div>
 
-
 <div class="standard-section">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-4" *ngFor="let pool of pools">
-        <opdex-card routerLink="/pools/{{pool.address}}">
-          <h3>{{pool.name}}</h3>
-          <small>{{pool.address}}</small>
-          <p>{{pool.reserveCrs.formattedValue}} CRS Reserves</p>
-          <p>{{pool.reserveSrc.formattedValue}} {{pool.srcToken.symbol}} Reserves</p>
-          <p>{{pool.totalStaked.formattedValue}} ODX Staked</p>
-          <p>1 CRS = {{pool.srcPerCrs.formattedValue}} {{pool.srcToken.symbol}}</p>
-          <p>1 {{pool.srcToken.symbol}} = {{pool.crsPerSrc.formattedValue}} CRS</p>
-        </opdex-card>
+      <div class="col-12">
+        <h3>Liquidity Pools</h3>
+        <opdex-pools-table [take]="5"></opdex-pools-table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <h3>Tokens</h3>
+        <opdex-tokens-table [take]="5"></opdex-tokens-table>
       </div>
     </div>
   </div>
 </div>
-

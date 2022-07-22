@@ -22,6 +22,11 @@ export class Token {
     return !!this.distribution;
   }
 
+  public get trackBy(): string {
+    const { pricing, address } = this;
+    return `${address}-${pricing.usd}`;
+  }
+
   constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any) {
     this.address = entity.address;
     this.name = entity.name;

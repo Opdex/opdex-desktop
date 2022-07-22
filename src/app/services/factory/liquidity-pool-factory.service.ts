@@ -1,7 +1,7 @@
 import { TokenFactoryService } from '@services/factory/token-factory.service';
 import { MiningPoolService } from '@services/platform/mining-pool.service';
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { ILiquidityPoolEntity } from '@interfaces/database.interface';
+import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { PoolRepositoryService } from '@services/database/pool-repository.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
@@ -34,9 +34,10 @@ export class LiquidityPoolFactoryService {
     return await this._buildLiquidityPool(entity);
   }
 
-  public async buildLiquidityPools(): Promise<LiquidityPool[]> {
-    const entities = await this._poolRepository.getPools(0, 20);
-    return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
+  public async buildLiquidityPools(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
+    const result = await this._poolRepository.getPools(skip, take);
+    const pools = await Promise.all(result.results.map(entity => this._buildLiquidityPool(entity)));
+    return { skip: result.skip, take: result.take, results: pools, count: result.count };
   }
 
   public async buildActiveMiningPools(): Promise<LiquidityPool[]> {

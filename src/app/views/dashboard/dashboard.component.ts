@@ -13,7 +13,6 @@ import { Token } from '@models/platform/token';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  pools: any[];
   odx: Token;
   crs: Token;
   nominatedPools: LiquidityPool[] = [null,null,null,null];
@@ -28,8 +27,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) { }
 
   async ngOnInit(): Promise<void> {
-    this.pools = await this._liquidityPoolFactory.buildLiquidityPools();
-
     this.subscription.add(
       this._nodeService.latestBlock$
         .pipe(

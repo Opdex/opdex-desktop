@@ -1,0 +1,96 @@
+import { CurrencyService } from '@services/platform/currency.service';
+import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { NodeService } from '@services/platform/node.service';
+import { Component, ViewChild, OnDestroy, OnInit, Input } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { MatSort } from '@angular/material/sort';
+import { Subscription } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { Icons } from 'src/app/enums/icons';
+import { LiquidityPool } from '@models/platform/liquidity-pool';
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { IPagination } from '@interfaces/database.interface';
+
+@Component({
+  selector: 'opdex-pools-table',
+  templateUrl: './pools-table.component.html',
+  styleUrls: ['./pools-table.component.scss']
+})
+export class PoolsTableComponent implements OnInit, OnDestroy {
+  @ViewChild(MatSort) sort: MatSort;
+  @Input() take: number = 10;
+  skip = 0;
+  displayedColumns: string[];
+  dataSource: MatTableDataSource<LiquidityPool>;
+  previous: boolean;
+  next: boolean;
+  selectedCurrency: ICurrency;
+  subscription = new Subscription();
+  icons = Icons;
+
+  constructor(
+    private _router: Router,
+    private _nodeService: NodeService,
+    private _liquidityPoolsService: LiquidityPoolFactoryService,
+    private _currencyService: CurrencyService
+    // private _sidebar: SidenavService
+  ) {
+    this.dataSource = new MatTableDataSource<LiquidityPool>();
+    this.displayedColumns = ['name', 'liquidity', 'stakingWeight', 'mining', 'options'];
+  }
+
+  ngOnInit() {
+    this.subscription.add(
+      this._nodeService.latestBlock$
+        .pipe(
+          switchMap(_ => this.getLiquidityPools$(this.skip, this.take)),
+          switchMap(_ => this._currencyService.selectedCurrency$),
+          tap(currency => this.selectedCurrency = currency))
+        .subscribe());
+  }
+
+  private async getLiquidityPools$(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
+    const result = await this._liquidityPoolsService.buildLiquidityPools(skip, take);
+    this.dataSource.data = [...result.results];
+    this.previous = this.skip > 0 && result.count > this.skip;
+    this.next = result.count > this.take + this.skip;
+    return result;
+  }
+
+  navigate(name: string): void {
+    this._router.navigateByUrl(`/pools/${name}`);
+  }
+
+  trackBy(index: number, pool: LiquidityPool): string {
+    return `${index}-${pool?.trackBy}`;
+  }
+
+  async pageChange(isNext: boolean): Promise<void> {
+    this.skip = isNext
+      ? this.skip + this.take
+      : this.skip - this.take;
+
+    await this.getLiquidityPools$(this.skip, this.take)
+  }
+
+  provide(pool: any): void {
+    // this._sidebar.openSidenav(TransactionView.provide, {pool: pool});
+  }
+
+  swap(pool: any): void {
+    // this._sidebar.openSidenav(TransactionView.swap, {pool: pool});
+  }
+
+  stake(pool: any): void {
+    // this._sidebar.openSidenav(TransactionView.stake, {pool: pool});
+  }
+
+  mine(pool: any): void {
+    // this._sidebar.openSidenav(TransactionView.mine, {pool: pool});
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+}

@@ -1,3 +1,4 @@
+import { TablesModule } from './components/tables-module/tables.module';
 import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { NavigationModule } from './components/navigation-module/navigation.module';
@@ -66,7 +67,8 @@ import { MatSelectModule } from '@angular/material/select';
     NavigationModule,
     ModalsModule,
     TxFeedModule,
-    MatSelectModule
+    MatSelectModule,
+    TablesModule
   ],
   providers: [
     {
