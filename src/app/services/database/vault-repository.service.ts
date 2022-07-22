@@ -1,5 +1,5 @@
-import { ICompleteVaultProposalLog } from './../../interfaces/contract-logs.interface';
-import { IVaultProposalEntity, IVaultCertificateEntity } from '@interfaces/database.interface';
+import { ICompleteVaultProposalLog } from '@interfaces/contract-logs.interface';
+import { IVaultProposalEntity, IVaultCertificateEntity, IPagination } from '@interfaces/database.interface';
 import { Injectable } from "@angular/core";
 import { OpdexDB } from "./db.service";
 
@@ -9,6 +9,12 @@ export class VaultRepositoryService {
 
   async getProposalById(proposalId: number): Promise<IVaultProposalEntity> {
     return await this._db.proposal.get(proposalId);
+  }
+
+  async getProposals(skip: number = 0, take: number = 10): Promise<IPagination<IVaultProposalEntity>> {
+    const count = await this._db.proposal.count();
+    const results = await this._db.proposal.offset(skip).limit(take).toArray();
+    return { skip, take, count, results };
   }
 
   async getCertificates(): Promise<IVaultCertificateEntity[]> {

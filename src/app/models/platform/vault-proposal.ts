@@ -101,10 +101,10 @@ export class VaultProposal {
     return oneHundred.multiply(percentageYes);
   }
 
-  constructor(vault: string, token: string, proposalId: number, entity: IVaultProposalEntity, hydratedProposal: IHydratedProposal) {
+  constructor(vault: string, token: string, entity: IVaultProposalEntity, hydratedProposal: IHydratedProposal) {
     this._vault = vault;
     this._token = token;
-    this._proposalId = proposalId,
+    this._proposalId = entity.proposalId,
     this._creator = entity.creator;
     this._wallet = entity.wallet;
     this._amount = FixedDecimal.FromBigInt(hydratedProposal.amount, 8);

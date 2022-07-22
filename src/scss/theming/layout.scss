@@ -27,6 +27,12 @@
 
   .header-section {
     background: #141325;
+
+    .mat-card {
+      .mat-table {
+        background: #1b192f;
+      }
+    }
   }
 }
 

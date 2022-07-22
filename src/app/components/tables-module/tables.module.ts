@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { PoolsTableComponent } from './pools-table/pools-table.component';
 import { TokensTableComponent } from './tokens-table/tokens-table.component';
 import { SkeletonTableComponent } from './skeleton-table/skeleton-table.component';
+import { VaultProposalsTableComponent } from './vault-proposals-table/vault-proposals-table.component';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -22,7 +23,8 @@ import { SharedModule } from '@components/shared-module/shared.module';
   declarations: [
     PoolsTableComponent,
     SkeletonTableComponent,
-    TokensTableComponent
+    TokensTableComponent,
+    VaultProposalsTableComponent
   ],
   imports: [
     CommonModule,
@@ -41,7 +43,8 @@ import { SharedModule } from '@components/shared-module/shared.module';
   ],
   exports: [
     PoolsTableComponent,
-    TokensTableComponent
+    TokensTableComponent,
+    VaultProposalsTableComponent
   ]
 })
 export class TablesModule { }
