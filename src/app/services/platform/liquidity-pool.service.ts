@@ -50,6 +50,15 @@ export class LiquidityPoolService {
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
   }
 
+  public addLiquidityQuote() { }
+  public removeLiquidityQuote() { }
+  public startStakingQuote() { }
+  public stopStakingQuote() { }
+  public collectStakingRewardsQuote() { }
+  public startMiningQuote() { }
+  public stopMiningQuote() { }
+  public collectMiningRewardsQuote() { }
+
   private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
     if (!entity) return undefined;
 

@@ -11,10 +11,14 @@ import { MiningGovernanceMethods } from '@enums/contracts/methods/mining-governa
 
 @Injectable({providedIn: 'root'})
 export class MiningGovernanceApiService {
+  private _miningGovernance: string;
+
   constructor(
     private _cirrus: CirrusApiService,
     private _env: EnvironmentsService
-  ) { }
+  ) {
+    this._miningGovernance = this._env.contracts.miningGovernance;
+  }
 
   getHydratedMiningGovernance(): Observable<any> {
     const { miningGovernance } = this._env.contracts;
@@ -57,8 +61,12 @@ export class MiningGovernanceApiService {
   }
 
   getNominatedPools(): Observable<any> {
-    const { miningGovernance } = this._env.contracts;
-    const request = new LocalCallPayload(miningGovernance, MiningGovernanceMethods.GetNominations, miningGovernance);
+    const request = new LocalCallPayload(this._miningGovernance, MiningGovernanceMethods.GetNominations, this._miningGovernance);
     return this._cirrus.localCall(request).pipe(map(response => response.return));
+  }
+
+  public rewardMiningPools(wallet: string) {
+    const request = new LocalCallPayload(this._miningGovernance, 'RewardMiningPools', wallet);
+    const response = this._cirrus.localCall(request);
   }
 }

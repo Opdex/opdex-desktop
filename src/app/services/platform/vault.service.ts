@@ -37,6 +37,17 @@ export class VaultService {
     return entities.map(entity => new VaultCertificate(entity));
   }
 
+  public pledgeQuote() { }
+  public withdrawPledgeQuote() { }
+  public voteQuote() { }
+  public withdrawVoteQuote() { }
+  public redeemCertificateQuote() { }
+  public completeProposalQuote() { }
+  public createCertificateProposalQuote() { }
+  public createRevokeCertificateProposalQuote() { }
+  public createMinimumPledgeProposalQuote() { }
+  public createMinimumVoteProposalQuote() { }
+
   private async _buildProposal(entity: IVaultProposalEntity): Promise<VaultProposal> {
     const hydrated = await firstValueFrom(this._vaultApi.getHydratedProposal(entity.proposalId));
     return new VaultProposal(this._env.contracts.vault, this._env.contracts.odx, entity, hydrated);

@@ -41,9 +41,15 @@ export class TokenService {
     return await this._buildToken(entity, isLpt);
   }
 
+  public amountInQuote() { }
+  public amountOutQuote() { }
+  public swapQuote() { }
+  public distributionQuote() { }
+  public allowanceApprovalQuote() { }
+
   private async _buildToken(entity: ITokenEntity, lpToken: boolean = false): Promise<Token> {
     const hydrated = entity.address === 'CRS'
-      ? { totalSupply: BigInt('10000000000000000') }
+      ? { totalSupply: BigInt('10000000000000000') } // 100M
       : await firstValueFrom(this._tokenApi.getHydratedToken(entity.address, lpToken));
 
     const pricing = await this._tokenApi.getTokenPricing(entity);

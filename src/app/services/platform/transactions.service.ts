@@ -14,4 +14,6 @@ export class TransactionsService {
     const txs = await firstValueFrom(this._cirrus.searchContractReceipts(request));
     return txs.map(tx => new TransactionReceipt(tx));
   }
+
+  public replayTransactionQuote() { }
 }
