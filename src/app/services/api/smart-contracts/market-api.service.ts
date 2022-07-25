@@ -6,7 +6,7 @@ import { map, Observable } from 'rxjs';
 import { EnvironmentsService } from '@services/utility/environments.service';
 
 @Injectable({providedIn: 'root'})
-export class MarketService {
+export class MarketApiService {
   constructor(
     private _cirrus: CirrusApiService,
     private _env: EnvironmentsService

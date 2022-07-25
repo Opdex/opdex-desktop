@@ -1,7 +1,7 @@
 import { CurrencyService } from '@services/platform/currency.service';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { NodeService } from '@services/platform/node.service';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { Token } from '@models/platform/token';
 import { Component, Input, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
@@ -34,10 +34,10 @@ export class TokensTableComponent implements OnInit, OnDestroy {
 
   constructor(
     private _router: Router,
-    private _tokensService: TokenFactoryService,
+    private _tokensService: TokenService,
     private _nodeService: NodeService,
     // private _sidebar: SidenavService,
-    private _liquidityPoolsService: LiquidityPoolFactoryService,
+    private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
   ) {
     this.dataSource = new MatTableDataSource<any>();

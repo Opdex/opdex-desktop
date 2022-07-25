@@ -1,5 +1,5 @@
 import { IStartMiningLog, IStopMiningLog, ICollectMiningRewardsLog } from '@interfaces/contract-logs.interface';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -26,7 +26,7 @@ export class MineTransactionSummaryComponent implements OnChanges {
   ]
 
   constructor(
-    private _liquidityPoolService: LiquidityPoolFactoryService
+    private _liquidityPoolService: LiquidityPoolService
   ) { }
 
   async ngOnChanges(): Promise<void> {

@@ -1,7 +1,7 @@
 import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { Icons } from '@enums/icons';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
@@ -22,7 +22,7 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   constructor(
     private _route: ActivatedRoute,
-    private _poolFactory: LiquidityPoolFactoryService,
+    private _liquidityPoolService: LiquidityPoolService,
     private _nodeServices: NodeService,
     private _router: Router
   ) { }
@@ -50,7 +50,7 @@ export class PoolComponent implements OnInit, OnDestroy {
       this._nodeServices.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
-          switchMap(_ =>  this._poolFactory.buildLiquidityPool(address)))
+          switchMap(_ =>  this._liquidityPoolService.buildLiquidityPool(address)))
         .subscribe(pool => this.pool = pool));
 
     this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400)

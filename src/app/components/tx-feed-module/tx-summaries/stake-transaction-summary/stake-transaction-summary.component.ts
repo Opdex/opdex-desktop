@@ -1,5 +1,5 @@
 import { IBurnLog, IStartStakingLog, IStopStakingLog, ICollectStakingRewardsLog } from '@interfaces/contract-logs.interface';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Token } from '@models/platform/token';
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
@@ -33,7 +33,7 @@ export class StakeTransactionSummaryComponent implements OnChanges {
   ]
 
   constructor(
-    private _liquidityPoolService: LiquidityPoolFactoryService
+    private _liquidityPoolService: LiquidityPoolService
   ) { }
 
   async ngOnChanges(): Promise<void> {

@@ -8,6 +8,7 @@ import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { ParameterType } from '@enums/parameter-type';
 import { CacheService } from '@services/utility/cache.service';
+import { Network } from '@enums/networks';
 
 @Injectable({providedIn: 'root'})
 export class CirrusApiService extends CacheService {
@@ -57,11 +58,14 @@ export class CirrusApiService extends CacheService {
 
   // Smart Contracts
   getContractReceipt(txHash: string): Observable<IContractReceiptResult> {
-    return this._rest.get(`${this.api}/SmartContracts/receipt?txHash=${txHash}`);
+    const endpoint = `${this.api}/SmartContracts/receipt?txHash=${txHash}`;
+    const observable$ = this._rest.get<IContractReceiptResult>(endpoint);
+    return this.getItem(endpoint, observable$);
   }
 
   searchContractReceipts(request: ReceiptSearchRequest): Observable<IContractReceiptResult[]> {
-    return this._rest.get(`${this.api}/SmartContracts/receipt-search${request.query}`);
+    const endpoint = `${this.api}/SmartContracts/receipt-search${request.query}`;
+    return this._rest.get<IContractReceiptResult[]>(endpoint);
   }
 
   localCall(payload: LocalCallPayload): Observable<ILocalCallResult> {
@@ -85,7 +89,8 @@ export class CirrusApiService extends CacheService {
 
   // Supported Contracts
   getSupportedInterfluxTokens(): Observable<ISupportedContract[]> {
-    const networkType = '0'; // 0 = mainnet, 1 = testnet
+    // 0 = mainnet, 1 = testnet
+    const networkType = this._env.network === Network.Mainnet ? '0' : '1';
     return this._rest.get(`${this.api}/SupportedContracts/list?networkType=${networkType}`);
   }
 }

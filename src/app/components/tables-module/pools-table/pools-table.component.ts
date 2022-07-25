@@ -1,5 +1,5 @@
 import { CurrencyService } from '@services/platform/currency.service';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { NodeService } from '@services/platform/node.service';
 import { Component, ViewChild, OnDestroy, OnInit, Input } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
@@ -32,7 +32,7 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
   constructor(
     private _router: Router,
     private _nodeService: NodeService,
-    private _liquidityPoolsService: LiquidityPoolFactoryService,
+    private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
     // private _sidebar: SidenavService
   ) {

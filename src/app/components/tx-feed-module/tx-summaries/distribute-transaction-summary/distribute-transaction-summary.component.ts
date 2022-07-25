@@ -1,4 +1,4 @@
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { Icons } from 'src/app/enums/icons';
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
@@ -24,7 +24,7 @@ export class DistributeTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.DistributionLog
   ]
 
-  constructor(private _tokenService: TokenFactoryService) { }
+  constructor(private _tokenService: TokenService) { }
 
   async ngOnChanges(): Promise<void> {
     const events = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));

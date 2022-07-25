@@ -1,4 +1,4 @@
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -23,7 +23,7 @@ export class EnableMiningTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.RewardMiningPoolLog,
   ]
 
-  constructor(private _liquidityPoolService: LiquidityPoolFactoryService) { }
+  constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
     const rewardEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));

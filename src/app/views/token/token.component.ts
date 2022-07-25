@@ -1,4 +1,4 @@
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { Subscription, tap, switchMap } from 'rxjs';
 import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
 import { NodeService } from '@services/platform/node.service';
@@ -7,7 +7,7 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Icons } from '@enums/icons';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Token } from '@models/platform/token';
 
 @Component({
@@ -29,9 +29,9 @@ export class TokenComponent implements OnInit, OnDestroy {
 
   constructor(
     private _route: ActivatedRoute,
-    private _poolFactory: LiquidityPoolFactoryService,
+    private _liquidityPoolService: LiquidityPoolService,
     private _nodeService: NodeService,
-    private _tokenFactory: TokenFactoryService,
+    private _tokenService: TokenService,
     private _router: Router
   ) { }
 
@@ -67,8 +67,8 @@ export class TokenComponent implements OnInit, OnDestroy {
   private async _setPoolAndToken(address: string): Promise<void> {
     if (address !== 'CRS') {
       // SRC token first, fallback if not found to OLPT
-      this.pool = await this._poolFactory.buildLiquidityPoolBySrcToken(address) ||
-                  await this._poolFactory.buildLiquidityPool(address);
+      this.pool = await this._liquidityPoolService.buildLiquidityPoolBySrcToken(address) ||
+                  await this._liquidityPoolService.buildLiquidityPool(address);
 
       // Todo: If no pool is found, display an error
 
@@ -87,7 +87,7 @@ export class TokenComponent implements OnInit, OnDestroy {
 
       this.token = address === this.pool.srcToken.address ? this.pool.srcToken : this.pool.lpToken;
     } else {
-      this.token = await this._tokenFactory.buildToken('CRS');
+      this.token = await this._tokenService.buildToken('CRS');
     }
   }
 

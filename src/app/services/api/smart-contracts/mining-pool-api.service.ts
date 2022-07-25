@@ -13,7 +13,7 @@ export interface IMiningPoolDetailsDto {
 }
 
 @Injectable({providedIn: 'root'})
-export class MiningPoolService {
+export class MiningPoolApiService {
   constructor(private _cirrus: CirrusApiService) { }
 
   getHydratedMiningPool(miningPool: string): Observable<IMiningPoolDetailsDto> {

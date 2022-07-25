@@ -1,5 +1,5 @@
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IMiningPoolDetailsDto } from '@services/platform/mining-pool.service';
+import { IMiningPoolDetailsDto } from '@services/api/smart-contracts/mining-pool-api.service';
 
 export class MiningPool {
   address: string;

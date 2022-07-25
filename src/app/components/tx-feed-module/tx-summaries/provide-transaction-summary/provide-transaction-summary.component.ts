@@ -1,5 +1,5 @@
 import { IBurnLog, IMintLog } from '@interfaces/contract-logs.interface';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
@@ -26,7 +26,7 @@ export class ProvideTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.BurnLog
   ]
 
-  constructor(private _liquidityPoolService: LiquidityPoolFactoryService) { }
+  constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
     // Should only be one

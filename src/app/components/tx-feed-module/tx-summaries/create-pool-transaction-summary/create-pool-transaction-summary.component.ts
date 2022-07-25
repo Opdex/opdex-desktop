@@ -1,6 +1,6 @@
 import { ICreateLiquidityPoolLog } from '@interfaces/contract-logs.interface';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { TokenService } from '@services/platform/token.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Token } from '@models/platform/token';
 import { Icons } from 'src/app/enums/icons';
 import { Component, Input, OnChanges } from '@angular/core';
@@ -27,8 +27,8 @@ export class CreatePoolTransactionSummaryComponent implements OnChanges {
   ]
 
   constructor(
-    private _liquidityPoolService: LiquidityPoolFactoryService,
-    private _tokenService: TokenFactoryService
+    private _liquidityPoolService: LiquidityPoolService,
+    private _tokenService: TokenService
   ) { }
 
   async ngOnChanges(): Promise<void> {

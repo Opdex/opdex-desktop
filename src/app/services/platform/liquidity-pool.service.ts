@@ -1,82 +1,71 @@
-import { MiningPoolStateKeys } from '@enums/contracts/state-keys/mining-pool-state-keys';
-import { ParameterType } from '@enums/parameter-type';
-import { map } from 'rxjs/operators';
-import { CirrusApiService } from '@services/api/cirrus-api.service';
-import { Injectable } from "@angular/core";
-import { zip, Observable, of } from 'rxjs';
-import { catchError } from 'rxjs';
-import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-pool-state-keys';
+import { TokenService } from '@services/platform/token.service';
+import { MiningPoolApiService } from '@services/api/smart-contracts/mining-pool-api.service';
 import { EnvironmentsService } from '@services/utility/environments.service';
-
-export interface IBaseLiquidityPoolDetailsDto {
-  address: string;
-  token: string;
-  miningPool: string;
-  transactionFee: number;
-}
-
-export interface IHydratedLiquidityPoolDetailsDto {
-  address: string;
-  totalSupply: BigInt;
-  reserveCrs: BigInt;
-  reserveSrc: BigInt;
-  totalStaked: BigInt;
-  miningPeriodEndBlock: number;
-}
+import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
+import { LiquidityPool } from '@models/platform/liquidity-pool';
+import { PoolRepositoryService } from '@services/database/pool-repository.service';
+import { LiquidityPoolApiService } from '@services/api/smart-contracts/liquidity-pool-api.service';
+import { Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { MiningPool } from '@models/platform/mining-pool';
 
 @Injectable({providedIn: 'root'})
 export class LiquidityPoolService {
   constructor(
-    private _cirrus: CirrusApiService,
-    private _env: EnvironmentsService
+    private _liquidityPoolApi: LiquidityPoolApiService,
+    private _poolRepository: PoolRepositoryService,
+    private _tokenService: TokenService,
+    private _env: EnvironmentsService,
+    private _miningPoolApi: MiningPoolApiService
   ) { }
 
-  getStaticPool(address: string): Observable<IBaseLiquidityPoolDetailsDto> {
-    const properties = [
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.Token, ParameterType.Address),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TransactionFee, ParameterType.UInt),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.MiningPool, ParameterType.Address),
-    ];
-
-    return zip(properties)
-      .pipe(
-        map(([token, transactionFee, miningPool]) => {
-          return {
-            address,
-            token,
-            transactionFee: parseFloat(transactionFee),
-            miningPool
-          };
-        })
-      );
+  public async buildLiquidityPool(address: string): Promise<LiquidityPool> {
+    const entity = await this._poolRepository.getPoolByAddress(address);
+    return await this._buildLiquidityPool(entity);
   }
 
-  getHydratedPool(address: string, miningPool: string): Observable<IHydratedLiquidityPoolDetailsDto> {
-    const properties = [
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
-      this._cirrus.getContractStorageItem(address, LiquidityPoolStateKeys.TotalStaked, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
-      this._cirrus.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong).pipe(catchError(_ => of('0')))
-    ];
-
-    return zip(properties)
-      .pipe(
-        map(([totalSupply, reserveCrs, reserveSrc, totalStaked, miningPeriodEndBlock]) => {
-          return {
-            address,
-            totalSupply: BigInt(totalSupply),
-            reserveCrs: BigInt(reserveCrs),
-            reserveSrc: BigInt(reserveSrc),
-            totalStaked: BigInt(totalStaked),
-            miningPeriodEndBlock: parseFloat(miningPeriodEndBlock)
-          };
-        }));
+  public async buildLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
+    const entity = await this._poolRepository.getPoolBySrcAddress(address);
+    return await this._buildLiquidityPool(entity);
   }
 
-  // Todo: Get Volume
-  // -- Get all swaps within 5400 blocks
-  // -- Add all CRS, Add all SRC
-  // -- Calculate current CRS/SRC pricing
-  // -- Calc volume by ($SRC * SrcTokenVolume) + ($CRS * CrsTokenVolume)
+  public async buildLiquidityPoolByMiningPoolAddress(address: string): Promise<LiquidityPool> {
+    const entity = await this._poolRepository.getPoolByMiningPoolAddress(address);
+    return await this._buildLiquidityPool(entity);
+  }
+
+  public async buildLiquidityPools(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
+    const result = await this._poolRepository.getPools(skip, take);
+    const pools = await Promise.all(result.results.map(entity => this._buildLiquidityPool(entity)));
+    return { skip: result.skip, take: result.take, results: pools, count: result.count };
+  }
+
+  public async buildActiveMiningPools(): Promise<LiquidityPool[]> {
+    const entities = await this._poolRepository.getActiveMiningPools();
+    return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
+  }
+
+  public async buildNominatedLiquidityPools(): Promise<LiquidityPool[]> {
+    const entities = await this._poolRepository.getNominatedPools();
+    return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
+  }
+
+  private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
+    if (!entity) return undefined;
+
+    const hydrated = await firstValueFrom(this._liquidityPoolApi.getHydratedPool(entity.address, entity.miningPool));
+
+    let miningPool = null;
+    if (entity.srcToken !== this._env.contracts.odx) {
+      const miningPoolDto = await firstValueFrom(this._miningPoolApi.getHydratedMiningPool(entity.miningPool));
+      miningPool = new MiningPool(miningPoolDto);
+    }
+
+    const srcToken = await this._tokenService.buildToken(entity.srcToken);
+    const stakingToken = await this._tokenService.buildToken(this._env.contracts.odx);
+    const crsToken = await this._tokenService.buildToken('CRS');
+    const lpToken = await this._tokenService.buildToken(entity.address);
+
+    return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken, crsToken, lpToken);
+  }
 }

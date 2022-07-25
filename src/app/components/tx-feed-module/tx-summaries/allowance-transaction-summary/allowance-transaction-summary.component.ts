@@ -1,4 +1,4 @@
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { IApprovalLog } from '@interfaces/contract-logs.interface';
 import { Token } from '@models/platform/token';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -24,7 +24,7 @@ export class AllowanceTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.ApprovalLog,
   ]
 
-  constructor(private _tokenService: TokenFactoryService) { }
+  constructor(private _tokenService: TokenService) { }
 
   async ngOnChanges(): Promise<void> {
     const approveEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));

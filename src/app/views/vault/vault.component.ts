@@ -2,9 +2,9 @@ import { EnvironmentsService } from '@services/utility/environments.service';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Token } from '@models/platform/token';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { NodeService } from '@services/platform/node.service';
-import { VaultFactoryService } from '@services/factory/vault-factory.service';
+import { VaultService } from '@services/platform/vault.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { Vault } from '@models/platform/vault';
@@ -45,8 +45,8 @@ export class VaultComponent implements OnInit, OnDestroy {
 
   constructor(
     private _nodeService: NodeService,
-    private _vaultFactory: VaultFactoryService,
-    private _tokenFactory: TokenFactoryService,
+    private _vaultService: VaultService,
+    private _tokenService: TokenService,
     private _userContextService: UserContextService,
     private _env: EnvironmentsService
   ) {
@@ -60,11 +60,11 @@ export class VaultComponent implements OnInit, OnDestroy {
       this._nodeService.latestBlock$
         .pipe(
           tap(latestBlock => this.latestBlock = latestBlock),
-          switchMap(_ => this._vaultFactory.getVault()),
+          switchMap(_ => this._vaultService.getVault()),
           tap(vault => this.vault = vault),
-          switchMap(vault => this._tokenFactory.buildToken(vault.token)),
+          switchMap(vault => this._tokenService.buildToken(vault.token)),
           tap(token => this.token = token),
-          switchMap(_ => this._vaultFactory.getCertificates()),
+          switchMap(_ => this._vaultService.getCertificates()),
           tap(certificates => this.certificates = certificates))
         .subscribe(_ => {
           this.statCards = this._getStatCards(this.vault, this.token);

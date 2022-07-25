@@ -1,5 +1,5 @@
 import { IPagination } from '@interfaces/database.interface';
-import { VaultFactoryService } from '@services/factory/vault-factory.service';
+import { VaultService } from '@services/platform/vault.service';
 import { NodeService } from '@services/platform/node.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -37,7 +37,7 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
   oneHundred = FixedDecimal.OneHundred(0);
 
   constructor(
-    private _vaultsService: VaultFactoryService,
+    private _vaultsService: VaultService,
     private _nodeService: NodeService,
     // private _sidebar: SidenavService,
     private _userContext: UserContextService,

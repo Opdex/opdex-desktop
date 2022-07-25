@@ -1,4 +1,4 @@
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Token } from '@models/platform/token';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
@@ -20,7 +20,7 @@ export class SwapTransactionSummaryComponent implements OnChanges {
   tokenOutAmount: FixedDecimal;
   error: string;
 
-  constructor(private _liquidityPoolService: LiquidityPoolFactoryService) { }
+  constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
     const swapEvents = this.transaction.events.filter(event => event.log.event === TransactionLogTypes.SwapLog);

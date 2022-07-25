@@ -1,5 +1,5 @@
 import { Token } from '@models/platform/token';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
@@ -22,7 +22,7 @@ export class VaultCertificateTransactionSummaryComponent implements OnChanges {
 
   constructor(
     private _envService: EnvironmentsService,
-    private _tokenFactory: TokenFactoryService
+    private _tokenService: TokenService
   ) { }
 
   async ngOnChanges(): Promise<void> {
@@ -34,7 +34,7 @@ export class VaultCertificateTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    this.vaultToken = await this._tokenFactory.buildToken(this._envService.contracts.odx);
+    this.vaultToken = await this._tokenService.buildToken(this._envService.contracts.odx);
     this.amount = FixedDecimal.FromBigInt(log.amount, this.vaultToken.decimals);
   }
 }

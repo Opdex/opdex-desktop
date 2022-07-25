@@ -1,7 +1,7 @@
 import { MiningPool } from './mining-pool';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IHydratedLiquidityPoolDetailsDto } from '@services/platform/liquidity-pool.service';
+import { IHydratedLiquidityPoolDetailsDto } from '@services/api/smart-contracts/liquidity-pool-api.service';
 import { Token } from './token';
 
 export class LiquidityPool {

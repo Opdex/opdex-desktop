@@ -1,9 +1,9 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
+import { TokenService } from '@services/platform/token.service';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Token } from '@models/platform/token';
 
@@ -20,9 +20,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
   constructor(
-    private _liquidityPoolFactory: LiquidityPoolFactoryService,
+    private _liquidityPoolService: LiquidityPoolService,
     private _nodeService: NodeService,
-    private _tokenFactory: TokenFactoryService,
+    private _tokenService: TokenService,
     private _env: EnvironmentsService
   ) { }
 
@@ -30,13 +30,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
         .pipe(
-          switchMap(_ => this._tokenFactory.buildToken(this._env.contracts.odx)),
+          switchMap(_ => this._tokenService.buildToken(this._env.contracts.odx)),
           tap(odx => this.odx = odx),
-          switchMap(_ => this._tokenFactory.buildToken('CRS')),
+          switchMap(_ => this._tokenService.buildToken('CRS')),
           tap(crs => this.crs = crs),
-          switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools()),
+          switchMap(_ => this._liquidityPoolService.buildNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
-          switchMap(_ => this._liquidityPoolFactory.buildActiveMiningPools()),
+          switchMap(_ => this._liquidityPoolService.buildActiveMiningPools()),
           tap(pools => this.miningPools = pools))
         .subscribe());
   }

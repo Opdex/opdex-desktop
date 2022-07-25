@@ -1,17 +1,17 @@
 import { VaultRepositoryService } from '@services/database/vault-repository.service';
-import { VaultService } from './vault.service';
+import { VaultApiService } from '../api/smart-contracts/vault-api.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
-import { MiningPoolService } from './mining-pool.service';
+import { MiningPoolApiService } from '../api/smart-contracts/mining-pool-api.service';
 import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
 import { firstValueFrom } from "rxjs";
-import { MarketService } from "./market.service";
-import { MiningGovernanceService } from "./mining-governance.service";
+import { MarketApiService } from "../api/smart-contracts/market-api.service";
+import { MiningGovernanceApiService } from "../api/smart-contracts/mining-governance-api.service";
 import { NodeService } from "./node.service";
-import { LiquidityPoolService } from "./liquidity-pool.service";
-import { TokenService } from "./token.service";
+import { LiquidityPoolApiService } from "../api/smart-contracts/liquidity-pool-api.service";
+import { TokenApiService } from "../api/smart-contracts/token-api.service";
 import { toChecksumAddress } from "ethereum-checksum-address";
 
 @Injectable({providedIn: 'root'})
@@ -20,14 +20,14 @@ export class IndexerService {
 
   constructor(
     private _nodeService: NodeService,
-    private _marketService: MarketService,
-    private _liquidityPoolService: LiquidityPoolService,
+    private _marketApi: MarketApiService,
+    private _liquidityPoolApi: LiquidityPoolApiService,
     private _poolsRepository: PoolRepositoryService,
-    private _tokenService: TokenService,
+    private _tokenApi: TokenApiService,
     private _tokenRepository: TokenRepositoryService,
-    private _miningGovernanceService: MiningGovernanceService,
-    private _miningPoolService: MiningPoolService,
-    private _vaultService: VaultService,
+    private _miningGovernanceApi: MiningGovernanceApiService,
+    private _miningPoolApi: MiningPoolApiService,
+    private _vaultApi: VaultApiService,
     private _vaultRepository: VaultRepositoryService,
     private _db: OpdexDB
   ) { }
@@ -41,19 +41,19 @@ export class IndexerService {
     const nodeStatus = this._nodeService.status;
 
     const [pools, rewardedMiningPools, nominations, createdProposals, createdCertificates, completedProposals, redeemedCertificates, revokedCertificates] = await Promise.all([
-      firstValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getNominatedPools()),
-      firstValueFrom(this._vaultService.getCreatedVaultProposals(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCreatedVaultCertificates(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCompletedVaultProposals(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRedeemedVaultCertificates(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRevokedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._marketApi.getMarketPools(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceApi.getRewardedPools(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceApi.getNominatedPools()),
+      firstValueFrom(this._vaultApi.getCreatedVaultProposals(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultApi.getCreatedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultApi.getCompletedVaultProposals(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultApi.getRedeemedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultApi.getRevokedVaultCertificates(indexer?.lastUpdateBlock)),
     ]);
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
-      const poolDetails = await firstValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
-      const tokenDetails = await firstValueFrom(this._tokenService.getToken(pool.token));
+      const poolDetails = await firstValueFrom(this._liquidityPoolApi.getStaticPool(pool.pool));
+      const tokenDetails = await firstValueFrom(this._tokenApi.getToken(pool.token));
 
       const poolResponse = {
         pool: poolDetails,
@@ -100,7 +100,7 @@ export class IndexerService {
 
     // Persist active mining pools
     if (rewardedMiningPools.length) {
-      const miningPoolEndBlocks = await firstValueFrom(this._miningPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
+      const miningPoolEndBlocks = await firstValueFrom(this._miningPoolApi.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
       const miningPoolEntities = await this._poolsRepository.getPoolsByMiningPoolAddress(miningPoolEndBlocks.map(pool => pool.miningPool));
 
       await this._poolsRepository.persistPools(miningPoolEntities.map((entity: ILiquidityPoolEntity) => {
@@ -123,7 +123,7 @@ export class IndexerService {
           description: proposal.description,
           wallet: proposal.wallet,
           createdBlock: proposal.blockHeight,
-          creator: proposal.creator,
+          creator: proposal.from,
           approved: 0 // false by default
         }
       }))

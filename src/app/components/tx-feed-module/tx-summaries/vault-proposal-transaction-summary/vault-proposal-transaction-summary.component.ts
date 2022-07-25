@@ -1,7 +1,7 @@
 import { IReceiptLogs } from '@interfaces/full-node.interface';
 import { ProposalType, VaultProposal } from '@models/platform/vault-proposal';
-import { TokenFactoryService } from '@services/factory/token-factory.service';
-import { VaultFactoryService } from '@services/factory/vault-factory.service';
+import { TokenService } from '@services/platform/token.service';
+import { VaultService } from '@services/platform/vault.service';
 import { Vault } from '@models/platform/vault';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Component, Input, OnChanges } from '@angular/core';
@@ -58,8 +58,8 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
   ];
 
   constructor(
-    private _vaultFactory: VaultFactoryService,
-    private _tokenFactory: TokenFactoryService
+    private _vaultService: VaultService,
+    private _tokenFactory: TokenService
   ) { }
 
   async ngOnChanges(): Promise<void> {
@@ -77,7 +77,7 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
       ? this.createOrCompleteEvents[0].log.data.proposalId
       : this.pledgeOrVoteEvents[0].log.data.proposalId
 
-    const proposal = await this._vaultFactory.getProposal(proposalId);
+    const proposal = await this._vaultService.getProposal(proposalId);
 
     let proposalSummary = { proposal } as IVaultProposalSummary;
     proposalSummary = await this.buildPledgeOrVoteSummary(proposalSummary);
@@ -126,7 +126,7 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
       const createLog = createEvent ? <ICreateVaultProposalLog>createEvent.log.data : undefined;
       const completeLog = completeEvent ? <ICompleteVaultProposalLog>completeEvent.log.data : undefined;
 
-      const vault = await this._vaultFactory.getVault();
+      const vault = await this._vaultService.getVault();
       const token = await this._tokenFactory.buildToken(vault.token);
 
       summary.vault = vault
