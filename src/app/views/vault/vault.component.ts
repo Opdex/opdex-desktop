@@ -12,7 +12,7 @@ import { Icons } from '@enums/icons';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { HelpInfo } from '@components/shared-module/help-button/help-button.component';
 import { UserContext } from '@models/user-context';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 
 export class StatCardInfo {
   daily?: boolean;

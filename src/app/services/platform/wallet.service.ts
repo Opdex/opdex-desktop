@@ -1,11 +1,10 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { ParameterType } from '@enums/parameter-type';
-import { Parameter } from '@models/cirrusApi/contract-calls/parameter';
-import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
 import { INodeWalletAddressModel } from '@interfaces/full-node.interface';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
+import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
 
 @Injectable({providedIn: 'root'})
 export class WalletService {
@@ -25,7 +24,7 @@ export class WalletService {
   }
 
   async getAllowance(token: string, wallet: string, spender: string): Promise<void> {
-    const request = new LocalCallPayload(token, 'Allowance', wallet, [
+    const request = new LocalCallRequest(token, 'Allowance', wallet, [
       new Parameter(ParameterType.Address, wallet),
       new Parameter(ParameterType.Address, spender)
     ]);
@@ -44,7 +43,7 @@ export class WalletService {
     if (token === 'CRS') {
       // Get CRS balance
     } else {
-      const request = new LocalCallPayload(token, 'GetBalance', wallet, [
+      const request = new LocalCallRequest(token, 'GetBalance', wallet, [
         new Parameter(ParameterType.Address, wallet)
       ]);
 
@@ -60,7 +59,7 @@ export class WalletService {
   }
 
   async getStakingPosition(liquidityPool: string, wallet: string): Promise<void> {
-    const request = new LocalCallPayload(liquidityPool, 'GetStakedBalance', wallet, [
+    const request = new LocalCallRequest(liquidityPool, 'GetStakedBalance', wallet, [
       new Parameter(ParameterType.Address, wallet)
     ]);
 
@@ -76,7 +75,7 @@ export class WalletService {
 
   // Todo: Same as "getBalance()" maybe should just use that...
   async getMiningPosition(miningPool: string, wallet: string): Promise<void> {
-    const request = new LocalCallPayload(miningPool, 'GetBalance', wallet, [
+    const request = new LocalCallRequest(miningPool, 'GetBalance', wallet, [
       new Parameter(ParameterType.Address, wallet)
     ]);
 
@@ -91,7 +90,7 @@ export class WalletService {
   }
 
   async geVaultPledgePosition(proposalId: number, wallet: string): Promise<void> {
-    const request = new LocalCallPayload(this._env.contracts.vault, 'GetProposalPledge', wallet, [
+    const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalPledge', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
     ]);
@@ -107,7 +106,7 @@ export class WalletService {
   }
 
   async geVaultVotePosition(proposalId: number, wallet: string): Promise<void> {
-    const request = new LocalCallPayload(this._env.contracts.vault, 'GetProposalVote', wallet, [
+    const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalVote', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
     ]);

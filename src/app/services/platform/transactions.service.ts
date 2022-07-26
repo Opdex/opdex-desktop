@@ -1,6 +1,6 @@
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 import { firstValueFrom } from 'rxjs';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { Injectable } from "@angular/core";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 

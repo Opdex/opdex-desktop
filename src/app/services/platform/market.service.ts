@@ -1,12 +1,12 @@
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { Injectable } from "@angular/core";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 import { map, Observable } from 'rxjs';
 import { EnvironmentsService } from '@services/utility/environments.service';
 
 @Injectable({providedIn: 'root'})
-export class MarketApiService {
+export class MarketService {
   constructor(
     private _cirrus: CirrusApiService,
     private _env: EnvironmentsService

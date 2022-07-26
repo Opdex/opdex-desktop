@@ -1,6 +1,6 @@
 import { TokenService } from '@services/platform/token.service';
 import { Subscription, tap, switchMap } from 'rxjs';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { LiquidityPool } from '@models/platform/liquidity-pool';

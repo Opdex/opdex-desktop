@@ -5,7 +5,7 @@ import { LiquidityPoolService } from '@services/platform/liquidity-pool.service'
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 
 @Component({
   selector: 'opdex-pool',

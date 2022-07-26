@@ -1,10 +1,26 @@
+export interface ILocalCallRequest {
+  contractAddress: string;
+  methodName: string;
+  sender: string;
+  parameters: string[];
+  amount: string;
+  gasPrice: number;
+  gasLimit: number;
+}
+
+export interface ICallRequest extends ILocalCallRequest {
+  walletName: string;
+  password: string;
+  feeAmount: string;
+}
+
 export interface ILocalCallResult {
   internalTransfers: any[];
   gasConsumed: IGasConsumed;
   revert: boolean;
   errorMessage: string;
   return: any;
-  logs: any[];
+  logs: IReceiptLogs[];
 }
 
 export interface IGasConsumed {
