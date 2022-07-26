@@ -29,7 +29,6 @@ abstract class CallRequestBase {
   }
 }
 
-
 export class CallRequest extends CallRequestBase {
   walletName: string;
   password: string;
@@ -104,4 +103,3 @@ export class Parameter {
     this.result = `${type}#${value}`;
   }
 }
-

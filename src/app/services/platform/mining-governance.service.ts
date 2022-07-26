@@ -4,12 +4,12 @@ import { EnvironmentsService } from '@services/utility/environments.service';
 import { Injectable } from "@angular/core";
 import { MiningGovernance } from "@models/platform/mining-governance";
 import { firstValueFrom, map, Observable, zip } from 'rxjs';
-import { TransactionQuote } from '@interfaces/transaction-quote.interface';
 import { MiningGovernanceStateKeys } from '@enums/contracts/state-keys/mining-governance-state-keys';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { ParameterType } from '@enums/parameter-type';
 import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { LocalCallRequest } from '@models/cirrusApi/contract-call';
+import { TransactionQuote } from '@models/platform/transaction-quote';
 
 @Injectable({providedIn: 'root'})
 export class MiningGovernanceService {

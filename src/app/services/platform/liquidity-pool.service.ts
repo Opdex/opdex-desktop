@@ -4,7 +4,6 @@ import { MiningPoolMethods } from '@enums/contracts/methods/mining-pool-methods'
 import { LiquidityPoolMethods } from '@enums/contracts/methods/liquidity-pool-methods';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { ParameterType } from '@enums/parameter-type';
-import { MarketMethods } from '@enums/contracts/methods/market-methods';
 import { TokenService } from '@services/platform/token.service';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
@@ -14,34 +13,11 @@ import { Injectable } from '@angular/core';
 import { catchError, firstValueFrom, map, Observable, of, zip } from 'rxjs';
 import { MiningPool } from '@models/platform/mining-pool';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
-import { TransactionQuote } from '@interfaces/transaction-quote.interface';
 import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-pool-state-keys';
 import { MiningPoolStateKeys } from '@enums/contracts/state-keys/mining-pool-state-keys';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
-
-export interface IBaseLiquidityPoolDetailsDto {
-  address: string;
-  token: string;
-  miningPool: string;
-  transactionFee: number;
-}
-
-export interface IHydratedLiquidityPoolDetailsDto {
-  address: string;
-  totalSupply: BigInt;
-  reserveCrs: BigInt;
-  reserveSrc: BigInt;
-  totalStaked: BigInt;
-  miningPeriodEndBlock: number;
-}
-
-export interface IMiningPoolDetailsDto {
-  address: string;
-  stakingToken: string;
-  miningPeriodEndBlock: number;
-  rewardRate: BigInt;
-  totalSupply: BigInt;
-}
+import { TransactionQuote } from '@models/platform/transaction-quote';
+import { IBaseLiquidityPoolDetailsDto, IHydratedLiquidityPoolDetailsDto, IMiningPoolDetailsDto } from '@interfaces/contract-properties.interface';
 
 @Injectable({providedIn: 'root'})
 export class LiquidityPoolService {
@@ -82,17 +58,6 @@ export class LiquidityPoolService {
   public async buildNominatedLiquidityPools(): Promise<LiquidityPool[]> {
     const entities = await this._poolRepository.getNominatedPools();
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
-  }
-
-  public async createLiquidityPoolQuote(token: string): Promise<TransactionQuote> {
-    const { wallet } = this._context.userContext;
-
-    // Address CreatePool(Address token);
-    const request = new LocalCallRequest(this._env.contracts.market, MarketMethods.CreatePool, wallet, [
-      new Parameter(ParameterType.Address, token, 'Token')
-    ]);
-
-    return await this._submitQuote(request);
   }
 
   public async addLiquidityQuote(token: string, amountSrc: FixedDecimal, amountCrsMin: FixedDecimal, amountSrcMin: FixedDecimal, deadline: number): Promise<TransactionQuote> {

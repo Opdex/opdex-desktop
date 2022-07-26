@@ -1,6 +1,6 @@
+import { IHydratedProposal } from '@interfaces/contract-properties.interface';
 import { IVaultProposalEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IHydratedProposal } from '@services/platform/vault.service';
 
 export class VaultProposal {
   private _vault: string;

@@ -1,3 +1,4 @@
+import { UserContextService } from '@services/utility/user-context.service';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { RouterMethods } from '@enums/contracts/methods/router-methods';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -14,23 +15,8 @@ import { LiquidityPoolStateKeys } from '@enums/contracts/state-keys/liquidity-po
 import { OdxStateKeys, StandardTokenStateKeys, InterfluxTokenStateKeys } from '@enums/contracts/state-keys/token-state-keys';
 import { CurrencyService } from './currency.service';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
-
-export interface ITokenDetailsDto {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  totalSupply: BigInt;
-  nativeChain: string;
-  nativeChainAddress: string;
-}
-
-export interface IHydratedTokenDetailsDto {
-  totalSupply: BigInt;
-  nextDistributionBlock?: number;
-  periodDuration?: number;
-  periodIndex?: number;
-}
+import { TransactionQuote } from '@models/platform/transaction-quote';
+import { ITokenDetailsDto, IHydratedTokenDetailsDto } from '@interfaces/contract-properties.interface';
 
 @Injectable({providedIn: 'root'})
 export class TokenService {
@@ -40,6 +26,7 @@ export class TokenService {
     private _env: EnvironmentsService,
     private _cirrusApi: CirrusApiService,
     private _currency: CurrencyService,
+    private _context: UserContextService
   ) { }
 
   public async buildTokens(skip: number, take: number): Promise<IPagination<Token>> {
@@ -85,9 +72,11 @@ export class TokenService {
     // UInt256 GetAmountOut(UInt256 tokenInAmount, UInt256 tokenInReserveCrs, UInt256 tokenInReserveSrc, UInt256 tokenOutReserveCrs, UInt256 tokenOutReserveSrc);
   }
 
-  public swapQuote(tokenIn: string, tokenOut: string, tokenInAmount: FixedDecimal, tokenOutAmount: FixedDecimal,
-                   tokenInMaxAmount: FixedDecimal, tokenOutMinAmount: FixedDecimal, tokenInExact: boolean, deadline: number) {
-    if (tokenIn === tokenOut) return;
+  public async swapQuote(tokenIn: string, tokenOut: string, tokenInAmount: FixedDecimal, tokenOutAmount: FixedDecimal,
+                   tokenInMaxAmount: FixedDecimal, tokenOutMinAmount: FixedDecimal, tokenInExact: boolean, deadline: number): Promise<TransactionQuote> {
+    if (tokenIn === tokenOut) return null;
+
+    const { wallet } = this._context.userContext;
 
     let methodName: RouterMethods;
     let parameters: Parameter[];
@@ -100,10 +89,10 @@ export class TokenService {
         methodName = RouterMethods.SwapExactCrsForSrc;
         amount = tokenInAmount;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenOutMinAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
         // Swap CRS for Exact SRC
@@ -111,10 +100,10 @@ export class TokenService {
         methodName = RouterMethods.SwapCrsForExactSrc;
         amount = tokenInMaxAmount;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
     } else if (tokenOut === 'CRS') {
@@ -123,22 +112,22 @@ export class TokenService {
         // ulong SwapExactSrcForCrs(UInt256 amountSrcIn, ulong amountCrsOutMin, Address token, Address to, ulong deadline);
         methodName = RouterMethods.SwapExactSrcForCrs;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString()),
-          new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString(), 'Amount Spent'),
+          new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
         // Swap SRC for Exact CRS
         // UInt256 SwapSrcForExactCrs(ulong amountCrsOut, UInt256 amountSrcInMax, Address token, Address to, ulong deadline);
         methodName = RouterMethods.SwapSrcForExactCrs;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString()),
-          new Parameter(ParameterType.ULong, tokenInMaxAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
+          new Parameter(ParameterType.ULong, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
     } else {
@@ -147,43 +136,54 @@ export class TokenService {
         // UInt256 SwapExactSrcForSrc(UInt256 amountSrcIn, Address tokenIn, UInt256 amountSrcOutMin, Address tokenOut, Address to, ulong deadline);
         methodName = RouterMethods.SwapExactSrcForSrc;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenIn),
-          new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString(), 'Amount Spent'),
+          new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
+          new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
         // Swap SRC for Exact SRC
         // UInt256 SwapSrcForExactSrc(UInt256 amountSrcInMax, Address tokenIn, UInt256 amountSrcOut, Address tokenOut, Address to, ulong deadline);
         methodName = RouterMethods.SwapSrcForExactSrc;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenIn),
-          new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString()),
-          new Parameter(ParameterType.Address, tokenOut),
-          new Parameter(ParameterType.Address, 'wallet'),
-          new Parameter(ParameterType.ULong, deadline),
+          new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
+          new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
+          new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString(), 'Amount Received'),
+          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
     }
 
-    const request = new LocalCallRequest(this._env.contracts.router, methodName, 'wallet', parameters, amount.formattedValue);
+    const request = new LocalCallRequest(this._env.contracts.router, methodName, wallet, parameters, amount.formattedValue);
+    const response = await firstValueFrom(this._cirrusApi.localCall(request));
+    return new TransactionQuote(request, response);
   }
 
-  public distributionQuote() {
+  public async distributionQuote(): Promise<TransactionQuote> {
+    const { wallet } = this._context.userContext;
+
     // void Distribute();
-    const request = new LocalCallRequest(this._env.contracts.odx, TokenMethods.Distribute, 'wallet');
+    const request = new LocalCallRequest(this._env.contracts.odx, TokenMethods.Distribute, wallet);
+    const response = await firstValueFrom(this._cirrusApi.localCall(request));
+    return new TransactionQuote(request, response);
   }
 
-  public allowanceApprovalQuote(token: string) {
+  public async allowanceApprovalQuote(token: string, spender: string, currentAmount: FixedDecimal, amount: FixedDecimal): Promise<TransactionQuote> {
+    const { wallet } = this._context.userContext;
+
     // UInt256 Approve(Address spender, UInt256 currentAmount, UInt256 amount);
-    const request = new LocalCallRequest(token, TokenMethods.Approve, 'wallet', [
-      new Parameter(ParameterType.Address, 'spender'),
-      new Parameter(ParameterType.UInt256, 'currentAmount'),
-      new Parameter(ParameterType.UInt256, 'amount'),
+    const request = new LocalCallRequest(token, TokenMethods.Approve, wallet, [
+      new Parameter(ParameterType.Address, spender, 'Spender'),
+      new Parameter(ParameterType.UInt256, currentAmount.bigInt.toString(), 'Current Amount'),
+      new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'New Amount'),
     ]);
+
+    const response = await firstValueFrom(this._cirrusApi.localCall(request));
+    return new TransactionQuote(request, response);
   }
 
   private async _buildToken(entity: ITokenEntity, lpToken: boolean = false): Promise<Token> {
