@@ -66,7 +66,7 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  async geVaultPledgePosition(proposalId: number, wallet: string): Promise<BigInt> {
+  async getVaultPledgePosition(proposalId: number, wallet: string): Promise<BigInt> {
     const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalPledge', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
@@ -76,7 +76,7 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  async geVaultVotePosition(proposalId: number, wallet: string): Promise<BigInt> {
+  async getVaultVotePosition(proposalId: number, wallet: string): Promise<BigInt> {
     const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalVote', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),

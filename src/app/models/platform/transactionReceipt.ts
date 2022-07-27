@@ -1,4 +1,4 @@
-import { IReceiptLogs } from './../../interfaces/full-node.interface';
+import { IReceiptLogs } from '@interfaces/full-node.interface';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { IContractReceiptResult } from '@interfaces/full-node.interface';
 import { ITransactionType, TransactionTypes } from '@lookups/transaction-types.lookup';

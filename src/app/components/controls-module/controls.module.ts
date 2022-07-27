@@ -15,12 +15,14 @@ import { DeadlineComponent } from './deadline/deadline.component';
 import { InputControlComponent } from './input-control/input-control.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToleranceComponent } from './tolerance/tolerance.component';
+import { TokenKeywordFilterControlComponent } from './token-keyword-filter-control/token-keyword-filter-control.component';
 
 @NgModule({
   declarations: [
     DeadlineComponent,
     InputControlComponent,
-    ToleranceComponent
+    ToleranceComponent,
+    TokenKeywordFilterControlComponent
   ],
   imports: [
     CommonModule,
@@ -35,7 +37,8 @@ import { ToleranceComponent } from './tolerance/tolerance.component';
   exports: [
     DeadlineComponent,
     InputControlComponent,
-    ToleranceComponent
+    ToleranceComponent,
+    TokenKeywordFilterControlComponent
   ]
 })
 export class ControlsModule { }

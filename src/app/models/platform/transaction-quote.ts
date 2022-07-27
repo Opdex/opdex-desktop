@@ -1,35 +1,19 @@
-import { ILocalCallResult } from "@interfaces/full-node.interface";
+import { IContractReceiptResult, ILocalCallResult } from "@interfaces/full-node.interface";
 import { ITransactionQuote, ITransactionError, ITransactionEvent, ITransactionQuoteRequest } from "@interfaces/transaction-quote.interface";
 import { LocalCallRequest } from "@models/cirrusApi/contract-call";
+import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionQuote implements ITransactionQuote {
-  result: any;
-  error: ITransactionError;
-  gasUsed: number;
-  events: ITransactionEvent[];
-  request: ITransactionQuoteRequest;
+  request: LocalCallRequest;
+  response: ILocalCallResult;
 
   constructor(request: LocalCallRequest, response: ILocalCallResult) {
-    this.result = response.return;
-    this.error = {
-      raw: response.errorMessage,
-      friendly: ''
-    };
-    this.gasUsed = response.gasConsumed.value;
-    this.request = {
-      sender: request.sender,
-      to: request.contractAddress,
-      amount: request.amount,
-      method: request.methodName,
-      parameters: request.parameters.map(param => {
-        return {
-          label: param.label,
-          value: param.result
-        }
-      }),
-      callback: null
-    };
-    this.events = response.logs.map((log, i) => {
+    this.response = response;
+    this.request = request;
+  }
+
+  public get events(): ITransactionEvent[] {
+    return this.response.logs.map((log, i) => {
       return {
         sortOrder: i,
         contract: log.address,
@@ -37,5 +21,36 @@ export class TransactionQuote implements ITransactionQuote {
         ...log.log.data
       }
     })
+  }
+
+  public get error(): ITransactionError {
+    return {
+      raw: this.response.errorMessage,
+      friendly: ''
+    };
+  }
+
+  public get gasUsed(): number {
+    return this.response.gasConsumed.value;
+  }
+
+  public get result(): any {
+    return this.response.return;
+  }
+
+  public get txHandoff(): ITransactionQuoteRequest {
+    return this.request.txHandoff;
+  }
+
+  public get receipt(): TransactionReceipt {
+    return new TransactionReceipt({
+      gasUsed: this.gasUsed,
+      from: this.request.sender,
+      to: this.request.contractAddress,
+      success: !!this.response.errorMessage === false,
+      logs: this.response.logs,
+      bloom: null,
+      error: this.response.errorMessage
+    } as IContractReceiptResult)
   }
 }

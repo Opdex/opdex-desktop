@@ -28,6 +28,10 @@ import { SharedPipesModule } from "@pipes/shared-pipes.module";
 
 import { TxQuoteErrorComponent } from "./shared/tx-quote-error/tx-quote-error.component";
 import { TxQuoteErrorsComponent } from "./shared/tx-quote-errors/tx-quote-errors.component";
+import { TxButtonsComponent } from "./shared/tx-buttons/tx-buttons.component";
+import { PercentageAmountButtonsComponent } from "./shared/percentage-amount-buttons/percentage-amount-buttons.component";
+import { AllowanceValidationComponent } from "./shared/allowance-validation/allowance-validation.component";
+import { ReviewQuoteComponent } from "./shared/review-quote/review-quote.component";
 
 @NgModule({
   declarations: [
@@ -45,13 +49,13 @@ import { TxQuoteErrorsComponent } from "./shared/tx-quote-errors/tx-quote-errors
     // TxProvideRemoveComponent,
     // TxAllowanceComponent,
     // LiquidityPoolSelectorComponent,
-    // AllowanceValidationComponent,
-    // ReviewQuoteComponent,
+    AllowanceValidationComponent,
+    ReviewQuoteComponent,
     // TxCreatePoolComponent,
     // TxSidebarComponent,
     // WalletPreviewComponent,
-    // TxButtonsComponent,
-    // PercentageAmountButtonsComponent,
+    TxButtonsComponent,
+    PercentageAmountButtonsComponent,
     // TxVaultProposalComponent,
     // TxVaultProposalCreateComponent,
     // TxVaultProposalVoteComponent,
@@ -96,7 +100,7 @@ import { TxQuoteErrorsComponent } from "./shared/tx-quote-errors/tx-quote-errors
     // TxAllowanceComponent,
     // TxCreatePoolComponent,
     // TxSidebarComponent,
-    // TxButtonsComponent
+    TxButtonsComponent
   ]
 })
 export class TransactionModule { }

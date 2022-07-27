@@ -10,6 +10,14 @@ export class TokenRepositoryService {
     return await this._db.token.get({ address });
   }
 
+  async searchTokens(keyword: string): Promise<ITokenEntity[]> {
+    return await this._db.token
+      .where('address').equals(keyword)
+      .or('symbol').startsWith(keyword)
+      .or('name').startsWith(keyword)
+      .toArray();
+  }
+
   async getTokens(skip: number = 0, take: number = 10): Promise<IPagination<ITokenEntity>> {
     const count = await this._db.token.count();
     const results = await this._db.token.offset(skip).limit(take).toArray();

@@ -29,6 +29,11 @@ export class TokenService {
     private _context: UserContextService
   ) { }
 
+  public async searchTokens(keyword: string): Promise<Token[]> {
+    const entities = await this._tokenRepository.searchTokens(keyword);
+    return await Promise.all(entities.map(entity => this._buildToken(entity)));
+  }
+
   public async buildTokens(skip: number, take: number): Promise<IPagination<Token>> {
     const result = await this._tokenRepository.getTokens(skip, take);
     const tokens = await Promise.all(result.results.map(entity => this._buildToken(entity)));

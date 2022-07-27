@@ -1,5 +1,6 @@
 import { ParameterType } from '@enums/parameter-type';
 import { ICallRequest, ILocalCallRequest } from '@interfaces/full-node.interface';
+import { ITransactionQuoteRequest } from '@interfaces/transaction-quote.interface';
 
 abstract class CallRequestBase {
   contractAddress: string;
@@ -86,6 +87,22 @@ export class LocalCallRequest extends CallRequestBase {
       amount: this.amount,
       gasPrice: this.gasPrice,
       gasLimit: this.gasLimit
+    }
+  }
+
+  public get txHandoff(): ITransactionQuoteRequest {
+    return {
+      sender: this.sender,
+      to: this.contractAddress,
+      amount: this.amount,
+      method: this.methodName,
+      parameters: this.parameters.map(param => {
+        return {
+          label: param.label,
+          value: param.result
+        }
+      }),
+      callback: null
     }
   }
 }

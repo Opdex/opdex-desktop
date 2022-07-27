@@ -1,11 +1,15 @@
+import { ILocalCallResult } from '@interfaces/full-node.interface';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
+import { LocalCallRequest } from '@models/cirrusApi/contract-call';
 
 export interface ITransactionQuote {
   result: any;
   error: ITransactionError;
   gasUsed: number;
   events: ITransactionEvent[];
-  request: ITransactionQuoteRequest;
+  request: LocalCallRequest;
+  txHandoff: ITransactionQuoteRequest;
+  response: ILocalCallResult;
 }
 
 export interface ITransactionError {
