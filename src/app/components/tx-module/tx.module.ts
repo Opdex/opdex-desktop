@@ -45,6 +45,7 @@ import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collec
 import { TxProvideComponent } from "./tx-provide/tx-provide.component";
 import { TxProvideRemoveComponent } from "./tx-provide/tx-provide-remove/tx-provide-remove.component";
 import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-add.component";
+import { TxTradeComponent } from './tx-trade/tx-trade.component';
 
 @NgModule({
   declarations: [
@@ -75,7 +76,9 @@ import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-ad
     // TxVaultProposalPledgeComponent,
     TxQuoteErrorsComponent,
     TxQuoteErrorComponent,
-    // VaultProposalSelectorComponent
+    TxTradeComponent,
+    // VaultProposalSelectorComponent,
+    TxTradeComponent
   ],
   imports: [
     CommonModule,
@@ -113,7 +116,8 @@ import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-ad
     // TxAllowanceComponent,
     // TxCreatePoolComponent,
     // TxSidebarComponent,
-    TxButtonsComponent
+    TxButtonsComponent,
+    TxTradeComponent
   ]
 })
 export class TransactionModule { }
