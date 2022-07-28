@@ -32,10 +32,11 @@ import { TxButtonsComponent } from "./shared/tx-buttons/tx-buttons.component";
 import { PercentageAmountButtonsComponent } from "./shared/percentage-amount-buttons/percentage-amount-buttons.component";
 import { AllowanceValidationComponent } from "./shared/allowance-validation/allowance-validation.component";
 import { ReviewQuoteComponent } from "./shared/review-quote/review-quote.component";
+import { TxSwapComponent } from "./tx-swap/tx-swap.component";
 
 @NgModule({
   declarations: [
-    // TxSwapComponent,
+    TxSwapComponent,
     // TxProvideComponent,
     // TxMineComponent,
     // TxStakeComponent,
@@ -93,7 +94,7 @@ import { ReviewQuoteComponent } from "./shared/review-quote/review-quote.compone
     MatSlideToggleModule
   ],
   exports: [
-    // TxSwapComponent,
+    TxSwapComponent,
     // TxProvideComponent,
     // TxMineComponent,
     // TxStakeComponent,

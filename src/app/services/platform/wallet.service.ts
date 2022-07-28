@@ -5,6 +5,7 @@ import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
+import { FixedDecimal } from '@models/types/fixed-decimal';
 
 @Injectable({providedIn: 'root'})
 export class WalletService {
@@ -36,7 +37,7 @@ export class WalletService {
   async getBalance(token: string, wallet: string): Promise<BigInt> {
     if (token === 'CRS') {
       const response = await firstValueFrom(this._cirrus.getAddressBalance(wallet));
-      return BigInt(response.toFixed(8));
+      return BigInt(response);
     } else {
       const request = new LocalCallRequest(token, 'GetBalance', wallet, [
         new Parameter(ParameterType.Address, wallet)

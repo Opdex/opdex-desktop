@@ -18,7 +18,7 @@ export interface ILocalCallResult {
   internalTransfers: any[];
   gasConsumed: IGasConsumed;
   revert: boolean;
-  errorMessage: string;
+  errorMessage: { value: string };
   return: any;
   logs: IReceiptLogs[];
 }

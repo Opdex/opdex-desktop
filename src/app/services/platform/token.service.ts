@@ -1,3 +1,4 @@
+import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { UserContextService } from '@services/utility/user-context.service';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { RouterMethods } from '@enums/contracts/methods/router-methods';
@@ -61,20 +62,70 @@ export class TokenService {
     return await this._buildToken(entity, isLpt);
   }
 
-  public amountInQuote() {
-    // CRS -> SRC
-    // UInt256 GetAmountIn(UInt256 amountOut, UInt256 reserveIn, UInt256 reserveOut);
+  public async amountInQuote(amountOut: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
+    const {wallet} = this._context.userContext;
+    let parameters: Parameter[];
 
-    // SRC -> SRC
-    // UInt256 GetAmountIn(UInt256 tokenOutAmount, UInt256 tokenOutReserveCrs, UInt256 tokenOutReserveSrc, UInt256 tokenInReserveCrs, UInt256 tokenInReserveSrc);
+    if (!poolOut || poolIn.address === poolOut.address) {
+      // CRS -> SRC
+      // UInt256 GetAmountIn(UInt256 amountOut, UInt256 reserveIn, UInt256 reserveOut);
+      const tokenInIsCrs = tokenIn === 'CRS';
+      const reserveIn = tokenInIsCrs ? poolIn.reserveCrs.bigInt.toString() : poolIn.reserveSrc.bigInt.toString();
+      const reserveOut = tokenInIsCrs ? poolIn.reserveSrc.bigInt.toString() : poolIn.reserveCrs.bigInt.toString();
+
+      parameters = [
+        new Parameter(ParameterType.UInt256, amountOut.bigInt.toString(), 'Amount Out'),
+        new Parameter(ParameterType.UInt256, reserveIn, 'Reserve In'),
+        new Parameter(ParameterType.UInt256, reserveOut, 'Reserve Out')
+      ];
+    } else {
+      // SRC -> SRC
+      // UInt256 GetAmountIn(UInt256 tokenOutAmount, UInt256 tokenOutReserveCrs, UInt256 tokenOutReserveSrc, UInt256 tokenInReserveCrs, UInt256 tokenInReserveSrc);
+      parameters = [
+        new Parameter(ParameterType.UInt256, amountOut.bigInt.toString(), 'Token Out Amount'),
+        new Parameter(ParameterType.UInt256, poolOut.reserveCrs.bigInt.toString(), 'Token Out Reserve CRS'),
+        new Parameter(ParameterType.UInt256, poolOut.reserveSrc.bigInt.toString(), 'Token Out Reserve SRC'),
+        new Parameter(ParameterType.UInt256, poolIn.reserveCrs.bigInt.toString(), 'Token In Reserve CRS'),
+        new Parameter(ParameterType.UInt256, poolIn.reserveSrc.bigInt.toString(), 'Token In Reserve SRC')
+      ];
+    }
+
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountIn, wallet, parameters);
+    const response = await firstValueFrom(this._cirrusApi.localCall(request));
+    return new TransactionQuote(request, response);
   }
 
-  public amountOutQuote() {
-    // CRS -> SRC
-    // UInt256 GetAmountOut(UInt256 amountIn, UInt256 reserveIn, UInt256 reserveOut);
+  public async amountOutQuote(amountIn: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
+    const {wallet} = this._context.userContext;
+    let parameters: Parameter[];
 
-    // SRC -> SRC
-    // UInt256 GetAmountOut(UInt256 tokenInAmount, UInt256 tokenInReserveCrs, UInt256 tokenInReserveSrc, UInt256 tokenOutReserveCrs, UInt256 tokenOutReserveSrc);
+    if (!poolOut || poolIn.address === poolOut.address) {
+      // CRS -> SRC
+      // UInt256 GetAmountOut(UInt256 amountIn, UInt256 reserveIn, UInt256 reserveOut);
+      const tokenInIsCrs = tokenIn === 'CRS';
+      const reserveIn = tokenInIsCrs ? poolIn.reserveCrs.bigInt.toString() : poolIn.reserveSrc.bigInt.toString();
+      const reserveOut = tokenInIsCrs ? poolIn.reserveSrc.bigInt.toString() : poolIn.reserveCrs.bigInt.toString();
+
+      parameters = [
+        new Parameter(ParameterType.UInt256, amountIn.bigInt.toString(), 'Amount In'),
+        new Parameter(ParameterType.UInt256, reserveIn, 'Reserve In'),
+        new Parameter(ParameterType.UInt256, reserveOut, 'Reserve Out')
+      ];
+    } else {
+      // SRC -> SRC
+      // UInt256 GetAmountOut(UInt256 tokenInAmount, UInt256 tokenInReserveCrs, UInt256 tokenInReserveSrc, UInt256 tokenOutReserveCrs, UInt256 tokenOutReserveSrc);
+      parameters = [
+        new Parameter(ParameterType.UInt256, amountIn.bigInt.toString(), 'Token In Amount'),
+        new Parameter(ParameterType.UInt256, poolIn.reserveCrs.bigInt.toString(), 'Token In Reserve CRS'),
+        new Parameter(ParameterType.UInt256, poolIn.reserveSrc.bigInt.toString(), 'Token In Reserve SRC'),
+        new Parameter(ParameterType.UInt256, poolOut.reserveCrs.bigInt.toString(), 'Token Out Reserve CRS'),
+        new Parameter(ParameterType.UInt256, poolOut.reserveSrc.bigInt.toString(), 'Token Out Reserve SRC')
+      ];
+    }
+
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountOut, wallet, parameters);
+    const response = await firstValueFrom(this._cirrusApi.localCall(request));
+    return new TransactionQuote(request, response);
   }
 
   public async swapQuote(tokenIn: string, tokenOut: string, tokenInAmount: FixedDecimal, tokenOutAmount: FixedDecimal,
@@ -128,8 +179,8 @@ export class TokenService {
         // UInt256 SwapSrcForExactCrs(ulong amountCrsOut, UInt256 amountSrcInMax, Address token, Address to, ulong deadline);
         methodName = RouterMethods.SwapSrcForExactCrs;
         parameters = [
-          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
-          new Parameter(ParameterType.ULong, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
+          new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString(), 'Amount Received'),
+          new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
           new Parameter(ParameterType.Address, wallet, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
@@ -143,7 +194,7 @@ export class TokenService {
         parameters = [
           new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString(), 'Amount Spent'),
           new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
-          new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
+          new Parameter(ParameterType.UInt256, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
           new Parameter(ParameterType.Address, wallet, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
@@ -155,7 +206,7 @@ export class TokenService {
         parameters = [
           new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
           new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
-          new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString(), 'Amount Received'),
+          new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
           new Parameter(ParameterType.Address, wallet, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),

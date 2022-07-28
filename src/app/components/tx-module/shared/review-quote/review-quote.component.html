@@ -22,7 +22,7 @@
         Errors
       </p>
 
-      <p>{{quote.error.friendly}}</p>
+      <p>{{quote.error.friendly || quote.error.raw}}</p>
 
       <div class="flex-row-center-between mb-3" *ngIf="!showQrAnyways">
         <button mat-stroked-button
@@ -103,7 +103,7 @@
 
       <small class="d-block light text-center mb-3">Scan or copy the QR code with a Stratis wallet to quote and complete the transaction.</small>
 
-      <opdex-qr-code [data]="quoteRequest" class="d-block mb-3"></opdex-qr-code>
+      <!-- <opdex-qr-code [data]="quoteRequest" class="d-block mb-3"></opdex-qr-code> -->
     </div>
   </ng-container>
 

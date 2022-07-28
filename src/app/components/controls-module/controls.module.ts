@@ -16,6 +16,7 @@ import { InputControlComponent } from './input-control/input-control.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToleranceComponent } from './tolerance/tolerance.component';
 import { TokenKeywordFilterControlComponent } from './token-keyword-filter-control/token-keyword-filter-control.component';
+import { SharedModule } from '@components/shared-module/shared.module';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { TokenKeywordFilterControlComponent } from './token-keyword-filter-contr
     MatIconModule,
     MatButtonModule,
     MatSelectModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    SharedModule
   ],
   exports: [
     DeadlineComponent,

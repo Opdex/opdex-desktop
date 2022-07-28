@@ -24,10 +24,15 @@ export class TransactionQuote implements ITransactionQuote {
   }
 
   public get error(): ITransactionError {
-    return {
-      raw: this.response.errorMessage,
-      friendly: ''
-    };
+    if (this.response.errorMessage) {
+      console.log(this.response.errorMessage)
+      return {
+        raw: this.response.errorMessage.value,
+        friendly: ''
+      };
+    }
+
+    return null;
   }
 
   public get gasUsed(): number {
@@ -47,10 +52,10 @@ export class TransactionQuote implements ITransactionQuote {
       gasUsed: this.gasUsed,
       from: this.request.sender,
       to: this.request.contractAddress,
-      success: !!this.response.errorMessage === false,
+      success: !!this.response.errorMessage?.value === false,
       logs: this.response.logs,
       bloom: null,
-      error: this.response.errorMessage
+      error: this.response.errorMessage?.value
     } as IContractReceiptResult)
   }
 }
