@@ -33,23 +33,28 @@ import { PercentageAmountButtonsComponent } from "./shared/percentage-amount-but
 import { AllowanceValidationComponent } from "./shared/allowance-validation/allowance-validation.component";
 import { ReviewQuoteComponent } from "./shared/review-quote/review-quote.component";
 import { TxSwapComponent } from "./tx-swap/tx-swap.component";
+import { LiquidityPoolSelectorComponent } from "./shared/liquidity-pool-selector/liquidity-pool-selector.component";
+import { TxStakeComponent } from "./tx-stake/tx-stake.component";
+import { TxStakeStartComponent } from "./tx-stake/tx-stake-start/tx-stake-start.component";
+import { TxStakeCollectComponent } from "./tx-stake/tx-stake-collect/tx-stake-collect.component";
+import { TxStakeStopComponent } from "./tx-stake/tx-stake-stop/tx-stake-stop.component";
 
 @NgModule({
   declarations: [
     TxSwapComponent,
     // TxProvideComponent,
     // TxMineComponent,
-    // TxStakeComponent,
+    TxStakeComponent,
     // TxMineStartComponent,
     // TxMineStopComponent,
     // TxMineCollectComponent,
-    // TxStakeCollectComponent,
-    // TxStakeStartComponent,
-    // TxStakeStopComponent,
+    TxStakeCollectComponent,
+    TxStakeStartComponent,
+    TxStakeStopComponent,
     // TxProvideAddComponent,
     // TxProvideRemoveComponent,
     // TxAllowanceComponent,
-    // LiquidityPoolSelectorComponent,
+    LiquidityPoolSelectorComponent,
     AllowanceValidationComponent,
     ReviewQuoteComponent,
     // TxCreatePoolComponent,
@@ -97,7 +102,7 @@ import { TxSwapComponent } from "./tx-swap/tx-swap.component";
     TxSwapComponent,
     // TxProvideComponent,
     // TxMineComponent,
-    // TxStakeComponent,
+    TxStakeComponent,
     // TxAllowanceComponent,
     // TxCreatePoolComponent,
     // TxSidebarComponent,

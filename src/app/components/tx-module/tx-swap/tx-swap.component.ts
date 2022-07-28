@@ -294,7 +294,6 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       return false;
     }
 
-
     try {
       const quote = await this._tokenService.amountInQuote(amountOutFixed, this.tokenIn.address, this.poolIn, this.poolOut);
       if (!quote) return null;
