@@ -42,11 +42,14 @@ import { TxMineComponent } from "./tx-mine/tx-mine.component";
 import { TxMineStopComponent } from "./tx-mine/tx-mine-stop/tx-mine-stop.component";
 import { TxMineStartComponent } from "./tx-mine/tx-mine-start/tx-mine-start.component";
 import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collect.component";
+import { TxProvideComponent } from "./tx-provide/tx-provide.component";
+import { TxProvideRemoveComponent } from "./tx-provide/tx-provide-remove/tx-provide-remove.component";
+import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-add.component";
 
 @NgModule({
   declarations: [
     TxSwapComponent,
-    // TxProvideComponent,
+    TxProvideComponent,
     TxMineComponent,
     TxStakeComponent,
     TxMineStartComponent,
@@ -55,8 +58,8 @@ import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collec
     TxStakeCollectComponent,
     TxStakeStartComponent,
     TxStakeStopComponent,
-    // TxProvideAddComponent,
-    // TxProvideRemoveComponent,
+    TxProvideAddComponent,
+    TxProvideRemoveComponent,
     // TxAllowanceComponent,
     LiquidityPoolSelectorComponent,
     AllowanceValidationComponent,
@@ -104,7 +107,7 @@ import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collec
   ],
   exports: [
     TxSwapComponent,
-    // TxProvideComponent,
+    TxProvideComponent,
     TxMineComponent,
     TxStakeComponent,
     // TxAllowanceComponent,

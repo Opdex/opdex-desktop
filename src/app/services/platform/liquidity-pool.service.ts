@@ -65,7 +65,7 @@ export class LiquidityPoolService {
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
   }
 
-  public async addLiquidityQuote(token: string, amountSrc: FixedDecimal, amountCrsMin: FixedDecimal, amountSrcMin: FixedDecimal, deadline: number): Promise<TransactionQuote> {
+  public async addLiquidityQuote(token: string, amountCrs: FixedDecimal, amountSrc: FixedDecimal, amountCrsMin: FixedDecimal, amountSrcMin: FixedDecimal, deadline: number): Promise<TransactionQuote> {
     const { wallet } = this._context.userContext;
 
     // UInt256[] AddLiquidity(Address token, UInt256 amountSrcDesired, ulong amountCrsMin, UInt256 amountSrcMin, Address to, ulong deadline);
@@ -76,7 +76,7 @@ export class LiquidityPoolService {
       new Parameter(ParameterType.UInt256, amountSrcMin.bigInt.toString(), 'Min SRC Amount'),
       new Parameter(ParameterType.Address, wallet, 'Recipient'),
       new Parameter(ParameterType.ULong, deadline, 'Deadline'),
-    ]);
+    ], amountCrs.formattedValue);
 
     return await this._submitQuote(request);
   }
@@ -97,14 +97,14 @@ export class LiquidityPoolService {
     return await this._submitQuote(request);
   }
 
-  public async provideAmountInQuote(amountIn: FixedDecimal, reserveIn: FixedDecimal, reserveOut: FixedDecimal): Promise<TransactionQuote> {
+  public async provideAmountInQuote(amountA: FixedDecimal, reserveA: FixedDecimal, reserveB: FixedDecimal): Promise<TransactionQuote> {
     const { wallet } = this._context.userContext;
 
     // UInt256 GetLiquidityQuote(UInt256 amountA, UInt256 reserveA, UInt256 reserveB);
     const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetLiquidityQuote, wallet, [
-      new Parameter(ParameterType.UInt256, amountIn.bigInt.toString(), 'Amount In'),
-      new Parameter(ParameterType.UInt256, reserveIn.bigInt.toString(), 'Reserve A'),
-      new Parameter(ParameterType.UInt256, reserveOut.bigInt.toString(), 'Reserve B'),
+      new Parameter(ParameterType.UInt256, amountA.bigInt.toString(), 'Amount In'),
+      new Parameter(ParameterType.UInt256, reserveA.bigInt.toString(), 'Reserve A'),
+      new Parameter(ParameterType.UInt256, reserveB.bigInt.toString(), 'Reserve B'),
     ]);
 
     return await this._submitQuote(request);
