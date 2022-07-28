@@ -38,16 +38,20 @@ import { TxStakeComponent } from "./tx-stake/tx-stake.component";
 import { TxStakeStartComponent } from "./tx-stake/tx-stake-start/tx-stake-start.component";
 import { TxStakeCollectComponent } from "./tx-stake/tx-stake-collect/tx-stake-collect.component";
 import { TxStakeStopComponent } from "./tx-stake/tx-stake-stop/tx-stake-stop.component";
+import { TxMineComponent } from "./tx-mine/tx-mine.component";
+import { TxMineStopComponent } from "./tx-mine/tx-mine-stop/tx-mine-stop.component";
+import { TxMineStartComponent } from "./tx-mine/tx-mine-start/tx-mine-start.component";
+import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collect.component";
 
 @NgModule({
   declarations: [
     TxSwapComponent,
     // TxProvideComponent,
-    // TxMineComponent,
+    TxMineComponent,
     TxStakeComponent,
-    // TxMineStartComponent,
-    // TxMineStopComponent,
-    // TxMineCollectComponent,
+    TxMineStartComponent,
+    TxMineStopComponent,
+    TxMineCollectComponent,
     TxStakeCollectComponent,
     TxStakeStartComponent,
     TxStakeStopComponent,
@@ -101,7 +105,7 @@ import { TxStakeStopComponent } from "./tx-stake/tx-stake-stop/tx-stake-stop.com
   exports: [
     TxSwapComponent,
     // TxProvideComponent,
-    // TxMineComponent,
+    TxMineComponent,
     TxStakeComponent,
     // TxAllowanceComponent,
     // TxCreatePoolComponent,

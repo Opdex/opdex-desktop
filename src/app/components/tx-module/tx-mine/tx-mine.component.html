@@ -1,0 +1,27 @@
+<div class="mining">
+  <mat-button-toggle-group aria-label="Transaction Type" class="w-100 mb-3" [value]="child" #group="matButtonToggleGroup">
+    <mat-button-toggle [value]="option.value" class="w-100" *ngFor="let option of txOptions">{{option.action}}</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <opdex-liquidity-pool-selector [pool]="pool" [view]="view" (onPoolChange)="handlePoolChange($event)"></opdex-liquidity-pool-selector>
+
+  <ng-container *ngIf="pool">
+    <!-- <opdex-wallet-preview
+      [balanceTokens]="[pool.tokens.lp.address]"
+      [positionMining]="[pool.miningPool?.address]"></opdex-wallet-preview> -->
+
+    <!-- We're specifically checking staking capabilities here for right now. In the staking market
+      if the liquidity pool does not have staking, then it cannot ever have liquidity mining. -->
+    <opdex-card *ngIf="pool?.stakingToken; else noStaking">
+      <opdex-tx-mine-start [data]="data" *ngIf="group.value == 1"></opdex-tx-mine-start>
+      <opdex-tx-mine-stop [data]="data" *ngIf="group.value == 2"></opdex-tx-mine-stop>
+      <opdex-tx-mine-collect [data]="data" *ngIf="group.value == 3"></opdex-tx-mine-collect>
+    </opdex-card>
+
+    <ng-template #noStaking>
+      <opdex-card [warn]="true">
+        Mining is not available for this liquidity pool.
+      </opdex-card>
+    </ng-template>
+  </ng-container>
+</div>
