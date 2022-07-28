@@ -29,6 +29,11 @@ export class LiquidityPoolService {
     private _cirrusApi: CirrusApiService
   ) { }
 
+  public async searchPools(keyword: string): Promise<LiquidityPool[]> {
+    const entities = await this._poolRepository.searchLiquidityPools(keyword);
+    return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
+  }
+
   public async buildLiquidityPool(address: string): Promise<LiquidityPool> {
     const entity = await this._poolRepository.getPoolByAddress(address);
     return await this._buildLiquidityPool(entity);

@@ -13,8 +13,8 @@ export class TokenRepositoryService {
   async searchTokens(keyword: string): Promise<ITokenEntity[]> {
     return await this._db.token
       .where('address').equals(keyword)
-      .or('symbol').startsWith(keyword)
-      .or('name').startsWith(keyword)
+      .or('symbol').startsWithIgnoreCase(keyword)
+      .or('name').startsWithIgnoreCase(keyword)
       .toArray();
   }
 
