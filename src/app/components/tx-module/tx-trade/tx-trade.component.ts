@@ -9,11 +9,7 @@ import { TransactionView } from '@enums/transaction-view';
 })
 export class TxTradeComponent {
   @Input() pool: LiquidityPool;
-  view: TransactionView;
-
-  constructor() {
-    this.view = TransactionView.swap;
-  }
+  @Input() view: TransactionView;
 
   handlePoolSelection(pool: LiquidityPool) {
     this.pool = pool;

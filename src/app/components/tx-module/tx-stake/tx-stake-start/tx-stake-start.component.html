@@ -6,7 +6,7 @@
       [formControl]="amount"
       [suffix]="pool.stakingToken?.symbol"
       [numbersOnly]="true">
-      <opdex-number [value]="fiatValue" prefix="$" [precision]="2"></opdex-number>
+      <opdex-number [value]="fiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
     </opdex-input-control>
 
     <opdex-percentage-amount-buttons
@@ -43,7 +43,5 @@
     </opdex-tx-quote-submit-button>
 
     <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
-
-
   </form>
 </div>

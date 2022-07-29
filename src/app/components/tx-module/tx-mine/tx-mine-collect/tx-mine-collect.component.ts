@@ -45,12 +45,6 @@ export class TxMineCollectComponent extends TxBase implements OnChanges, OnDestr
   }
 
   async submit(): Promise<void> {
-    // this._platformApi
-    //   .collectMiningRewardsQuote(this.pool.miningPool.address)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
-
     try {
       const response = await this._liquidityPoolService.collectMiningRewardsQuote(this.pool.miningPool.address);
       this.quote(response);
@@ -63,7 +57,9 @@ export class TxMineCollectComponent extends TxBase implements OnChanges, OnDestr
   private async validateMiningBalance(): Promise<boolean> {
     if (!!this.pool === false || !this.context?.wallet) return false;
 
-    const sufficientBalance = await this._validateMiningBalance(this.pool, FixedDecimal.Zero(this.pool.lpToken.decimals));
+    // Should be mining with at least 1 sat
+    const amount = FixedDecimal.FromBigInt(BigInt('1'), this.pool.lpToken.decimals);
+    const sufficientBalance = await this._validateMiningBalance(this.pool, amount);
 
     this.balanceError = !sufficientBalance;
 

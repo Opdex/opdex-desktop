@@ -17,69 +17,13 @@
           <div class="badge red" *ngIf="pool?.miningPool?.miningPeriodEndBlock > latestBlock"><mat-icon class="mr-1">{{icons.mining}}</mat-icon> Mining</div>
         </div>
       </div>
-
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <opdex-liquidity-pool-token-card
-          [token]="pool?.srcToken"
-          [swapToken]="pool?.crsToken"
-          [swapRate]="pool?.crsPerSrc">
-        </opdex-liquidity-pool-token-card>
-      </div>
-
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <opdex-liquidity-pool-token-card
-          [token]="pool?.crsToken"
-          [swapToken]="pool?.srcToken"
-          [swapRate]="pool?.srcPerCrs">
-        </opdex-liquidity-pool-token-card>
-      </div>
     </div>
   </div>
 </div>
 
-<div class="offset-section">
+<div class="offset-section tx-bg light">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-6 col-lg-4">
-        <opdex-liquidity-pool-summary-card [pool]="pool"></opdex-liquidity-pool-summary-card>
-      </div>
-
-      <div class="col-12 col-sm-6 col-lg-4">
-        <opdex-tx-trade [pool]="pool"></opdex-tx-trade>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="standard-section blend-cards pt-5 pb-3 tx-bg">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-6 col-xl-5">
-        <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="l"></opdex-tx-feed>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Experimental -->
-<!-- <div class="header-section">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12">
-        <div class="flex-row-center">
-          <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
-          <h1 class="mb-0 ml-2">{{pool?.name}}</h1>
-        </div>
-
-        <opdex-copy-address [address]="pool?.address"></opdex-copy-address>
-
-        <div class="flex-row-center mt-2 mb-3">
-          <div class="badge blue mr-2">{{pool?.transactionFee?.bigInt > 0 ? pool.transactionFee.formattedValue : 0}}% Fee</div>
-          <div class="badge purple mr-2" *ngIf="pool?.isNominated"><mat-icon class="mr-1">{{icons.staking}}</mat-icon> Nominated</div>
-          <div class="badge red" *ngIf="pool?.miningPool?.miningPeriodEndBlock > latestBlock"><mat-icon class="mr-1">{{icons.mining}}</mat-icon> Mining</div>
-        </div>
-      </div>
-
       <div class="col-12 col-sm-6 col-xl-4">
         <opdex-liquidity-pool-token-card
           [token]="pool?.srcToken"
@@ -97,9 +41,8 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-4">
-        <opdex-tx-trade [pool]="pool"></opdex-tx-trade>
         <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="l"></opdex-tx-feed>
       </div>
     </div>
   </div>
-</div> -->
+</div>

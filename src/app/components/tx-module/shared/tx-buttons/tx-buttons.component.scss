@@ -13,7 +13,7 @@
     }
   }
 
-  &.swap-button {
+  &.swap-button, &.create-pool-button {
     background: rgba($blue-primary, .2) !important;
 
     &:hover {

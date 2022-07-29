@@ -1,3 +1,5 @@
+import { CurrencyService } from '@services/platform/currency.service';
+import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { OnDestroy } from '@angular/core';
 import { Component, Input, OnChanges, Injector } from '@angular/core';
@@ -7,7 +9,7 @@ import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
 import { AllowanceValidation } from '@models/allowance-validation';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { debounceTime, switchMap, distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { Icons } from 'src/app/enums/icons';
 
@@ -21,13 +23,12 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
   icons = Icons;
   form: FormGroup;
   pool: LiquidityPool;
-  allowance$: Subscription;
   fiatValue: FixedDecimal;
   allowance: AllowanceValidation;
-  allowanceTransaction$ = new Subscription();
-  latestSyncedBlock$: Subscription;
   percentageSelected: string;
   balanceError: boolean;
+  selectedCurrency: ICurrency;
+  subscription = new Subscription();
 
   get amount(): FormControl {
     return this.form.get('amount') as FormControl;
@@ -44,7 +45,8 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
   constructor(
     private _fb: FormBuilder,
     protected _injector: Injector,
-    private _liquidityPoolService: LiquidityPoolService
+    private _liquidityPoolService: LiquidityPoolService,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
@@ -52,14 +54,21 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
       amount: [null, [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]]
     });
 
-    this.latestSyncedBlock$ = this._nodeService.latestBlock$
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
+
+    this.subscription.add(
+      this._nodeService.latestBlock$
       .pipe(
         filter(_ => !!this.context.wallet),
         switchMap(_ => this.getAllowance()),
         switchMap(_ => this.validateBalance()))
-      .subscribe();
+      .subscribe());
 
-    this.allowance$ = this.amount.valueChanges
+    this.subscription.add(
+      this.amount.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
@@ -71,7 +80,7 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
         filter(amount => !!this.context?.wallet && amount.bigInt > 0),
         switchMap(amount => this.getAllowance(amount.formattedValue)),
         switchMap(_ => this.validateBalance()))
-      .subscribe();
+      .subscribe());
   }
 
   ngOnChanges(): void {
@@ -80,23 +89,6 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
   }
 
   async submit(): Promise<void> {
-    // Temporary
-    // const walletConflicts = this._env.prevention.wallets.includes(this.context.wallet);
-    // const poolConflicts = this._env.prevention.pools.includes(this.pool.address);
-
-    // if (walletConflicts || poolConflicts) {
-    //   this.quoteErrors = ['Unexpected error, please try again later or seek support in Discord.'];
-    //   return;
-    // }
-
-    // const request = new StartStakingRequest();
-
-    // this._platformApi
-    //   .startStakingQuote(this.pool.address, request.payload)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
-
     try {
       const amount = new FixedDecimal(this.amount.value, this.pool.stakingToken.decimals);
       const response = await this._liquidityPoolService.startStakingQuote(this.pool.address, amount);
@@ -112,13 +104,22 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
     this.amount.setValue(value.result, {emitEvent: true});
   }
 
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    if (this.pool && this.amount.value) {
+      const amount = new FixedDecimal(this.amount.value || '0', this.pool.stakingToken.decimals);
+      this.setFiatValue(amount);
+    }
+  }
+
   private async validateBalance(): Promise<boolean> {
     if (!this.amount.value || !this.context?.wallet || !this.pool || !this.pool.totalStaked) {
       return false;
     }
 
     const amountNeeded = new FixedDecimal(this.amount.value, this.pool.lpToken.decimals);
-
     const sufficientBalance = await this._validateBalance(this.pool.stakingToken, amountNeeded);
 
     this.balanceError = !sufficientBalance;
@@ -127,9 +128,8 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
   }
 
   private setFiatValue(amount: FixedDecimal): void {
-    // const stakingTokenFiat = this.pool.stakingToken?.summary?.priceUsd || FixedDecimal.Zero(8);
-    // this.fiatValue = stakingTokenFiat.multiply(amount);
-    this.fiatValue = FixedDecimal.Zero(8);
+    const stakingTokenFiat = this.pool.stakingToken.pricing[this.selectedCurrency.abbreviation];
+    this.fiatValue = stakingTokenFiat.multiply(amount);
   }
 
   private async getAllowance(amount?: string): Promise<AllowanceValidation> {
@@ -156,8 +156,6 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
 
   ngOnDestroy(): void {
     this.destroyContext$();
-    if (this.allowance$) this.allowance$.unsubscribe();
-    if (this.latestSyncedBlock$) this.latestSyncedBlock$.unsubscribe();
-    if (this.allowanceTransaction$) this.allowanceTransaction$.unsubscribe();
+    this.subscription.unsubscribe();
   }
 }

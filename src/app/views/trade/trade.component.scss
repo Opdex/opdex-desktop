@@ -1,0 +1,10 @@
+#trade {
+  justify-content: center;
+  min-height: 100vh;
+}
+
+@media (min-height: 1081px) {
+  #trade {
+    align-items: center;
+  }
+}

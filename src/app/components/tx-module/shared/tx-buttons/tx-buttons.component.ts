@@ -11,8 +11,11 @@ export class TxButtonsComponent {
   @Output() onSelectOption = new EventEmitter<TransactionView>();
   @Input() disableStaking = false;
   @Input() disableMining = false;
+  @Input() disableCreatePool = false;
   @Input() hideStaking = false;
   @Input() hideMining = false;
+
+  showCreatePool = true
 
   icons = Icons;
   transactionViews = TransactionView;

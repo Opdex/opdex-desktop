@@ -147,14 +147,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
 
       this.tokenInExact
         ? await this.amountOutQuote(this.tokenInAmount.value)
-        : await this.amountInQuote(this.tokenOutAmount.value)
-
-      // this.refreshTokens()
-      //   .pipe(take(1), switchMap(_ => {
-      //     return this.tokenInExact
-      //       ? this.amountOutQuote(this.tokenInAmount.value)
-      //       : this.amountInQuote(this.tokenOutAmount.value);
-      //   })).subscribe();
+        : await this.amountInQuote(this.tokenOutAmount.value);
     }
   }
 
@@ -304,7 +297,6 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
 
       if (this.context.wallet === undefined) return null;
       return await this.validateAllowance();
-
     } catch (error) {
       console.log(error)
       this.tokenOutAmount.setErrors({ invalidAmountInQuote: true });

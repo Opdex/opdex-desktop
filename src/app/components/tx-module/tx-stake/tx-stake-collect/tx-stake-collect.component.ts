@@ -55,16 +55,7 @@ export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDest
   }
 
   async submit(): Promise<void> {
-    // const request = new CollectStakingRewardsRequest(this.liquidate.value);
-
-    // this._platformApi
-    //   .collectStakingRewardsQuote(this.pool.address, request.payload)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
-
-
-      try {
+    try {
       const response = await this._liquidityPoolService.collectStakingRewardsQuote(this.pool.address, this.liquidate.value);
       this.quote(response);
     } catch (error) {
@@ -78,7 +69,8 @@ export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDest
       return false;
     }
 
-    const amount = FixedDecimal.Zero(this.pool.stakingToken.decimals);
+    // Should be staking at least 1 sat to collect
+    const amount = FixedDecimal.FromBigInt(BigInt('1'), this.pool.stakingToken.decimals);
     const sufficientBalance = await this._validateStakingBalance(this.pool, amount);
 
     this.balanceError = !sufficientBalance;

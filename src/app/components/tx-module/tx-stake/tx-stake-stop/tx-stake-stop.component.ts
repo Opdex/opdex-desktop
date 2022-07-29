@@ -1,6 +1,7 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { OnDestroy } from '@angular/core';
-import { debounceTime, distinctUntilChanged, switchMap, filter, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap, filter, map, tap } from 'rxjs/operators';
 import { Component, Input, OnChanges, Injector } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Icons } from 'src/app/enums/icons';
@@ -9,6 +10,7 @@ import { TxBase } from '@components/tx-module/tx-base.component';
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { FixedDecimal } from '@models/types/fixed-decimal';
+import { CurrencyService } from '@services/platform/currency.service';
 
 @Component({
   selector: 'opdex-tx-stake-stop',
@@ -24,6 +26,7 @@ export class TxStakeStopComponent extends TxBase implements OnChanges, OnDestroy
   fiatValue: FixedDecimal;
   percentageSelected: string;
   balanceError: boolean;
+  selectedCurrency: ICurrency;
 
   get amount(): FormControl {
     return this.form.get('amount') as FormControl;
@@ -44,7 +47,8 @@ export class TxStakeStopComponent extends TxBase implements OnChanges, OnDestroy
   constructor(
     private _fb: FormBuilder,
     protected _injector: Injector,
-    private _liquidityPoolService: LiquidityPoolService
+    private _liquidityPoolService: LiquidityPoolService,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
@@ -52,6 +56,11 @@ export class TxStakeStopComponent extends TxBase implements OnChanges, OnDestroy
       amount: [null, [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]],
       liquidate: [false]
     });
+
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
 
     this.subscription.add(
       this.amount.valueChanges
@@ -74,14 +83,6 @@ export class TxStakeStopComponent extends TxBase implements OnChanges, OnDestroy
   }
 
   async submit(): Promise<void> {
-    // const request = new StopStakingRequest(new FixedDecimal(this.amount.value, this.pool.stakingToken.decimals), this.liquidate.value);
-
-    // this._platformApi
-    //   .stopStakingQuote(this.pool.address, request.payload)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
-
     try {
       const amount = new FixedDecimal(this.amount.value, this.pool.stakingToken.decimals);
       const response = await this._liquidityPoolService.stopStakingQuote(this.pool.address, amount, this.liquidate.value);
@@ -96,10 +97,20 @@ export class TxStakeStopComponent extends TxBase implements OnChanges, OnDestroy
     this.percentageSelected = value.percentageOption;
     this.amount.setValue(value.result, {emitEvent: true});
   }
+
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    if (this.pool && this.amount.value) {
+      const amount = new FixedDecimal(this.amount.value || '0', this.pool.stakingToken.decimals);
+      this.setFiatValue(amount);
+    }
+  }
+
   private setFiatValue(amount: FixedDecimal): void {
-    // const stakingTokenFiat = this.pool.stakingToken?.summary?.priceUsd || FixedDecimal.Zero(8);
-    // this.fiatValue = stakingTokenFiat.multiply(amount);
-    this.fiatValue = FixedDecimal.Zero(8);
+    const stakingTokenFiat = this.pool.stakingToken.pricing[this.selectedCurrency.abbreviation];
+    this.fiatValue = stakingTokenFiat.multiply(amount);
   }
 
   private async validateStakingBalance(): Promise<boolean> {
