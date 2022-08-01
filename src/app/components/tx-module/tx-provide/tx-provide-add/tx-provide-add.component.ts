@@ -1,3 +1,4 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnDestroy, Input, Injector } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, Validators } from "@angular/forms";
@@ -11,6 +12,7 @@ import { Token } from "@models/platform/token";
 import { FixedDecimal } from "@models/types/fixed-decimal";
 import { EnvironmentsService } from "@services/utility/environments.service";
 import { Subscription, debounceTime, distinctUntilChanged, map, filter, switchMap, tap } from "rxjs";
+import { CurrencyService } from '@services/platform/currency.service';
 
 @Component({
   selector: 'opdex-tx-provide-add',
@@ -22,7 +24,6 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   @Input() pool: LiquidityPool;
   icons = Icons;
   txHash: string;
-  subscription = new Subscription();
   allowance: AllowanceValidation;
   form: FormGroup;
   showMore: boolean = false;
@@ -33,13 +34,14 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   crsInMin: FixedDecimal;
   srcInMin: FixedDecimal;
   deadlineBlock: number;
-  latestSyncedBlock$: Subscription;
   latestBlock: number;
   crsPercentageSelected: string;
   srcPercentageSelected: string;
   crsBalanceError: boolean;
   srcBalanceError: boolean;
+  selectedCurrency: ICurrency;
   showTransactionDetails: boolean = true;
+  subscription = new Subscription();
 
   get amountCrs(): FormControl {
     return this.form.get('amountCrs') as FormControl;
@@ -60,7 +62,8 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
     private _fb: FormBuilder,
     private _liquidityPoolService: LiquidityPoolService,
     private _env: EnvironmentsService,
-    protected _injector: Injector
+    protected _injector: Injector,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
@@ -77,17 +80,11 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
       amountSrc: [null, [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]],
     });
 
-    // Investigate
-    // Set CRS amount in (quotes and sets SRC amount)
-    // Change SRC amount (quote and change CRS amount)
-    // Change CRS amount (12.24999999 to 12.25) registers no change, no re-quote is given.
-    // FINDINGS
-    // This is because CRS value is manually typed, auto populates SRC value with quote. Change SRC value, auto re-populates CRS from quote.
-    // Then changing CRS does not get triggered by DistinctUntilChanged(), it never knew about the auto populated quote changes so it thinks nothing changed.
-    //
-    // This isn't reproducible 100% of the time, there must be more to it.
-    // ----
-    // Working as expected - will circle back and remove 2/4/22
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
+
     this.subscription.add(
       this.amountCrs.valueChanges
         .pipe(
@@ -130,18 +127,28 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
           switchMap(_ => this.validateBalances()))
         .subscribe());
 
-    this.latestSyncedBlock$ = this._nodeService.latestBlock$
-      .pipe(
-        tap(block => this.latestBlock = block),
-        tap(_ => this.calcDeadline(this.deadlineThreshold)),
-        filter(_ => !!this.context.wallet),
-        switchMap(_ => this.getAllowance()),
-        switchMap(_ => this.validateBalances()))
-      .subscribe();
+    this.subscription.add(
+      this._nodeService.latestBlock$
+        .pipe(
+          tap(block => this.latestBlock = block),
+          tap(_ => this.calcDeadline(this.deadlineThreshold)),
+          filter(_ => !!this.context.wallet),
+          switchMap(_ => this.getAllowance()),
+          switchMap(_ => this.validateBalances()))
+        .subscribe());
   }
 
   ngOnChanges(): void {
     this.reset();
+  }
+
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    if (this.pool) {
+      this.calcTolerance();
+    }
   }
 
   private async _quoteAmountIn(value: string, tokenIn: Token): Promise<string> {
@@ -164,35 +171,9 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
 
       return '';
     }
-
-    // const payload: IAddLiquidityAmountInQuoteRequest = {
-    //   amountIn: value,
-    //   tokenIn: tokenIn.address
-    // };
-
-    // return this._platformApi.quoteAddLiquidity(this.pool.address, payload)
-    //   .pipe(
-    //     map((response: IProvideAmountInResponse) => response?.amountIn || ''),
-    //     catchError(() => {
-    //       const isBasedOnCrs = tokenIn.address.toLowerCase() === 'crs';
-
-    //       if (isBasedOnCrs) this.amountCrs.setErrors({ invalidAmountEquivalent: true });
-    //       else this.amountSrc.setErrors({ invalidAmountEquivalent: true });
-
-    //       return of('')
-    //     }));
   }
 
   async submit(): Promise<void> {
-    // Temporary
-    // const walletConflicts = this._env.prevention.wallets.includes(this.context.wallet);
-    // const poolConflicts = this._env.prevention.pools.includes(this.pool.address);
-
-    // if (walletConflicts || poolConflicts) {
-    //   this.quoteErrors = ['Unexpected error, please try again later or seek support in Discord.'];
-    //   return;
-    // }
-
     try {
       this.calcDeadline(this.deadlineThreshold);
       const amountCrs = new FixedDecimal(this.amountCrs.value, this.pool.crsToken.decimals);
@@ -203,26 +184,11 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
       console.log(error);
       this.quoteErrors = ['Unexpected error quoting transaction'];
     }
-
-    // const request = new AddLiquidityRequest(
-    //   new FixedDecimal(this.amountCrs.value, this.pool.crsToken.decimals),
-    //   new FixedDecimal(this.amountSrc.value, this.pool.srcToken.decimals),
-    //   this.crsInMin,
-    //   this.srcInMin,
-    //   this.context.wallet,
-    //   this.deadlineBlock
-    // );
-
-    // this._platformApi
-    //   .addLiquidityQuote(this.pool.address, request.payload)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
   }
 
   calcTolerance(tolerance?: number): void {
     if (tolerance) this.toleranceThreshold = tolerance;
-
+    if (!this.selectedCurrency) return;
     if (this.toleranceThreshold > 99.99 || this.toleranceThreshold < .01) return;
     if (!this.amountCrs.value || !this.amountSrc.value) return;
 
@@ -235,11 +201,9 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
     this.srcInMin = srcInValue.subtract(srcMinTolerance);
 
     const amountCrs = new FixedDecimal(this.amountCrs.value, this.pool.crsToken.decimals);
-    // const priceCrs = this.pool.crsToken.summary.priceUsd;
-    const priceCrs = FixedDecimal.Zero(8);
+    const priceCrs = this.pool.crsToken.pricing[this.selectedCurrency.abbreviation];
     const amountSrc = new FixedDecimal(this.amountSrc.value, this.pool.srcToken.decimals);
-    // const priceSrc = this.pool.srcToken.summary.priceUsd;
-    const priceSrc = FixedDecimal.Zero(8);
+    const priceSrc = this.pool.srcToken.pricing[this.selectedCurrency.abbreviation];
 
     this.crsInFiatValue = amountCrs.multiply(priceCrs);
     this.srcInFiatValue = amountSrc.multiply(priceSrc);
@@ -320,6 +284,5 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   ngOnDestroy(): void {
     this.destroyContext$();
     this.subscription.unsubscribe();
-    if (this.latestSyncedBlock$) this.latestSyncedBlock$.unsubscribe();
   }
 }

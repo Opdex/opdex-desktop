@@ -7,7 +7,7 @@
         [formControl]="amountCrs"
         [suffix]="pool.crsToken.symbol"
         [numbersOnly]="true">
-        <opdex-number [value]="crsInFiatValue" prefix="$" [precision]="2"></opdex-number>
+        <opdex-number [value]="crsInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
       </opdex-input-control>
 
       <opdex-percentage-amount-buttons
@@ -38,7 +38,7 @@
       [formControl]="amountSrc"
       [suffix]="pool.srcToken.symbol"
       [numbersOnly]="true">
-      <opdex-number [value]="srcInFiatValue" prefix="$" [precision]="2"></opdex-number>
+      <opdex-number [value]="srcInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
     </opdex-input-control>
 
     <opdex-percentage-amount-buttons

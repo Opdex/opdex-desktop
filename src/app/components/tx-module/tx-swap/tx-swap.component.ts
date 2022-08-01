@@ -13,6 +13,8 @@ import { SwapQuoteService } from "@services/utility/swap-quote.service";
 import { Subscription, debounceTime, tap, switchMap, filter } from "rxjs";
 import { TxBase } from "../tx-base.component";
 import { LiquidityPoolService } from "@services/platform/liquidity-pool.service";
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { CurrencyService } from '@services/platform/currency.service';
 
 @Component({
   selector: 'opdex-tx-swap',
@@ -46,10 +48,11 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
   poolIn: LiquidityPool;
   poolOut: LiquidityPool;
   marketFee: FixedDecimal;
-  subscription = new Subscription();
+  selectedCurrency: ICurrency;
   icons = Icons;
   tokenInExact = true;
   showTransactionDetails: boolean = true;
+  subscription = new Subscription();
 
   get tokenInAmount(): FormControl {
     return this.form.get('tokenInAmount') as FormControl;
@@ -64,7 +67,8 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
     private _liquidityPoolService: LiquidityPoolService,
     private _env: EnvironmentsService,
     protected _injector: Injector,
-    private _tokenService: TokenService
+    private _tokenService: TokenService,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
@@ -75,6 +79,11 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       tokenInAmount: ['', [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]],
       tokenOutAmount: ['', [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]],
     });
+
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
 
     this.subscription.add(
       this.tokenInAmount.valueChanges
@@ -116,14 +125,15 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.poolOut = this.data.pool;
     }
 
+    // Todo: If we sync markets, we can pull from that, or set from pool txfee
     this.marketFee = new FixedDecimal('.003', 3);
+  }
 
-    // this._marketService.getMarket()
-    //   .pipe(take(1))
-    //   .subscribe(market => {
-    //     if (!this.tokenIn) this.tokenIn = market.tokens.crs;
-    //     this.marketFee = market.transactionFeePercent.multiply(new FixedDecimal('.01', 2));
-    //   });
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    this.calcTotals();
   }
 
   async selectToken(tokenField: string, token: Token): Promise<void> {
@@ -164,10 +174,11 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
     const tokenOutMin = !this.tokenInExact ? tokenOutAmount : this.tokenOutMin;
 
     try {
-      const quote = await this._tokenService.swapQuote(this.tokenIn.address, this.tokenOut.address, tokenInAmount, tokenOutAmount, tokenInMax, tokenOutMin, this.tokenInExact, this.deadlineBlock);
+      const quote = await this._tokenService.swapQuote(this.tokenIn.address, this.tokenOut.address, tokenInAmount,
+                                                       tokenOutAmount, tokenInMax, tokenOutMin, this.tokenInExact, this.deadlineBlock);
       this.quote(quote);
-    } catch {
-      // Todo: Should use error from FN if available
+    } catch (error) {
+      console.log(error);
       this.quoteErrors = ['Unexpected error quoting transaction'];
     }
   }
@@ -205,14 +216,15 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
     if (this.toleranceThreshold > 99.99 || this.toleranceThreshold < .01) return;
     if (!this.tokenInAmount.value || !this.tokenInAmount.value) return;
     if (!this.poolIn || !this.poolOut) return;
+    if (!this.selectedCurrency) return;
 
     const one = FixedDecimal.One(8);
     const negativeOneHundred = FixedDecimal.NegativeOneHundred(8);
     const tokenInAmount = new FixedDecimal(this.tokenInAmount.value, this.tokenIn.decimals);
-    const tokenInPrice = new FixedDecimal('0', 8); // this.tokenIn.summary.priceUsd;
+    const tokenInPrice = this.tokenIn.pricing[this.selectedCurrency.abbreviation];
     const tokenInTolerance = new FixedDecimal((1 + (this.toleranceThreshold / 100)).toFixed(8), 8);
     const tokenOutAmount = new FixedDecimal(this.tokenOutAmount.value, this.tokenOut.decimals);
-    const tokenOutPrice = new FixedDecimal('0', 8); // this.tokenOut.summary.priceUsd;
+    const tokenOutPrice = this.tokenOut.pricing[this.selectedCurrency.abbreviation];
     const tokenOutTolerancePercentage = new FixedDecimal((this.toleranceThreshold / 100).toFixed(8), 8);
     const tokenOutTolerance = tokenOutAmount.multiply(tokenOutTolerancePercentage);
 
@@ -303,22 +315,6 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.resetValues(true);
       return null;
     }
-
-    // const request = new SwapAmountInQuoteRequest(this.tokenOut.address, amountOutFixed);
-
-    // this._platformApi.
-    //   .swapAmountInQuote(this.tokenIn.address, request.payload)
-    //   .pipe(
-    //     catchError(() => {
-    //       this.tokenOutAmount.setErrors({ invalidAmountInQuote: true });
-    //       this.resetValues(true);
-    //       return of();
-    //     }),
-    //     filter(quote => quote !== null && quote !== undefined),
-    //     tap((value: ISwapAmountInQuoteResponse) => this.tokenInAmount.setValue(value.amountIn, { emitEvent: false })),
-    //     tap(_ => this.calcTotals()),
-    //     filter(_ => this.context.wallet !== undefined),
-    //     switchMap(() => this.validateAllowance()));
   }
 
   private async amountOutQuote(amountIn: string): Promise<boolean> {
@@ -347,21 +343,6 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.resetValues(false);
       return null;
     }
-
-    // const request = new SwapAmountOutQuoteRequest(this.tokenIn.address, amountInFixed);
-
-    // return this._platformApi.swapAmountOutQuote(this.tokenOut.address, request.payload)
-    //   .pipe(
-    //     catchError(() => {
-    //       this.tokenInAmount.setErrors({ invalidAmountOutQuote: true });
-    //       this.resetValues(false);
-    //       return of();
-    //     }),
-    //     filter(quote => quote !== null && quote !== undefined),
-    //     tap((value: ISwapAmountOutQuoteResponse) => this.tokenOutAmount.setValue(value.amountOut, { emitEvent: false })),
-    //     tap(_ => this.calcTotals()),
-    //     filter(_ => this.context.wallet !== undefined),
-    //     switchMap(_ => this.validateAllowance()));
   }
 
   private async validateAllowance(): Promise<boolean> {

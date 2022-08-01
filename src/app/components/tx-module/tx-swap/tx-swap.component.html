@@ -1,7 +1,3 @@
-<!-- <ng-container *ngIf="tokenIn && tokenOut">
-  <opdex-wallet-preview [balanceTokens]="[tokenIn.address, tokenOut.address]"></opdex-wallet-preview>
-</ng-container> -->
-
 <opdex-card class="swap">
   <form [formGroup]="form" name="swap-form" id="swap-form">
     <opdex-input-control *ngIf="!changeTokenIn"
@@ -10,7 +6,7 @@
       [suffix]="tokenIn?.symbol || 'Select Token'"
       (handleChangeToken)="changeToken('tokenIn')"
       [numbersOnly]="true">
-      <opdex-number [value]="tokenInFiatValue" prefix="$" [precision]="2"></opdex-number>
+      <opdex-number [value]="tokenInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
     </opdex-input-control>
 
     <opdex-token-keyword-filter-control
@@ -64,7 +60,7 @@
       [numbersOnly]="true">
       <div class="flex-row-center-between">
         <div class="fiat-quote">
-          <opdex-number [value]="tokenOutFiatValue" prefix="$" [precision]="2"></opdex-number>
+          <opdex-number [value]="tokenOutFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
           <span class="ml-1"
             [ngClass]="{
               'orange': tokenOutFiatPercentageDifference < -1 && tokenOutFiatPercentageDifference > -5,

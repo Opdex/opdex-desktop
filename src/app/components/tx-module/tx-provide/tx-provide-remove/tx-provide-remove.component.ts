@@ -1,3 +1,4 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnChanges, OnDestroy, Input, Injector } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, Validators } from "@angular/forms";
@@ -11,6 +12,7 @@ import { FixedDecimal } from "@models/types/fixed-decimal";
 import { UserContext } from "@models/user-context";
 import { EnvironmentsService } from "@services/utility/environments.service";
 import { Subscription, debounceTime, distinctUntilChanged, map, filter, switchMap, tap } from "rxjs";
+import { CurrencyService } from '@services/platform/currency.service';
 
 @Component({
   selector: 'opdex-tx-provide-remove',
@@ -23,7 +25,6 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
   icons = Icons;
   form: FormGroup;
   context: UserContext;
-  allowance$: Subscription;
   showMore: boolean = false;
   lptInFiatValue: FixedDecimal;
   usdOut: FixedDecimal;
@@ -34,13 +35,13 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
   deadlineBlock: number;
   toleranceThreshold = 5;
   deadlineThreshold = 10;
-  allowanceTransaction$: Subscription;
   allowance: AllowanceValidation;
-  latestSyncedBlock$: Subscription;
   latestBlock: number;
   percentageSelected: string;
   balanceError: boolean;
   showTransactionDetails: boolean = true;
+  selectedCurrency: ICurrency;
+  subscription = new Subscription();
 
   get liquidity(): FormControl {
     return this.form.get('liquidity') as FormControl;
@@ -56,7 +57,8 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
     private _fb: FormBuilder,
     private _liquidityPoolService: LiquidityPoolService,
     protected _injector: Injector,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
@@ -72,27 +74,34 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
       liquidity: [null, [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]],
     });
 
-    this.allowance$ = this.liquidity.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        map(amount => {
-          const amountFixed = new FixedDecimal(amount || '0', this.pool.lpToken.decimals);
-          amountFixed.isZero ? this.reset() : this.calcTolerance();
-          return amountFixed;
-        }),
-        filter(amount => !!this.context?.wallet && amount.bigInt > 0),
-        switchMap(amount => this.getAllowance(amount.formattedValue)),
-        switchMap(allowance => this.validateBalance(allowance.requestToSpend)))
-      .subscribe();
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
 
-    this.latestSyncedBlock$ = this._nodeService.latestBlock$
-      .pipe(
-        tap(block => this.latestBlock = block),
-        tap(_ => this.calcDeadline(this.deadlineThreshold)),
-        filter(_ => !!this.context?.wallet && !!this.pool),
-        switchMap(_ => this.getAllowance()))
-      .subscribe();
+    this.subscription.add(
+      this.liquidity.valueChanges
+        .pipe(
+          debounceTime(400),
+          distinctUntilChanged(),
+          map(amount => {
+            const amountFixed = new FixedDecimal(amount || '0', this.pool.lpToken.decimals);
+            amountFixed.isZero ? this.reset() : this.calcTolerance();
+            return amountFixed;
+          }),
+          filter(amount => !!this.context?.wallet && amount.bigInt > 0),
+          switchMap(amount => this.getAllowance(amount.formattedValue)),
+          switchMap(allowance => this.validateBalance(allowance.requestToSpend)))
+        .subscribe());
+
+    this.subscription.add(
+      this._nodeService.latestBlock$
+        .pipe(
+          tap(block => this.latestBlock = block),
+          tap(_ => this.calcDeadline(this.deadlineThreshold)),
+          filter(_ => !!this.context?.wallet && !!this.pool),
+          switchMap(_ => this.getAllowance()))
+        .subscribe());
   }
 
   async ngOnChanges(): Promise<void> {
@@ -109,20 +118,6 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
 
   async submit(): Promise<void> {
     this.calcDeadline(this.deadlineThreshold);
-
-    // const request = new RemoveLiquidityRequest(
-    //   new FixedDecimal(this.liquidity.value, this.pool.lpToken.decimals),
-    //   this.crsOutMin,
-    //   this.srcOutMin,
-    //   this.context.wallet,
-    //   this.deadlineBlock
-    // );
-
-    // this._platformApi
-    //   .removeLiquidityQuote(this.pool.address, request.payload)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //                (error: OpdexHttpError) => this.quoteErrors = error.errors);
 
     try {
       const amount = new FixedDecimal(this.liquidity.value, this.pool.lpToken.decimals);
@@ -143,8 +138,11 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
     const lptDecimals = this.pool.lpToken.decimals;
     const liquidityValue = new FixedDecimal(this.liquidity.value, lptDecimals);
     const totalSupply = this.pool.lpToken.totalSupply;
-    // const reservesUsd = this.pool.summary.reserves.usd;
-    const reservesUsd = FixedDecimal.Zero(8);
+    const { abbreviation } = this.selectedCurrency;
+    const reservesUsd = this.pool.crsToken.pricing[abbreviation]
+      .multiply(this.pool.reserveCrs)
+      .add(this.pool.srcToken.pricing[abbreviation]
+      .multiply(this.pool.reserveSrc));
     const reserveCrs = this.pool.reserveCrs;
     const reserveSrc = this.pool.reserveSrc;
 
@@ -182,6 +180,15 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
   handlePercentageSelect(value: any): void {
     this.percentageSelected = value.percentageOption;
     this.liquidity.setValue(value.result, {emitEvent: true});
+  }
+
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    if (this.pool && this.liquidity.value) {
+      this.calcTolerance();
+    }
   }
 
   private async getAllowance(amount?: string): Promise<AllowanceValidation> {
@@ -223,8 +230,6 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
 
   ngOnDestroy(): void {
     this.destroyContext$();
-    if (this.allowance$) this.allowance$.unsubscribe();
-    if (this.allowanceTransaction$) this.allowanceTransaction$.unsubscribe();
-    if (this.latestSyncedBlock$) this.latestSyncedBlock$.unsubscribe();
+    this.subscription.unsubscribe();
   }
 }

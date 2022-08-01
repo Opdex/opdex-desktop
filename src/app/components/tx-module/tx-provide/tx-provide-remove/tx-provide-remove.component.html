@@ -6,7 +6,7 @@
       [formControl]="liquidity"
       [suffix]="pool.lpToken.symbol"
       [numbersOnly]="true">
-      <opdex-number [value]="lptInFiatValue" prefix="$" [precision]="2"></opdex-number>
+      <opdex-number [value]="lptInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
     </opdex-input-control>
 
     <opdex-percentage-amount-buttons
@@ -40,7 +40,6 @@
       </div>
 
       <div [@collapse]="!showTransactionDetails">
-
         <div class="flex-row-center-between">
           <small class="b-400 light mr-1">Estimated Output</small>
           <small>

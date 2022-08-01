@@ -1,5 +1,5 @@
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 import { Injector, OnChanges, OnDestroy } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
@@ -9,6 +9,8 @@ import { TxBase } from '@components/tx-module/tx-base.component';
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { FixedDecimal } from '@models/types/fixed-decimal';
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { CurrencyService } from '@services/platform/currency.service';
 
 @Component({
   selector: 'opdex-tx-mine-stop',
@@ -24,6 +26,7 @@ export class TxMineStopComponent extends TxBase implements OnChanges, OnDestroy 
   fiatValue: FixedDecimal;
   percentageSelected: string;
   balanceError: boolean;
+  selectedCurrency: ICurrency;
 
   get amount(): FormControl {
     return this.form.get('amount') as FormControl;
@@ -41,12 +44,18 @@ export class TxMineStopComponent extends TxBase implements OnChanges, OnDestroy 
     private _fb: FormBuilder,
     private _liquidityPoolService: LiquidityPoolService,
     protected _injector: Injector,
+    private _currencyService: CurrencyService
   ) {
     super(_injector);
 
     this.form = this._fb.group({
       amount: [null, [Validators.required, Validators.pattern(PositiveDecimalNumberRegex)]]
     });
+
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
 
     this.subscription.add(
       this.amount.valueChanges
@@ -69,13 +78,6 @@ export class TxMineStopComponent extends TxBase implements OnChanges, OnDestroy 
   }
 
   async submit(): Promise<void> {
-    // const request = new MiningQuote(new FixedDecimal(this.amount.value, this.pool.lpToken.decimals));
-
-    // this._platformApi.stopMiningQuote(this.pool.miningPool.address, request.payload)
-    //   .pipe(take(1))
-    //   .subscribe((quote: ITransactionQuote) => this.quote(quote),
-    //               (error: OpdexHttpError) => this.quoteErrors = error.errors);
-
     try {
       const amount = new FixedDecimal(this.amount.value, this.pool.lpToken.decimals);
       const quote = await this._liquidityPoolService.stopMiningQuote(this.pool.miningPool.address, amount);
@@ -91,9 +93,19 @@ export class TxMineStopComponent extends TxBase implements OnChanges, OnDestroy 
     this.amount.setValue(value.result, {emitEvent: true});
   }
 
+  private _setSelectedCurrency(currency?: ICurrency): void {
+    if (!currency) currency = this.selectedCurrency;
+    else this.selectedCurrency = currency;
+
+    if (this.pool && this.amount.value) {
+      const amount = new FixedDecimal(this.amount.value || '0', this.pool.lpToken.decimals);
+      this.setFiatValue(amount);
+    }
+  }
+
   private setFiatValue(amount: FixedDecimal): void {
-    // this.fiatValue = this.pool.lpToken.summary.priceUsd.multiply(amount);
-    this.fiatValue = FixedDecimal.Zero(8);
+    const lpTokenFiat = this.pool.lpToken.pricing[this.selectedCurrency.abbreviation];
+    this.fiatValue = lpTokenFiat.multiply(amount);
   }
 
   private async validateMiningBalance(): Promise<boolean> {

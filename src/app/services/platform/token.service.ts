@@ -63,7 +63,9 @@ export class TokenService {
   }
 
   public async amountInQuote(amountOut: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
-    const {wallet} = this._context.userContext;
+    // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
+    const sender = this._context.userContext.wallet || this._env.contracts.router;
+
     let parameters: Parameter[];
 
     if (!poolOut || poolIn.address === poolOut.address) {
@@ -90,13 +92,14 @@ export class TokenService {
       ];
     }
 
-    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountIn, wallet, parameters);
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountIn, sender, parameters);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }
 
   public async amountOutQuote(amountIn: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
-    const {wallet} = this._context.userContext;
+    // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
+    const sender = this._context.userContext.wallet || this._env.contracts.router;
     let parameters: Parameter[];
 
     if (!poolOut || poolIn.address === poolOut.address) {
@@ -123,7 +126,7 @@ export class TokenService {
       ];
     }
 
-    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountOut, wallet, parameters);
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetAmountOut, sender, parameters);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }

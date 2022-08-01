@@ -98,10 +98,11 @@ export class LiquidityPoolService {
   }
 
   public async provideAmountInQuote(amountA: FixedDecimal, reserveA: FixedDecimal, reserveB: FixedDecimal): Promise<TransactionQuote> {
-    const { wallet } = this._context.userContext;
+    // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
+    const sender = this._context.userContext.wallet || this._env.contracts.router;
 
     // UInt256 GetLiquidityQuote(UInt256 amountA, UInt256 reserveA, UInt256 reserveB);
-    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetLiquidityQuote, wallet, [
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetLiquidityQuote, sender, [
       new Parameter(ParameterType.UInt256, amountA.bigInt.toString(), 'Amount In'),
       new Parameter(ParameterType.UInt256, reserveA.bigInt.toString(), 'Reserve A'),
       new Parameter(ParameterType.UInt256, reserveB.bigInt.toString(), 'Reserve B'),
