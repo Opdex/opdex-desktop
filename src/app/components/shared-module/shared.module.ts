@@ -25,6 +25,8 @@ import { TxQuoteSubmitButtonComponent } from './tx-quote-submit-button/tx-quote-
 import { HelpButtonComponent } from './help-button/help-button.component';
 import { CopyButtonComponent } from './copy-button/copy-button.component';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
+import { QrCodeComponent } from './qr-code/qr-code.component';
+import { QrCodeModule } from 'ng-qrcode';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,8 @@ import { SharedPipesModule } from '@pipes/shared-pipes.module';
     TokenNativeChainBadgeComponent,
     CopyButtonComponent,
     HelpButtonComponent,
-    TxQuoteSubmitButtonComponent
+    TxQuoteSubmitButtonComponent,
+    QrCodeComponent
   ],
   imports: [
     CommonModule,
@@ -48,7 +51,8 @@ import { SharedPipesModule } from '@pipes/shared-pipes.module';
     MatButtonModule,
     MatMenuModule,
     ClipboardModule,
-    SharedPipesModule
+    SharedPipesModule,
+    QrCodeModule
   ],
   exports: [
     MatIconModule,
@@ -62,7 +66,8 @@ import { SharedPipesModule } from '@pipes/shared-pipes.module';
     TokenNativeChainBadgeComponent,
     CopyButtonComponent,
     HelpButtonComponent,
-    TxQuoteSubmitButtonComponent
+    TxQuoteSubmitButtonComponent,
+    QrCodeComponent
   ]
 })
 export class SharedModule { }
