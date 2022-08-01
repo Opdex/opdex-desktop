@@ -32,6 +32,7 @@ nav {
     display: flex;
     flex-direction: column;
     transition: margin-left .15s ease-in;
+    height: 100vh;
 
     #page-content {
       display: flex;
@@ -41,6 +42,7 @@ nav {
       .page-content-container {
         padding-bottom: 50px;
         padding-bottom: calc(50px + env(safe-area-inset-bottom, 0));
+        height: 100%;
       }
     }
   }

@@ -1,3 +1,4 @@
+import { TransactionModule } from './components/tx-module/tx.module';
 import { TablesModule } from './components/tables-module/tables.module';
 import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
 import { EnvironmentsService } from '@services/utility/environments.service';
@@ -35,6 +36,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { TradeComponent } from './views/trade/trade.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { MatSelectModule } from '@angular/material/select';
     MiningComponent,
     VaultComponent,
     PoolComponent,
-    TokenComponent
+    TokenComponent,
+    TradeComponent
   ],
   imports: [
     BrowserModule,
@@ -68,7 +71,8 @@ import { MatSelectModule } from '@angular/material/select';
     ModalsModule,
     TxFeedModule,
     MatSelectModule,
-    TablesModule
+    TablesModule,
+    TransactionModule
   ],
   providers: [
     {

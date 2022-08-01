@@ -1,5 +1,5 @@
+import { IHydratedVault } from "@interfaces/contract-properties.interface";
 import { FixedDecimal } from "@models/types/fixed-decimal";
-import { IHydratedVault } from "@services/api/smart-contracts/vault-api.service";
 
 export class Vault {
   private _vault: string;

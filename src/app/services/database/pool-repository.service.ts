@@ -7,6 +7,13 @@ import { Injectable } from "@angular/core";
 export class PoolRepositoryService {
   constructor(private _db: OpdexDB, private _nodeService: NodeService) { }
 
+  async searchLiquidityPools(keyword: string): Promise<ILiquidityPoolEntity[]> {
+    return await this._db.liquidityPool
+      .where('address').equals(keyword)
+      .or('name').startsWithIgnoreCase(keyword)
+      .toArray();
+  }
+
   async getPoolByAddress(address: string): Promise<ILiquidityPoolEntity> {
     return await this._db.liquidityPool.get({ address });
   }

@@ -21,7 +21,7 @@
         <opdex-number
           [short]="true"
           [prefix]="selectedCurrency.htmlEntity"
-          [value]="pool.crsToken.pricing[selectedCurrency.abbreviation].multiply(pool.reserveCrs).add(pool.srcToken.pricing[selectedCurrency.abbreviation].multiply(pool.reserveSrc))">
+          [value]="liquidityFiat">
         </opdex-number>
       </div>
     </div>

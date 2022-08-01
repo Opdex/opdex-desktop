@@ -1,7 +1,3 @@
-import { HelpButtonComponent } from './help-button/help-button.component';
-import { CopyButtonComponent } from './copy-button/copy-button.component';
-import { SharedPipesModule } from '@pipes/shared-pipes.module';
-
 // Angular Core Imports
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -25,9 +21,12 @@ import { NumberComponent } from './number/number.component';
 import { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
 import { CurrencySelectComponent } from './currency-select/currency-select.component';
 import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token-native-chain-badge.component';
-
-// Other Imports
-
+import { TxQuoteSubmitButtonComponent } from './tx-quote-submit-button/tx-quote-submit-button.component';
+import { HelpButtonComponent } from './help-button/help-button.component';
+import { CopyButtonComponent } from './copy-button/copy-button.component';
+import { SharedPipesModule } from '@pipes/shared-pipes.module';
+import { QrCodeComponent } from './qr-code/qr-code.component';
+import { QrCodeModule } from 'ng-qrcode';
 
 @NgModule({
   declarations: [
@@ -39,7 +38,9 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     CurrencySelectComponent,
     TokenNativeChainBadgeComponent,
     CopyButtonComponent,
-    HelpButtonComponent
+    HelpButtonComponent,
+    TxQuoteSubmitButtonComponent,
+    QrCodeComponent
   ],
   imports: [
     CommonModule,
@@ -50,7 +51,8 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     MatButtonModule,
     MatMenuModule,
     ClipboardModule,
-    SharedPipesModule
+    SharedPipesModule,
+    QrCodeModule
   ],
   exports: [
     MatIconModule,
@@ -63,7 +65,9 @@ import { TokenNativeChainBadgeComponent } from './token-native-chain-badge/token
     CurrencySelectComponent,
     TokenNativeChainBadgeComponent,
     CopyButtonComponent,
-    HelpButtonComponent
+    HelpButtonComponent,
+    TxQuoteSubmitButtonComponent,
+    QrCodeComponent
   ]
 })
 export class SharedModule { }

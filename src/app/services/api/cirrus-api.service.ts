@@ -3,9 +3,8 @@ import { Injectable, Injector } from "@angular/core";
 import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
 import { catchError, map, Observable, of } from "rxjs";
 import { RestApiService } from "./rest-api.service";
-import { CallPayload } from '@models/cirrusApi/contract-calls/call';
-import { LocalCallPayload } from '@models/cirrusApi/contract-calls/local-call';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { CallRequest, LocalCallRequest } from '@models/cirrusApi/contract-call';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { ParameterType } from '@enums/parameter-type';
 import { CacheService } from '@services/utility/cache.service';
 import { Network } from '@enums/networks';
@@ -68,12 +67,12 @@ export class CirrusApiService extends CacheService {
     return this._rest.get<IContractReceiptResult[]>(endpoint);
   }
 
-  localCall(payload: LocalCallPayload): Observable<ILocalCallResult> {
-    return this._rest.post(`${this.api}/SmartContracts/local-call`, payload);
+  localCall(request: LocalCallRequest): Observable<ILocalCallResult> {
+    return this._rest.post(`${this.api}/SmartContracts/local-call`, request.payload);
   }
 
-  call(payload: CallPayload): Observable<IContractCallResult> {
-    return this._rest.post(`${this.api}/SmartContractWallet/call`, payload);
+  call(request: CallRequest): Observable<IContractCallResult> {
+    return this._rest.post(`${this.api}/SmartContractWallet/call`, request.payload);
   }
 
   getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string> {

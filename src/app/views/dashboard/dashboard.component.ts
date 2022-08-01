@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenService } from '@services/platform/token.service';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
@@ -6,6 +7,7 @@ import { Subscription, switchMap, tap } from 'rxjs';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Token } from '@models/platform/token';
+import { TransactionView } from '@enums/transaction-view';
 
 @Component({
   selector: 'opdex-dashboard',
@@ -23,7 +25,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private _liquidityPoolService: LiquidityPoolService,
     private _nodeService: NodeService,
     private _tokenService: TokenService,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    private _router: Router
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -43,6 +46,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   poolsTrackBy(index: number, pool: LiquidityPool): string {
     return `${index}-${pool?.trackBy}`;
+  }
+
+  handleTxOption(view: TransactionView) {
+    this._router.navigate(['/trade'], {queryParams: {view}})
   }
 
   ngOnDestroy(): void {

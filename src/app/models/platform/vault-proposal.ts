@@ -1,6 +1,7 @@
-import { IHydratedProposal } from '@services/api/smart-contracts/vault-api.service';
+import { IHydratedProposal } from '@interfaces/contract-properties.interface';
 import { IVaultProposalEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
+
 export class VaultProposal {
   private _vault: string;
   private _token: string;

@@ -1,7 +1,7 @@
 import { Icons } from '@enums/icons';
+import { IHydratedTokenDetailsDto } from '@interfaces/contract-properties.interface';
 import { ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IHydratedTokenDetailsDto } from '@services/api/smart-contracts/token-api.service';
 
 export class Token {
   address: string;

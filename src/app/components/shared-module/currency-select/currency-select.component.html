@@ -1,6 +1,6 @@
 <button mat-button [matMenuTriggerFor]="currencyMenu" class="small d-inline pl-0 pr-0 transparent w-100">
   <div class="flex-row-center">
-    <span [innerHtml]="currency.htmlEntity" class="mr-2 currencySymbol"></span>
+    <span [innerHtml]="currency?.htmlEntity" class="mr-2 currencySymbol"></span>
     {{currency.abbreviation | uppercase}}
   </div>
 </button>

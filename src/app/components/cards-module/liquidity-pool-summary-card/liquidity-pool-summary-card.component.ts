@@ -21,14 +21,17 @@ export class LiquidityPoolSummaryCardComponent implements OnDestroy {
   subscription = new Subscription();
   one = FixedDecimal.One(0);
 
-  // public get miningUsd(): FixedDecimal {
-  //   if (!!this.pool?.miningPool === false) return FixedDecimal.Zero(0);
+  public get liquidityFiat(): FixedDecimal {
+    if (!!this.pool?.miningPool === false) return FixedDecimal.Zero(0);
 
-  //   const { priceUsd } = this.pool.tokens.lp.summary;
-  //   const { tokensMining } = this.pool.miningPool;
+    const { abbreviation } = this.selectedCurrency;
+    const { crsToken, srcToken, reserveCrs, reserveSrc } = this.pool;
 
-  //   return priceUsd.multiply(tokensMining);
-  // }
+    return crsToken.pricing[abbreviation]
+      .multiply(reserveCrs)
+      .add(srcToken.pricing[abbreviation]
+      .multiply(reserveSrc));
+  }
 
   constructor(
     private _nodeService: NodeService,

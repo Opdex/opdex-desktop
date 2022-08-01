@@ -1,0 +1,26 @@
+<div class="staking">
+  <mat-button-toggle-group aria-label="Transaction Type" class="w-100 mb-3" [value]="child" #group="matButtonToggleGroup">
+    <mat-button-toggle [value]="option.value" class="w-100" *ngFor="let option of txOptions">{{option.action}}</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <opdex-liquidity-pool-selector
+    [pool]="pool"
+    [view]="view"
+    (onPoolChange)="handlePoolChange($event)">
+  </opdex-liquidity-pool-selector>
+
+  <ng-container *ngIf="pool">
+    <!-- No mining pool means no staking -->
+    <opdex-card *ngIf="pool?.miningPool; else noStaking">
+      <opdex-tx-stake-start [pool]="pool" *ngIf="group.value == 1"></opdex-tx-stake-start>
+      <opdex-tx-stake-stop [pool]="pool" *ngIf="group.value == 2"></opdex-tx-stake-stop>
+      <opdex-tx-stake-collect [pool]="pool" *ngIf="group.value == 3"></opdex-tx-stake-collect>
+    </opdex-card>
+
+    <ng-template #noStaking>
+      <opdex-card [warn]="true">
+        Staking is not available for this liquidity pool.
+      </opdex-card>
+    </ng-template>
+  </ng-container>
+</div>

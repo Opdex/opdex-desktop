@@ -1,3 +1,4 @@
+import { TransactionView } from '@enums/transaction-view';
 import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { Icons } from '@enums/icons';
@@ -5,7 +6,7 @@ import { LiquidityPoolService } from '@services/platform/liquidity-pool.service'
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 
 @Component({
   selector: 'opdex-pool',
@@ -54,6 +55,10 @@ export class PoolComponent implements OnInit, OnDestroy {
         .subscribe(pool => this.pool = pool));
 
     this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400)
+  }
+
+  handleTxOption(view: TransactionView) {
+    this._router.navigate(['/trade'], { queryParams: {view: view, pool: this.pool?.address}})
   }
 
   ngOnDestroy(): void {

@@ -30,72 +30,54 @@
 
       <div class="col-12 col-sm-5 col-lg-4 col-xl-3">
         <div class="d-sm-none mt-3"></div>
-        <!-- <opdex-tx-buttons
+        <opdex-tx-buttons
           (onSelectOption)="handleTxOption($event)"
           [hideStaking]="true"
-          [hideMining]="!token.isProvisional">
-        </opdex-tx-buttons> -->
+          [hideMining]="token && token.address !== pool?.address">
+        </opdex-tx-buttons>
       </div>
     </div>
   </div>
 </div>
 
-<div class="offset-section">
+<div class="offset-section tx-bg light">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-lg-4 col-xl-3">
-        <div class="row">
-          <div class="col-12 col-sm-6 col-lg-12">
-            <opdex-token-summary-card [token]="token"></opdex-token-summary-card>
+      <div class="col-12 col-sm-6 col-xl-4">
+        <opdex-token-summary-card [token]="token"></opdex-token-summary-card>
 
-            <opdex-card *ngIf="token && token.address === pool?.address">
-              <div class="flex-row-center mb-2">
-                <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
-                <a class="b-400 no-decoration ml-2" routerLink="/pools/{{pool?.address}}">{{pool?.name}}</a>
-              </div>
-
-              <div class="flex-row-center-between">
-                <div class="flex-column">
-                  <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
-                  <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
-                </div>
-
-                <div class="flex-column">
-                  <p class="mb-0">=</p>
-                  <p class="mb-0">=</p>
-                </div>
-
-                <div class="flex-column">
-                  <opdex-number [value]="crsPerOlpt" [short]="true" [suffix]="pool?.crsToken?.symbol"></opdex-number>
-                  <opdex-number [value]="srcPerOlpt" [short]="true" [suffix]="pool?.srcToken?.symbol"></opdex-number>
-                </div>
-              </div>
-            </opdex-card>
+        <opdex-card *ngIf="token && token.address === pool?.address">
+          <div class="flex-row-center mb-2">
+            <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
+            <a class="b-400 no-decoration ml-2" routerLink="/pools/{{pool?.address}}">{{pool?.name}}</a>
           </div>
 
-          <div class="col-12 col-sm-6 col-lg-12">
-            <opdex-liquidity-pool-summary-card
-              [pool]="pool"
-              [showPoolName]="true"
-              *ngIf="!token?.isCrs && token?.address !== pool?.address">
-            </opdex-liquidity-pool-summary-card>
-          </div>
-        </div>
-      </div>
+          <div class="flex-row-center-between">
+            <div class="flex-column">
+              <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
+              <opdex-number [value]="one" [suffix]="pool?.lpToken?.symbol"></opdex-number>
+            </div>
 
-      <div class="col-12 col-lg-8 col-xl-9">
-        <opdex-card>
-          <h2>Trading Component</h2>
+            <div class="flex-column">
+              <p class="mb-0">=</p>
+              <p class="mb-0">=</p>
+            </div>
+
+            <div class="flex-column">
+              <opdex-number [value]="crsPerOlpt" [short]="true" [suffix]="pool?.crsToken?.symbol"></opdex-number>
+              <opdex-number [value]="srcPerOlpt" [short]="true" [suffix]="pool?.srcToken?.symbol"></opdex-number>
+            </div>
+          </div>
         </opdex-card>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="standard-section blend-cards pt-5 pb-3 tx-bg" *ngIf="!token?.isCrs">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-6 col-xl-5">
+        <opdex-liquidity-pool-summary-card
+          [pool]="pool"
+          [showPoolName]="true"
+          *ngIf="!token?.isCrs && token?.address !== pool?.address">
+        </opdex-liquidity-pool-summary-card>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4" *ngIf="!token?.isCrs">
         <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="l"></opdex-tx-feed>
       </div>
     </div>

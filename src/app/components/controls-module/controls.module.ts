@@ -15,12 +15,17 @@ import { DeadlineComponent } from './deadline/deadline.component';
 import { InputControlComponent } from './input-control/input-control.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToleranceComponent } from './tolerance/tolerance.component';
+import { TokenKeywordFilterControlComponent } from './token-keyword-filter-control/token-keyword-filter-control.component';
+import { SharedModule } from '@components/shared-module/shared.module';
+import { LiquidityPoolKeywordFilterControlComponent } from './liquidity-pool-keyword-filter-control/liquidity-pool-keyword-filter-control.component';
 
 @NgModule({
   declarations: [
     DeadlineComponent,
     InputControlComponent,
-    ToleranceComponent
+    ToleranceComponent,
+    TokenKeywordFilterControlComponent,
+    LiquidityPoolKeywordFilterControlComponent
   ],
   imports: [
     CommonModule,
@@ -30,12 +35,15 @@ import { ToleranceComponent } from './tolerance/tolerance.component';
     MatIconModule,
     MatButtonModule,
     MatSelectModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    SharedModule
   ],
   exports: [
     DeadlineComponent,
     InputControlComponent,
-    ToleranceComponent
+    ToleranceComponent,
+    TokenKeywordFilterControlComponent,
+    LiquidityPoolKeywordFilterControlComponent
   ]
 })
 export class ControlsModule { }

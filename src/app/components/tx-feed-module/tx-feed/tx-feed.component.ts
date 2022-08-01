@@ -1,4 +1,4 @@
-import { ReceiptSearchRequest } from '@models/cirrusApi/requests/receipt-search.request';
+import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { NodeService } from '@services/platform/node.service';
 import { switchMap } from 'rxjs/operators';
 import { Subscription, tap } from 'rxjs';

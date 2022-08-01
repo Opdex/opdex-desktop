@@ -1,8 +1,17 @@
 <div class="header-section">
   <div class="container">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-md-8 col-lg-9">
         <h1 class="mb-0">Tokens</h1>
+      </div>
+
+      <div class="col-12 col-md-4 col-lg-3">
+        <div class="d-md-none mt-3"></div>
+        <opdex-tx-buttons
+          (onSelectOption)="handleTxOption($event)"
+          [hideMining]="true"
+          [hideStaking]="true">
+        </opdex-tx-buttons>
       </div>
     </div>
   </div>

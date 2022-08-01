@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 @import '~node_modules/bootstrap-4-grid/scss/grid/bootstrap-grid';
 @import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500');
+@import 'colors';
 
 $fontConfig: (
   display-4: mat.define-typography-level(112px, 112px, 400, 'Roboto', -0.0134em),
@@ -30,6 +31,14 @@ $fontConfig: (
   label {
     color: rgba(255, 255, 255, 0.7);
   }
+}
+
+.error {
+  color: $red-primary;
+}
+
+.light {
+  color: #979797;
 }
 
 label {

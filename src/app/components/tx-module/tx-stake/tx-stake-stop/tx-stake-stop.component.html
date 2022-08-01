@@ -1,0 +1,52 @@
+<div class="stop-staking">
+  <form [formGroup]="form" name="stop-staking-form" id="stop-staking-form">
+    <opdex-input-control
+      [suffixDisabled]="true"
+      label="Stop Staking"
+      [formControl]="amount"
+      [suffix]="pool.stakingToken?.symbol"
+      [numbersOnly]="true">
+      <opdex-number [value]="fiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      [contract]="pool.address"
+      [token]="pool.stakingToken"
+      positionType="Staking"
+      [selected]="percentageSelected"
+      (onPercentageSelect)="handlePercentageSelect($event)"></opdex-percentage-amount-buttons>
+
+    <div class="mt-2" *ngIf="balanceError">
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient Staking Balance">
+      </opdex-tx-quote-error>
+    </div>
+
+    <mat-checkbox
+      formControlName="liquidate"
+      color="primary"
+      name="liquidate"
+      value="false"
+      aria-label="Liquidate Rewards"
+      class="mt-3">
+      Liquidate Collected OLPT
+    </mat-checkbox>
+
+    <div *ngIf="fiatValue" class="mt-3 p-2 border" style="border-radius: 4px;">
+      <div class="flex-row-center-between">
+        <small class="b-400">
+          <span class="error">-{{percentageOfSupply.formattedValue | shortNumber}}%</span> Total Staking Weight
+        </small>
+      </div>
+    </div>
+
+    <opdex-tx-quote-submit-button
+      [warn]="balanceError"
+      [disabled]="!form.valid || !context?.wallet || balanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>
