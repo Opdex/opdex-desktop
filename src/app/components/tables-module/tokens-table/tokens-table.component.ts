@@ -12,6 +12,8 @@ import { switchMap } from 'rxjs/operators';
 import { Icons } from 'src/app/enums/icons';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { IPagination } from '@interfaces/database.interface';
+import { TransactionView } from '@enums/transaction-view';
+import { LiquidityPool } from '@models/platform/liquidity-pool';
 
 @Component({
   selector: 'opdex-tokens-table',
@@ -36,7 +38,6 @@ export class TokensTableComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _tokensService: TokenService,
     private _nodeService: NodeService,
-    // private _sidebar: SidenavService,
     private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
   ) {
@@ -62,12 +63,14 @@ export class TokensTableComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  provide(poolAddress: string): void {
-    // this._openSidebarWithPool(TransactionView.provide, poolAddress);
+  async provide(tokenAddress: string): Promise<void> {
+    const pool = await this._liquidityPoolsService.buildLiquidityPoolBySrcToken(tokenAddress);
+    this._tradeRoute(pool, TransactionView.provide);
   }
 
-  swap(poolAddress: string): void {
-    // this._openSidebarWithPool(TransactionView.swap, poolAddress);
+  async swap(tokenAddress: string): Promise<void> {
+    const pool = await this._liquidityPoolsService.buildLiquidityPoolBySrcToken(tokenAddress);
+    this._tradeRoute(pool, TransactionView.swap);
   }
 
   async pageChange(isNext: boolean): Promise<void> {
@@ -86,11 +89,9 @@ export class TokensTableComponent implements OnInit, OnDestroy {
     return `${index}-${token?.trackBy}`;
   }
 
-  // private _openSidebarWithPool(txView: TransactionView, address: string): void {
-  //   this._liquidityPoolsService.getLiquidityPool(address)
-  //     .pipe(take(1))
-  //     .subscribe(pool => this._sidebar.openSidenav(txView, { pool }));
-  // }
+  private _tradeRoute(pool: LiquidityPool, view: TransactionView): void {
+    this._router.navigate(['/trade'], {queryParams: {pool: pool.address, view}})
+  }
 
   ngOnDestroy(): void {
     if (this.subscription) this.subscription.unsubscribe();

@@ -21,7 +21,7 @@ import { CurrencyService } from '@services/platform/currency.service';
   animations: [CollapseAnimation]
 })
 export class TxProvideAddComponent extends TxBase implements OnDestroy {
-  @Input() pool: LiquidityPool;
+  _pool: LiquidityPool;
   icons = Icons;
   txHash: string;
   allowance: AllowanceValidation;
@@ -42,6 +42,18 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   selectedCurrency: ICurrency;
   showTransactionDetails: boolean = true;
   subscription = new Subscription();
+
+  @Input() set pool(pool: LiquidityPool) {
+    if (this._pool && pool.address !== this._pool.address) {
+      this.reset();
+    }
+
+    this._pool = pool;
+  };
+
+  get pool(): LiquidityPool {
+    return this._pool;
+  }
 
   get amountCrs(): FormControl {
     return this.form.get('amountCrs') as FormControl;
@@ -136,10 +148,6 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
-  }
-
-  ngOnChanges(): void {
-    this.reset();
   }
 
   private _setSelectedCurrency(currency?: ICurrency): void {

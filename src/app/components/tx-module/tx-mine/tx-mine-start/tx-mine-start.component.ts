@@ -1,6 +1,6 @@
 import { tap } from 'rxjs';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { Component, Input, OnChanges, Injector, OnDestroy } from '@angular/core';
+import { Component, Input, Injector, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { TxBase } from '@components/tx-module/tx-base.component';
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
@@ -18,17 +18,28 @@ import { CurrencyService } from '@services/platform/currency.service';
   templateUrl: './tx-mine-start.component.html',
   styleUrls: ['./tx-mine-start.component.scss']
 })
-export class TxMineStartComponent extends TxBase implements OnChanges, OnDestroy {
-  @Input() data;
+export class TxMineStartComponent extends TxBase implements OnDestroy {
+  _pool: LiquidityPool;
   form: FormGroup;
   icons = Icons;
-  pool: LiquidityPool;
   fiatValue: FixedDecimal;
   allowance: AllowanceValidation;
   percentageSelected: string;
   balanceError: boolean;
   selectedCurrency: ICurrency;
   subscription = new Subscription();
+
+  @Input() set pool(pool: LiquidityPool) {
+    if (this._pool && pool.address !== this._pool.address) {
+      this.reset();
+    }
+
+    this._pool = pool;
+  };
+
+  get pool(): LiquidityPool {
+    return this._pool;
+  }
 
   get amount(): FormControl {
     return this.form.get('amount') as FormControl;
@@ -80,11 +91,6 @@ export class TxMineStartComponent extends TxBase implements OnChanges, OnDestroy
         filter(_ => !!this.context.wallet),
         switchMap(_ => this.getAllowance$()))
       .subscribe());
-  }
-
-  ngOnChanges(): void {
-    this.pool = this.data?.pool;
-    this.reset();
   }
 
   async submit(): Promise<void> {

@@ -11,6 +11,7 @@ import { Icons } from 'src/app/enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { IPagination } from '@interfaces/database.interface';
+import { TransactionView } from '@enums/transaction-view';
 
 @Component({
   selector: 'opdex-pools-table',
@@ -34,7 +35,6 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
     private _nodeService: NodeService,
     private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
-    // private _sidebar: SidenavService
   ) {
     this.dataSource = new MatTableDataSource<LiquidityPool>();
     this.displayedColumns = ['name', 'liquidity', 'stakingWeight', 'mining', 'options'];
@@ -75,19 +75,23 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
   }
 
   provide(pool: any): void {
-    // this._sidebar.openSidenav(TransactionView.provide, {pool: pool});
+    this._tradeRoute(pool, TransactionView.provide);
   }
 
   swap(pool: any): void {
-    // this._sidebar.openSidenav(TransactionView.swap, {pool: pool});
+    this._tradeRoute(pool, TransactionView.swap);
   }
 
   stake(pool: any): void {
-    // this._sidebar.openSidenav(TransactionView.stake, {pool: pool});
+    this._tradeRoute(pool, TransactionView.stake);
   }
 
   mine(pool: any): void {
-    // this._sidebar.openSidenav(TransactionView.mine, {pool: pool});
+    this._tradeRoute(pool, TransactionView.mine);
+  }
+
+  private _tradeRoute(pool: LiquidityPool, view: TransactionView): void {
+    this._router.navigate(['/trade'], {queryParams: {pool: pool.address, view}})
   }
 
   ngOnDestroy(): void {

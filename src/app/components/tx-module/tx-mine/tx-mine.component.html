@@ -7,11 +7,11 @@
 
   <ng-container *ngIf="pool">
     <!-- We're specifically checking staking capabilities here for right now. In the staking market
-      if the liquidity pool does not have staking, then it cannot ever have liquidity mining. -->
-    <opdex-card *ngIf="pool?.stakingToken; else noStaking">
-      <opdex-tx-mine-start [data]="data" *ngIf="group.value == 1"></opdex-tx-mine-start>
-      <opdex-tx-mine-stop [data]="data" *ngIf="group.value == 2"></opdex-tx-mine-stop>
-      <opdex-tx-mine-collect [data]="data" *ngIf="group.value == 3"></opdex-tx-mine-collect>
+      if the liquidity pool does not have a mining pool, then it cannot ever have liquidity mining. -->
+    <opdex-card *ngIf="pool?.miningPool; else noStaking">
+      <opdex-tx-mine-start [pool]="pool" *ngIf="group.value == 1"></opdex-tx-mine-start>
+      <opdex-tx-mine-stop [pool]="pool" *ngIf="group.value == 2"></opdex-tx-mine-stop>
+      <opdex-tx-mine-collect [pool]="pool" *ngIf="group.value == 3"></opdex-tx-mine-collect>
     </opdex-card>
 
     <ng-template #noStaking>

@@ -2,7 +2,7 @@ import { CurrencyService } from '@services/platform/currency.service';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { OnDestroy } from '@angular/core';
-import { Component, Input, OnChanges, Injector } from '@angular/core';
+import { Component, Input, Injector } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { TxBase } from '@components/tx-module/tx-base.component';
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
@@ -18,17 +18,28 @@ import { Icons } from 'src/app/enums/icons';
   templateUrl: './tx-stake-start.component.html',
   styleUrls: ['./tx-stake-start.component.scss']
 })
-export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestroy {
-  @Input() data;
+export class TxStakeStartComponent extends TxBase implements OnDestroy {
+  _pool: LiquidityPool;
   icons = Icons;
   form: FormGroup;
-  pool: LiquidityPool;
   fiatValue: FixedDecimal;
   allowance: AllowanceValidation;
   percentageSelected: string;
   balanceError: boolean;
   selectedCurrency: ICurrency;
   subscription = new Subscription();
+
+  @Input() set pool(pool: LiquidityPool) {
+    if (this._pool && pool.address !== this._pool.address) {
+      this.reset();
+    }
+
+    this._pool = pool;
+  };
+
+  get pool(): LiquidityPool {
+    return this._pool;
+  }
 
   get amount(): FormControl {
     return this.form.get('amount') as FormControl;
@@ -81,11 +92,6 @@ export class TxStakeStartComponent extends TxBase implements OnChanges, OnDestro
         switchMap(amount => this.getAllowance(amount.formattedValue)),
         switchMap(_ => this.validateBalance()))
       .subscribe());
-  }
-
-  ngOnChanges(): void {
-    this.pool = this.data?.pool;
-    this.reset();
   }
 
   async submit(): Promise<void> {

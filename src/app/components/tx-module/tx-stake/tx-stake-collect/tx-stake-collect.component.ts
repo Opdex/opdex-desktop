@@ -1,5 +1,5 @@
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { Component, Input, OnChanges, Injector, OnDestroy } from '@angular/core';
+import { Component, Input, Injector, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -12,9 +12,8 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
   templateUrl: './tx-stake-collect.component.html',
   styleUrls: ['./tx-stake-collect.component.scss']
 })
-export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDestroy {
-  @Input() data;
-  pool: LiquidityPool;
+export class TxStakeCollectComponent extends TxBase implements OnDestroy {
+  @Input() pool: LiquidityPool;
   form: FormGroup;
   balanceError: boolean;
   subscription = new Subscription();
@@ -33,20 +32,6 @@ export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDest
     this.form = this._fb.group({
       liquidate: [false]
     });
-  }
-
-  ngOnChanges(): void {
-    const pool = this.data?.pool;
-    if (!!pool === false) {
-      return; // No pool found
-    }
-
-    if (!this.subscription.closed && this.pool?.address !== pool.address) {
-      this.subscription.unsubscribe();
-      this.subscription = new Subscription();
-    }
-
-    this.pool = pool;
 
     this.subscription.add(
       this._nodeService.latestBlock$
@@ -65,7 +50,7 @@ export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDest
   }
 
   private async validateStakingBalance(): Promise<boolean> {
-    if (!!this.pool.stakingToken === false || !this.context?.wallet) {
+    if (!!this.pool?.stakingToken === false || !this.context?.wallet) {
       return false;
     }
 

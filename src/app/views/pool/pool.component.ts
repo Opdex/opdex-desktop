@@ -1,3 +1,4 @@
+import { TransactionView } from '@enums/transaction-view';
 import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { Icons } from '@enums/icons';
@@ -54,6 +55,10 @@ export class PoolComponent implements OnInit, OnDestroy {
         .subscribe(pool => this.pool = pool));
 
     this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400)
+  }
+
+  handleTxOption(view: TransactionView) {
+    this._router.navigate(['/trade'], { queryParams: {view: view, pool: this.pool?.address}})
   }
 
   ngOnDestroy(): void {

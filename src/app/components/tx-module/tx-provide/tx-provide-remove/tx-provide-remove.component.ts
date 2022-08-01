@@ -1,6 +1,6 @@
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { Component, OnChanges, OnDestroy, Input, Injector } from "@angular/core";
+import { Component, OnDestroy, Input, Injector } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, Validators } from "@angular/forms";
 import { CollapseAnimation } from "@animations/collapse";
 import { TxBase } from "@components/tx-module/tx-base.component";
@@ -20,8 +20,8 @@ import { CurrencyService } from '@services/platform/currency.service';
   styleUrls: ['./tx-provide-remove.component.scss'],
   animations: [CollapseAnimation]
 })
-export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDestroy {
-  @Input() pool: LiquidityPool;
+export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
+  _pool: LiquidityPool;
   icons = Icons;
   form: FormGroup;
   context: UserContext;
@@ -42,6 +42,18 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
   showTransactionDetails: boolean = true;
   selectedCurrency: ICurrency;
   subscription = new Subscription();
+
+  @Input() set pool(pool: LiquidityPool) {
+    if (this._pool && pool.address !== this._pool.address) {
+      this.reset();
+    }
+
+    this._pool = pool;
+  };
+
+  get pool(): LiquidityPool {
+    return this._pool;
+  }
 
   get liquidity(): FormControl {
     return this.form.get('liquidity') as FormControl;
@@ -102,18 +114,6 @@ export class TxProvideRemoveComponent extends TxBase implements OnChanges, OnDes
           filter(_ => !!this.context?.wallet && !!this.pool),
           switchMap(_ => this.getAllowance()))
         .subscribe());
-  }
-
-  async ngOnChanges(): Promise<void> {
-    this.reset();
-
-    if (!!this.pool === false) return;
-
-    if (this.liquidity.value) {
-      const allowance = await this.getAllowance(this.liquidity.value);
-      this.calcTolerance();
-      await this.validateBalance(allowance.requestToSpend);
-    }
   }
 
   async submit(): Promise<void> {

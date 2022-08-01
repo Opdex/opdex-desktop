@@ -1,6 +1,6 @@
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { OnDestroy } from '@angular/core';
-import { Component, Input, OnChanges, Injector } from '@angular/core';
+import { Component, Input, Injector } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TxBase } from '@components/tx-module/tx-base.component';
@@ -12,9 +12,8 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
   templateUrl: './tx-mine-collect.component.html',
   styleUrls: ['./tx-mine-collect.component.scss']
 })
-export class TxMineCollectComponent extends TxBase implements OnChanges, OnDestroy {
-  @Input() data: any;
-  pool: LiquidityPool;
+export class TxMineCollectComponent extends TxBase implements OnDestroy {
+  @Input() pool: LiquidityPool;
   balanceError: boolean;
   subscription = new Subscription();
 
@@ -23,20 +22,6 @@ export class TxMineCollectComponent extends TxBase implements OnChanges, OnDestr
     protected _injector: Injector
   ) {
     super(_injector);
-  }
-
-  ngOnChanges(): void {
-    const pool = this.data?.pool;
-    if (!!pool === false) {
-      return; // No pool found
-    }
-
-    if (!this.subscription.closed && this.pool?.address !== pool.address) {
-      this.subscription.unsubscribe();
-      this.subscription = new Subscription();
-    }
-
-    this.pool = pool;
 
     this.subscription.add(
       this._nodeService.latestBlock$

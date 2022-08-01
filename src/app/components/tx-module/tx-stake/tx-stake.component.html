@@ -10,10 +10,11 @@
   </opdex-liquidity-pool-selector>
 
   <ng-container *ngIf="pool">
-    <opdex-card *ngIf="pool?.stakingToken; else noStaking">
-      <opdex-tx-stake-start [data]="data" *ngIf="group.value == 1"></opdex-tx-stake-start>
-      <opdex-tx-stake-stop [data]="data" *ngIf="group.value == 2"></opdex-tx-stake-stop>
-      <opdex-tx-stake-collect [data]="data" *ngIf="group.value == 3"></opdex-tx-stake-collect>
+    <!-- No mining pool means no staking -->
+    <opdex-card *ngIf="pool?.miningPool; else noStaking">
+      <opdex-tx-stake-start [pool]="pool" *ngIf="group.value == 1"></opdex-tx-stake-start>
+      <opdex-tx-stake-stop [pool]="pool" *ngIf="group.value == 2"></opdex-tx-stake-stop>
+      <opdex-tx-stake-collect [pool]="pool" *ngIf="group.value == 3"></opdex-tx-stake-collect>
     </opdex-card>
 
     <ng-template #noStaking>
