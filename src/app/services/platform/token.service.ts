@@ -252,7 +252,13 @@ export class TokenService {
 
     const pricing = await this.getTokenPricing(entity);
 
-    return new Token(entity, hydrated, pricing);
+    let trusted = false;
+    if (entity.nativeChainAddress) {
+      const supportedTokens = await firstValueFrom(this._cirrusApi.getSupportedInterfluxTokens());
+      trusted = supportedTokens.find(token => token.nativeChainAddress === entity.nativeChainAddress) !== undefined;
+    }
+
+    return new Token(entity, hydrated, pricing, trusted);
   }
 
   getToken(address: string): Observable<ITokenDetailsDto> {

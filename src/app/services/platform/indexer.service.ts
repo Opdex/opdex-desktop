@@ -10,7 +10,6 @@ import { TokenRepositoryService } from "@services/database/token-repository.serv
 import { firstValueFrom } from "rxjs";
 import { MarketService } from "./market.service";
 import { NodeService } from "./node.service";
-import { toChecksumAddress } from "ethereum-checksum-address";
 import { LiquidityPoolService } from './liquidity-pool.service';
 import { MiningGovernanceService } from './mining-governance.service';
 
@@ -80,20 +79,13 @@ export class IndexerService {
       }));
 
       await this._tokenRepository.persistTokens(poolsDetails.map(({token, createdBlock}) => {
-        const decimals = parseInt(token.decimals);
-
-        // console.log(token.nativeChain, token.nativeAddress);
-
-        // Todo: try/catch checksummed native chain address, validate against supported FN tokens
-        // Todo: -- Add functionality to re-validate interflux tokens
-        // ----------- Edge case when opdex-desktop syncs new pools/tokens but the user hasn't updated their FN yet.
         return {
           address: token.address,
           name: token.name,
           symbol: token.symbol,
-          decimals: decimals,
+          decimals: parseInt(token.decimals),
           nativeChain: token.nativeChain || 'Cirrus',
-          nativeChainAddress: token.nativeChainAddress ? toChecksumAddress(token.nativeChainAddress) : undefined,
+          nativeChainAddress: token.nativeChainAddress,
           createdBlock
         }
       }));

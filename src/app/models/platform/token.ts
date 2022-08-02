@@ -1,3 +1,4 @@
+import { toChecksumAddress } from 'ethereum-checksum-address';
 import { Icons } from '@enums/icons';
 import { IHydratedTokenDetailsDto } from '@interfaces/contract-properties.interface';
 import { ITokenEntity } from '@interfaces/database.interface';
@@ -27,7 +28,7 @@ export class Token {
     return `${address}-${pricing.usd}`;
   }
 
-  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any) {
+  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any, trusted?: boolean) {
     this.address = entity.address;
     this.name = entity.name;
     this.symbol = entity.symbol;
@@ -40,11 +41,8 @@ export class Token {
       this.wrappedToken = new WrappedToken({
         chain: entity.nativeChain,
         address: entity.nativeChainAddress,
-        // Todo: should validate the ethereum address via checksum (we do but don't mark success)
-        validated: true,
-        // Validate supported tokens via Cirrus FN API
-        trusted: true
-      } as IWrappedToken);
+        trusted
+      });
     }
 
     if (hydrated.nextDistributionBlock) {
@@ -67,15 +65,10 @@ export class Token {
 }
 
 export class WrappedToken {
-  private _custodian: string;
   private _chain: string;
   private _address: string;
-  private _validated: boolean;
-  private _trusted: boolean;
-
-  public get custodian(): string {
-    return this._custodian;
-  }
+  private _validated: boolean = false;
+  private _trusted: boolean = false;
 
   public get chain(): string {
     return this._chain;
@@ -109,11 +102,18 @@ export class WrappedToken {
   }
 
   constructor(wrapped: IWrappedToken) {
-    this._custodian = wrapped.custodian;
     this._chain = wrapped.chain;
-    this._address = wrapped.address;
-    this._validated = wrapped.validated;
     this._trusted = wrapped.trusted;
+    this._setAddress(wrapped.address);
+  }
+
+  private _setAddress(address: string): void {
+    try {
+      this._address = toChecksumAddress(address);
+      this._validated = true;
+    } catch {
+      this._address = address;
+    }
   }
 }
 
@@ -137,10 +137,8 @@ export class TokenDistribution {
 }
 
 export interface IWrappedToken {
-  custodian: string;
   chain: string;
   address: string;
-  validated: boolean;
   trusted: boolean;
 }
 

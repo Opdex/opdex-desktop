@@ -90,6 +90,10 @@ export class CirrusApiService extends CacheService {
   getSupportedInterfluxTokens(): Observable<ISupportedContract[]> {
     // 0 = mainnet, 1 = testnet
     const networkType = this._env.network === Network.Mainnet ? '0' : '1';
-    return this._rest.get(`${this.api}/SupportedContracts/list?networkType=${networkType}`);
+    const endpoint = `${this.api}/SupportedContracts/list?networkType=${networkType}`;
+    const observable$ = this._rest.get<ISupportedContract[]>(endpoint);
+
+    // cache for 5400 blocks
+    return this.getItem(endpoint, observable$, 5400);
   }
 }
