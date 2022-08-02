@@ -14,13 +14,13 @@ export class UserContext {
 
   constructor (wallet?: string, preferences?: UserContextPreferences) {
     this._wallet = wallet;
-    this._preferences = preferences;
+    this._preferences = preferences || new UserContextPreferences();
   }
 }
 
 export class UserContextPreferences {
-  theme: string;
-  deadlineThreshold: number;
-  toleranceThreshold: number;
-  currency: Currencies;
+  theme: string = 'light-mode';
+  deadlineThreshold: number = 10;
+  toleranceThreshold: number = 5;
+  currency: Currencies = Currencies.USD;
 }
