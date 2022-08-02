@@ -1,3 +1,4 @@
+import { TokenService } from '@services/platform/token.service';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { CurrencyService } from '@services/platform/currency.service';
 import { NodeService } from '@services/platform/node.service';
@@ -8,6 +9,7 @@ import { Icons } from 'src/app/enums/icons';
 import { Subscription, tap } from 'rxjs';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Token } from '@models/platform/token';
+import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
 
 @Component({
   selector: 'opdex-token-summary-card',
@@ -28,7 +30,8 @@ export class TokenSummaryCardComponent implements OnDestroy {
     private _indexService: NodeService,
     private _userContextService: UserContextService,
     private _bottomSheet: MatBottomSheet,
-    private _currency: CurrencyService
+    private _currency: CurrencyService,
+    private _tokenService: TokenService
   ) {
     this.subscription.add(
       this._indexService.latestBlock$
@@ -44,13 +47,12 @@ export class TokenSummaryCardComponent implements OnDestroy {
         .subscribe());
   }
 
-  distribute(): void {
-    // if (!this.context?.wallet || !this.token) return;
+  async distribute(): Promise<void> {
+    if (!this.context?.wallet || !this.token) return;
 
-    // this._platformApiService.distributeTokensQuote(this.token.address)
-    //   .pipe(take(1))
-    //   .subscribe((quote: ITransactionQuote) => this._bottomSheet.open(ReviewQuoteComponent, { data: quote }),
-    //              (error: OpdexHttpError) => this.quoteErrors = error.errors);
+    const quote = await this._tokenService.distributionQuote();
+
+    this._bottomSheet.open(ReviewQuoteComponent, { data: quote });
   }
 
 

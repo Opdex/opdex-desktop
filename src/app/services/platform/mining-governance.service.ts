@@ -1,3 +1,4 @@
+import { UserContextService } from '@services/utility/user-context.service';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { MiningGovernanceMethods } from '@enums/contracts/methods/mining-governance-methods';
 import { EnvironmentsService } from '@services/utility/environments.service';
@@ -17,7 +18,8 @@ export class MiningGovernanceService {
 
   constructor(
     private _cirrusApi: CirrusApiService,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    private _userContextService: UserContextService
   ) {
     this._miningGovernance = this._env.contracts.miningGovernance;
   }
@@ -27,7 +29,8 @@ export class MiningGovernanceService {
     return new MiningGovernance(hydrated, latestBlock);
   }
 
-  public async rewardMiningPools(wallet: string): Promise<TransactionQuote> {
+  public async rewardMiningPools(): Promise<TransactionQuote> {
+    const { wallet } = this._userContextService.userContext;
     const request = new LocalCallRequest(this._miningGovernance, MiningGovernanceMethods.RewardMiningPools, wallet);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
