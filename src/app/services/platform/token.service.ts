@@ -51,11 +51,27 @@ export class TokenService {
     if (entity === undefined) {
       const pool = await this._liquidityPoolRepository.getPoolByAddress(address);
 
+      // If is LP Token
       if (pool !== undefined) {
         entity = { address, symbol: 'OLPT', name: 'Liquidity Pool Token', decimals: 8, createdBlock: pool.createdBlock }
         isLpt = true;
-      } else {
-        return undefined;
+      }
+      // Else lookup the token from Cirrus
+      else {
+        const base = await firstValueFrom(this.getToken(address));
+
+        // Todo: validate token base was found
+
+        isLpt = base.symbol === 'OLPT' && base.name === 'Opdex Liquidity Pool Token';
+        entity = {
+          address: base.address,
+          name: base.name,
+          symbol: base.symbol,
+          decimals: base.decimals,
+          nativeChain: base.nativeChain || 'Cirrus',
+          nativeChainAddress: base.nativeChainAddress,
+          createdBlock: 0
+        };
       }
     }
 

@@ -1,0 +1,16 @@
+<opdex-input-control
+  [suffixDisabled]="true"
+  [prefixIcon]="icons.link"
+  label="Token Address"
+  [formControl]="tokenControl"
+  placeholder="torAyErDvMdZqNdVU8kmiLaykuE5L2UfwJ">
+</opdex-input-control>
+
+<button
+  mat-flat-button
+  color="primary"
+  class="mt-3 w-100"
+  [disabled]="!tokenControl.value"
+  (click)="validateToken()">
+  Validate Token
+</button>

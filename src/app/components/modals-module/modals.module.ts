@@ -1,3 +1,4 @@
+import { ControlsModule } from '@components/controls-module/controls.module';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
 import { NgModule } from '@angular/core';
@@ -12,11 +13,13 @@ import { MatDialogModule } from '@angular/material/dialog';
 
 import { BugReportModalComponent } from './bug-report-modal/bug-report-modal.component';
 import { HelpModalComponent } from './help-modal/help-modal.component';
+import { CreatePoolModalComponent } from './create-pool-modal/create-pool-modal.component';
 
 @NgModule({
   declarations: [
     BugReportModalComponent,
-    HelpModalComponent
+    HelpModalComponent,
+    CreatePoolModalComponent
   ],
   imports: [
     CommonModule,
@@ -26,7 +29,8 @@ import { HelpModalComponent } from './help-modal/help-modal.component';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
-    SharedModule
+    SharedModule,
+    ControlsModule
   ],
   exports: [
     BugReportModalComponent,
