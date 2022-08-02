@@ -1,0 +1,88 @@
+import { Observable } from 'rxjs';
+import { TokenService } from '@services/platform/token.service';
+import { CurrencyService } from '@services/platform/currency.service';
+import { switchMap } from 'rxjs';
+import { NodeService } from '@services/platform/node.service';
+import { TransactionView } from '@enums/transaction-view';
+import { FixedDecimal } from '@models/types/fixed-decimal';
+import { Router } from '@angular/router';
+import { tap } from 'rxjs';
+import { UserContext } from '@models/user-context';
+import { Subscription } from 'rxjs';
+import { EnvironmentsService } from '@services/utility/environments.service';
+import { WalletService } from '@services/platform/wallet.service';
+import { UserContextService } from '@services/utility/user-context.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { Token } from '@models/platform/token';
+
+@Component({
+  selector: 'opdex-wallet',
+  templateUrl: './wallet.component.html',
+  styleUrls: ['./wallet.component.scss']
+})
+export class WalletComponent implements OnInit, OnDestroy {
+  context: UserContext;
+  crs: Token;
+  selectedCurrency: ICurrency;
+  crsBalance: FixedDecimal;
+  crsBalanceValue: FixedDecimal;
+  subscription = new Subscription();
+
+  constructor(
+    private _userContextService: UserContextService,
+    private _nodeService: NodeService,
+    private _walletService: WalletService,
+    private _currencyService: CurrencyService,
+    private _tokenService: TokenService,
+    private _env: EnvironmentsService,
+    private _router: Router
+  ) { }
+
+  ngOnInit(): void {
+    this.context = this._userContextService.userContext;
+
+    this.subscription.add(
+      this._currencyService.selectedCurrency$
+        .pipe(tap(currency => this._setSelectedCurrency(currency)))
+        .subscribe());
+
+    this.subscription.add(
+      this._nodeService.latestBlock$
+        .pipe(
+          switchMap(_ => this._setCrsToken()),
+          switchMap(_ => this._walletService.getBalance('CRS', this.context.wallet)),
+          tap(balance => this._setCrsBalance(balance))
+        )
+        .subscribe()
+    )
+  }
+
+  private _setCrsBalance(balance: BigInt): void {
+    this.crsBalance = FixedDecimal.FromBigInt(balance, 8);
+
+    if (this.selectedCurrency && this.crs) {
+      this.crsBalanceValue = this.crsBalance.multiply(this.crs.pricing[this.selectedCurrency.abbreviation])
+    }
+  }
+
+  private _setSelectedCurrency(currency: ICurrency): void {
+    this.selectedCurrency = currency;
+
+    if (this.crsBalance) {
+      this._setCrsBalance(this.crsBalance.bigInt);
+    }
+  }
+
+  private async _setCrsToken(): Promise<void> {
+    this.crs = await this._tokenService.buildToken('CRS');
+  }
+
+  handleTxOption(view: TransactionView) {
+    this._router.navigate(['/trade'], { queryParams: {view}})
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+}

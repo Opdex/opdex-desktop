@@ -37,6 +37,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { TradeComponent } from './views/trade/trade.component';
+import { WalletComponent } from './views/wallet/wallet.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { TradeComponent } from './views/trade/trade.component';
     VaultComponent,
     PoolComponent,
     TokenComponent,
-    TradeComponent
+    TradeComponent,
+    WalletComponent
   ],
   imports: [
     BrowserModule,

@@ -33,6 +33,10 @@ $fontConfig: (
   }
 }
 
+.positive-value {
+  color: $green-primary;
+}
+
 .error {
   color: $red-primary;
 }
