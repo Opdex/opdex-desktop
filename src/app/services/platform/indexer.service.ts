@@ -1,3 +1,4 @@
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenService } from '@services/platform/token.service';
 import { VaultService } from '@services/platform/vault.service';
 import { VaultRepositoryService } from '@services/database/vault-repository.service';
@@ -27,7 +28,8 @@ export class IndexerService {
     private _miningGovernanceService: MiningGovernanceService,
     private _vaultService: VaultService,
     private _vaultRepository: VaultRepositoryService,
-    private _db: OpdexDB
+    private _db: OpdexDB,
+    private _env: EnvironmentsService
   ) { }
 
   public async index(): Promise<void> {
@@ -36,17 +38,18 @@ export class IndexerService {
     this.indexing = true;
 
     const indexer = await this._db.indexer.get(1);
+    const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight
     const nodeStatus = this._nodeService.status;
 
     const [pools, rewardedMiningPools, nominations, createdProposals, createdCertificates, completedProposals, redeemedCertificates, revokedCertificates] = await Promise.all([
-      firstValueFrom(this._marketService.getMarketPools(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getRewardedPools(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._marketService.getMarketPools(lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceService.getRewardedPools(lastUpdateBlock)),
       firstValueFrom(this._miningGovernanceService.getNominatedPools()),
-      firstValueFrom(this._vaultService.getCreatedVaultProposals(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCreatedVaultCertificates(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCompletedVaultProposals(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRedeemedVaultCertificates(indexer?.lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRevokedVaultCertificates(indexer?.lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCreatedVaultProposals(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCreatedVaultCertificates(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCompletedVaultProposals(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRedeemedVaultCertificates(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRevokedVaultCertificates(lastUpdateBlock)),
     ]);
 
     const poolsDetails = await Promise.all(pools.map(async pool => {

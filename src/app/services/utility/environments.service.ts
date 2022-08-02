@@ -17,6 +17,10 @@ export class EnvironmentsService {
     return this._env.network;
   }
 
+  public get startHeight(): number {
+    return this._env.startHeight;
+  }
+
   public get contracts(): IEnvironmentContracts {
     return this._env.contracts;
   }

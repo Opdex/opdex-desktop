@@ -51,7 +51,7 @@ export class MiningGovernanceService {
         }));
   }
 
-  getRewardedPools(fromBlock: number = 3500000): Observable<any> {
+  getRewardedPools(fromBlock: number): Observable<any> {
     const type = TransactionLogTypes.RewardMiningPoolLog;
     const request = new ReceiptSearchRequest(this._env.contracts.miningGovernance, fromBlock, type);
 

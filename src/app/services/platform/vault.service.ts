@@ -217,31 +217,31 @@ export class VaultService {
     return this._cirrusApi.localCall(request).pipe(map(response => response.return));
   }
 
-  getCreatedVaultProposals(fromBlock: number = 3500000): Observable<any> {
+  getCreatedVaultProposals(fromBlock: number): Observable<any> {
     const logType = TransactionLogTypes.CreateVaultProposalLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);
   }
 
-  getCompletedVaultProposals(fromBlock: number = 3500000): Observable<any> {
+  getCompletedVaultProposals(fromBlock: number): Observable<any> {
     const logType = TransactionLogTypes.CompleteVaultProposalLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);
   }
 
-  getCreatedVaultCertificates(fromBlock: number = 3500000): Observable<any> {
+  getCreatedVaultCertificates(fromBlock: number): Observable<any> {
     const logType = TransactionLogTypes.CreateVaultCertificateLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);
   }
 
-  getRevokedVaultCertificates(fromBlock: number = 3500000): Observable<any> {
+  getRevokedVaultCertificates(fromBlock: number): Observable<any> {
     const logType = TransactionLogTypes.RevokeVaultCertificateLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);
   }
 
-  getRedeemedVaultCertificates(fromBlock: number = 3500000): Observable<any> {
+  getRedeemedVaultCertificates(fromBlock: number): Observable<any> {
     const logType = TransactionLogTypes.RedeemVaultCertificateLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);

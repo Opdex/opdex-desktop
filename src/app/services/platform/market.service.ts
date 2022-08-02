@@ -34,7 +34,7 @@ export class MarketService {
     return new TransactionQuote(request, response);
   }
 
-  getMarketPools(fromBlock: number = 3500000): Observable<any> {
+  getMarketPools(fromBlock: number): Observable<any> {
     const createPoolLog = TransactionLogTypes.CreateLiquidityPoolLog;
     const request = new ReceiptSearchRequest(this._market, fromBlock, createPoolLog);
 
