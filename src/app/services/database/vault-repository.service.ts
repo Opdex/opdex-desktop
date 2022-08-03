@@ -13,7 +13,7 @@ export class VaultRepositoryService {
 
   async getProposals(skip: number = 0, take: number = 10): Promise<IPagination<IVaultProposalEntity>> {
     const count = await this._db.proposal.count();
-    const results = await this._db.proposal.offset(skip).limit(take).toArray();
+    const results = await this._db.proposal.offset(skip).limit(take).reverse().toArray();
     return { skip, take, count, results };
   }
 

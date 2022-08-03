@@ -17,6 +17,15 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
+        <div class="flex-row-center-end" *ngIf="context?.wallet">
+          <button color="primary" mat-stroked-button class="flex-row-center" (click)="createPool()">
+            <span class="flex-row-center">
+              Create Liquidity Pool
+              <mat-icon class="small ml-1">{{icons.add}}</mat-icon>
+            </span>
+          </button>
+        </div>
+
         <opdex-pools-table></opdex-pools-table>
       </div>
     </div>
