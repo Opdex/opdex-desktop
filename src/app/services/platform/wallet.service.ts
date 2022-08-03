@@ -5,7 +5,6 @@ import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
-import { FixedDecimal } from '@models/types/fixed-decimal';
 
 @Injectable({providedIn: 'root'})
 export class WalletService {
@@ -77,13 +76,16 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  async getVaultVotePosition(proposalId: number, wallet: string): Promise<BigInt> {
+  async getVaultVotePosition(proposalId: number, wallet: string): Promise<{balance: BigInt, inFavor: boolean}> {
     const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalVote', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
     ]);
 
     const response = await firstValueFrom(this._cirrus.localCall(request));
-    return BigInt(response.errorMessage ? '0' : response.return);
+    return {
+      balance: BigInt(response.errorMessage ? '0' : response.return.amount),
+      inFavor: response.errorMessage ? false : response.return.inFavor
+    };
   }
 }

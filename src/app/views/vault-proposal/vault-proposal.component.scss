@@ -1,0 +1,22 @@
+@import 'src/scss/colors';
+
+.vote-bar {
+  font-size: .8em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 400;
+  display: inline-flex;
+
+  &.yes {
+    background: $green-primary;
+  }
+
+  &.no {
+    background: $red-primary;
+  }
+}
+
+.description {
+  overflow-wrap: break-word;
+}
