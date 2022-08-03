@@ -60,8 +60,6 @@ export class TokenService {
       else {
         const base = await firstValueFrom(this.getToken(address));
 
-        // Todo: validate token base was found
-
         isLpt = base.symbol === 'OLPT' && base.name === 'Opdex Liquidity Pool Token';
         entity = {
           address: base.address,
