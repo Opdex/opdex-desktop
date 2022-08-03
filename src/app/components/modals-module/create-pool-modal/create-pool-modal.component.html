@@ -6,11 +6,73 @@
   placeholder="torAyErDvMdZqNdVU8kmiLaykuE5L2UfwJ">
 </opdex-input-control>
 
+<div class="error" *ngIf="validationError">
+  {{validationError}}
+</div>
+
 <button
   mat-flat-button
   color="primary"
   class="mt-3 w-100"
   [disabled]="!tokenControl.value"
-  (click)="validateToken()">
+  (click)="validateToken()"
+  *ngIf="!validatedToken">
   Validate Token
 </button>
+
+<ng-container *ngIf="validatedToken">
+  <div class="flex-row-center-between mt-2">
+    <div class="flex-row-center">
+      <opdex-token-icon [token]="validatedToken"></opdex-token-icon>
+      <div class="flex-col-center ml-2">
+        <small class="overflow-ellipsis d-block">{{validatedToken.symbol}}</small>
+        <small class=" light overflow-ellipsis d-block">{{validatedToken.name}}</small>
+      </div>
+    </div>
+
+    <span class="badge {{isTokenValid ? 'green' : 'red'}}" *ngIf="!validatedTokenPool">
+      <mat-icon class="mr-1">{{isTokenValid ? icons.check : icons.error}}</mat-icon>
+      {{isTokenValid ? 'Valid' : 'Invalid'}}
+    </span>
+
+    <span class="badge orange" *ngIf="!!validatedTokenPool">
+      <mat-icon class="mr-1">{{icons.warning}}</mat-icon>
+      Pool Exists
+    </span>
+  </div>
+
+  <div class="flex-row-center-between mt-2 mb-1">
+    <div class="flex-row-center">
+      <opdex-token-native-chain-badge class="mr-2"></opdex-token-native-chain-badge>
+      <opdex-copy-address [address]="validatedToken.address" [short]="true"></opdex-copy-address>
+    </div>
+
+    <a class="no-decoration"
+      (click)="viewPool()"
+      href="javascript:void(0)"
+      *ngIf="validatedTokenPool">
+      <small class="flex-row-center b-400">
+        View {{validatedTokenPool.name}}
+        <mat-icon class="tiny ml-1">{{icons.transfer}}</mat-icon>
+      </small>
+    </a>
+  </div>
+
+  <div class="flex-row-center" *ngIf="validatedToken.wrappedToken">
+    <opdex-token-native-chain-badge
+      class="mr-2"
+      [wrappedToken]="validatedToken.wrappedToken">
+    </opdex-token-native-chain-badge>
+    <opdex-copy-address
+      *ngIf="validatedToken.wrappedToken?.address"
+      [address]="validatedToken.wrappedToken.address"
+      [short]="true">
+    </opdex-copy-address>
+  </div>
+
+  <opdex-tx-quote-submit-button
+    label="Add Liquidity Pool"
+    [disabled]="!context?.wallet || !isTokenValid || !!validatedTokenPool"
+    (onSubmit)="createPool()">
+  </opdex-tx-quote-submit-button>
+</ng-container>

@@ -358,7 +358,11 @@ export class TokenService {
     }
 
     const pool = await this._liquidityPoolRepository.getPoolBySrcAddress(token.address) ||
-                 await this._liquidityPoolRepository.getPoolByAddress(token.address)
+                 await this._liquidityPoolRepository.getPoolByAddress(token.address);
+
+    if (!pool) {
+      return prices;
+    }
 
     if /* LP Token */ (pool.address === token.address) {
       const totalSupply = FixedDecimal.FromBigInt(

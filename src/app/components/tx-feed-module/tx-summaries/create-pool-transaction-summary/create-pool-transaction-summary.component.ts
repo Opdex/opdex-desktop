@@ -32,7 +32,7 @@ export class CreatePoolTransactionSummaryComponent implements OnChanges {
   ) { }
 
   async ngOnChanges(): Promise<void> {
-    this.isQuote = this.transaction.hash?.length === 0;
+    this.isQuote = !this.transaction.hash;
     const createEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
 
     if (createEvents[0] === undefined) {
