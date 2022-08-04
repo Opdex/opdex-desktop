@@ -145,59 +145,59 @@
     </div>
   </div>
 </div>
-<!--
+
 <div class="offset-section pt-5 pb-4" *ngIf="!!context?.wallet && (userPledge || userVote)">
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h3>Positions</h3>
+        <h3>Current Positions</h3>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3" *ngIf="userPledge">
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
         <opdex-card>
           <div class="flex-row-center-between mb-2">
             <div class="flex-column">
-              <p class="light mb-1">Pledged Balance</p>
-              <opdex-number [value]="userPledge?.pledge" [short]="true" suffix="CRS"></opdex-number>
-            </div>
-
-            <div class="flex-column">
-              <p class="light mb-1">Balance</p>
-              <opdex-number [value]="userPledge?.balance" suffix="CRS"></opdex-number>
+              <p class="light mb-1">Pledge Balance</p>
+              <opdex-number [value]="userPledge" [short]="true" suffix="CRS"></opdex-number>
             </div>
           </div>
 
           <div class="btn-group flex-row-center-end w-100" *ngIf="proposal">
-            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Pledge', true)">Withdraw</button>
+            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Pledge', true)" [disabled]="userPledge?.bigInt <= 0">Withdraw</button>
             <button mat-flat-button color="primary" class="w-100 small ml-3" (click)="openTransactionView('Pledge', false)" *ngIf="proposal.status === 'Pledge' && proposal.expiration >= latestBlock">Pledge</button>
           </div>
         </opdex-card>
       </div>
 
-      <div class="col-12 col-md-6 col-lg-4 col-xl-3" *ngIf="proposal && proposal.status !== 'Pledge' && userVote">
-        <opdex-card>
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+        <opdex-card  *ngIf="proposal && proposal.status !== 'Pledge' && userVote">
           <div class="flex-row-center-between mb-2">
             <div class="flex-column">
-              <p class="light mb-1">Voted</p>
+              <p class="light mb-1">Vote Balance</p>
 
               <div class="flex-row-center">
-                <mat-icon *ngIf="userVote" class="tiny mr-1 {{userVote.inFavor ? 'green' : 'red'}}">{{userVote.inFavor ? icons.thumbUp : icons.thumbDown}}</mat-icon>
-                <opdex-number [value]="userVote?.vote" [short]="true" suffix="CRS"></opdex-number>
+                <mat-icon *ngIf="userVote && userVote.balance.bigInt > 0" class="tiny mr-1 {{userVote.inFavor ? 'green' : 'red'}}">{{userVote?.inFavor ? icons.thumbUp : icons.thumbDown}}</mat-icon>
+                <opdex-number [value]="userVote?.balance" [short]="true" suffix="CRS"></opdex-number>
               </div>
-            </div>
-
-            <div class="flex-column">
-              <p class="light mb-1">Balance</p>
-              <opdex-number [value]="userVote?.balance" suffix="CRS"></opdex-number>
             </div>
           </div>
 
           <div class="btn-group flex-row-center-end w-100" *ngIf="proposal">
-            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Vote', true)">Withdraw</button>
+            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Vote', true)" [disabled]="userVote?.balance?.bigInt <= 0">Withdraw</button>
             <button mat-flat-button color="primary" class="w-100 small ml-3" (click)="openTransactionView('Vote', false)" *ngIf="proposal.status === 'Vote' && proposal.expiration >= latestBlock">Vote</button>
           </div>
         </opdex-card>
       </div>
     </div>
   </div>
-</div> -->
+</div>
+
+<div class="standard-section tx-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-8 col-md-6 col-xl-4">
+        <opdex-tx-vault-proposal [data]="{ proposal: proposal }"></opdex-tx-vault-proposal>
+      </div>
+    </div>
+  </div>
+</div>

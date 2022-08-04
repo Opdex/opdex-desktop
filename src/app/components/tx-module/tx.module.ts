@@ -45,6 +45,10 @@ import { TxMineCollectComponent } from "./tx-mine/tx-mine-collect/tx-mine-collec
 import { TxProvideComponent } from "./tx-provide/tx-provide.component";
 import { TxProvideRemoveComponent } from "./tx-provide/tx-provide-remove/tx-provide-remove.component";
 import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-add.component";
+import { TxVaultProposalPledgeComponent } from "./tx-vault-proposal/tx-vault-proposal-pledge/tx-vault-proposal-pledge.component";
+import { TxVaultProposalVoteComponent } from "./tx-vault-proposal/tx-vault-proposal-vote/tx-vault-proposal-vote.component";
+import { TxVaultProposalComponent } from "./tx-vault-proposal/tx-vault-proposal.component";
+import { VaultProposalSelectorComponent } from "./shared/vault-proposal-selector/vault-proposal-selector.component";
 
 @NgModule({
   declarations: [
@@ -69,13 +73,13 @@ import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-ad
     // WalletPreviewComponent,
     TxButtonsComponent,
     PercentageAmountButtonsComponent,
-    // TxVaultProposalComponent,
+    TxVaultProposalComponent,
     // TxVaultProposalCreateComponent,
-    // TxVaultProposalVoteComponent,
-    // TxVaultProposalPledgeComponent,
+    TxVaultProposalVoteComponent,
+    TxVaultProposalPledgeComponent,
     TxQuoteErrorsComponent,
     TxQuoteErrorComponent,
-    // VaultProposalSelectorComponent,
+    VaultProposalSelectorComponent,
   ],
   imports: [
     CommonModule,
@@ -110,6 +114,7 @@ import { TxProvideAddComponent } from "./tx-provide/tx-provide-add/tx-provide-ad
     TxProvideComponent,
     TxMineComponent,
     TxStakeComponent,
+    TxVaultProposalComponent,
     // TxAllowanceComponent,
     // TxCreatePoolComponent,
     // TxSidebarComponent,

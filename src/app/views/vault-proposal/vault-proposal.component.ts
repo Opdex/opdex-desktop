@@ -28,7 +28,7 @@ export class VaultProposalComponent {
   latestBlock: number;
   proposal: VaultProposal;
   context: UserContext;
-  userVote: FixedDecimal;
+  userVote:  { balance: FixedDecimal; inFavor: boolean };
   userPledge: FixedDecimal;
   pledgePercentage: FixedDecimal;
   icons = Icons;
@@ -80,9 +80,7 @@ export class VaultProposalComponent {
     try {
       const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet);
       const fixed = FixedDecimal.FromBigInt(response.balance, 8); // CRS 8 decimals
-
-      console.log(response)
-      this.userVote = fixed;
+      this.userVote = {balance: fixed, inFavor: response.inFavor};
       return fixed;
     } catch {
       return null;
