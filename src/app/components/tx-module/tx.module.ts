@@ -64,17 +64,12 @@ import { VaultProposalSelectorComponent } from "./shared/vault-proposal-selector
     TxStakeStopComponent,
     TxProvideAddComponent,
     TxProvideRemoveComponent,
-    // TxAllowanceComponent,
     LiquidityPoolSelectorComponent,
     AllowanceValidationComponent,
     ReviewQuoteComponent,
-    // TxCreatePoolComponent,
-    // TxSidebarComponent,
-    // WalletPreviewComponent,
     TxButtonsComponent,
     PercentageAmountButtonsComponent,
     TxVaultProposalComponent,
-    // TxVaultProposalCreateComponent,
     TxVaultProposalVoteComponent,
     TxVaultProposalPledgeComponent,
     TxQuoteErrorsComponent,
@@ -115,10 +110,9 @@ import { VaultProposalSelectorComponent } from "./shared/vault-proposal-selector
     TxMineComponent,
     TxStakeComponent,
     TxVaultProposalComponent,
-    // TxAllowanceComponent,
-    // TxCreatePoolComponent,
-    // TxSidebarComponent,
     TxButtonsComponent,
+    TxQuoteErrorsComponent,
+    TxQuoteErrorComponent
   ]
 })
 export class TransactionModule { }

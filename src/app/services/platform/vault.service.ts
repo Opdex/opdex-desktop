@@ -126,13 +126,14 @@ export class VaultService {
 
   public async createCertificateProposalQuote(amount: FixedDecimal, recipient: string, description: string): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
+    const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateNewCertificateProposal(UInt256 amount, Address recipient, string description);
     const request = new LocalCallRequest(this._vault, VaultMethods.CreateNewCertificateProposal, wallet, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.Address, recipient, 'Recipient'),
       new Parameter(ParameterType.String, description, 'Description'),
-    ]);
+    ], deposit);
 
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
@@ -140,12 +141,13 @@ export class VaultService {
 
   public async createRevokeCertificateProposalQuote(recipient: string, description: string): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
+    const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateRevokeCertificateProposal(Address recipient, string description);
     const request = new LocalCallRequest(this._vault, VaultMethods.CreateRevokeCertificateProposal, wallet, [
       new Parameter(ParameterType.Address, recipient, 'Recipient'),
       new Parameter(ParameterType.String, description, 'Description'),
-    ]);
+    ], deposit);
 
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
@@ -153,12 +155,13 @@ export class VaultService {
 
   public async createMinimumPledgeProposalQuote(amount: FixedDecimal, description: string): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
+    const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateTotalPledgeMinimumProposal(UInt256 amount, string description);
     const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalPledgeMinimumProposal, wallet, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.String, description, 'Description'),
-    ]);
+    ], deposit);
 
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
@@ -166,12 +169,13 @@ export class VaultService {
 
   public async createMinimumVoteProposalQuote(amount: FixedDecimal, description: string): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
+    const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateTotalVoteMinimumProposal(UInt256 amount, string description);
     const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalVoteMinimumProposal, wallet, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.String, description, 'Description'),
-    ]);
+    ], deposit);
 
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
@@ -213,7 +217,7 @@ export class VaultService {
 
   getHydratedProposal(proposalId: number): Observable<IHydratedProposal> {
     const vault = this._vault;
-    const request = new LocalCallRequest(vault, 'GetProposal', vault, [new Parameter(ParameterType.ULong, proposalId)])
+    const request = new LocalCallRequest(vault, VaultMethods.GetProposal, vault, [new Parameter(ParameterType.ULong, proposalId)])
     return this._cirrusApi.localCall(request).pipe(map(response => response.return));
   }
 

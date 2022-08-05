@@ -38,12 +38,12 @@
           <div class="flex-row-center-between mb-1">
             <h3 class="mb-0">Proposals</h3>
 
-            <!-- <button mat-stroked-button
-              color="primary"
-              (click)="openTransactionView('Create')"
-              *ngIf="context.wallet">
-              Create <mat-icon class="small">{{icons.add}}</mat-icon>
-            </button> -->
+            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.wallet">
+              <span class="flex-row-center">
+                Create Proposal
+                <mat-icon class="small ml-1">{{icons.add}}</mat-icon>
+              </span>
+            </button>
           </div>
 
          <opdex-vault-proposals-table></opdex-vault-proposals-table>

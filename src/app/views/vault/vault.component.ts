@@ -1,3 +1,5 @@
+import { CreateProposalModalComponent } from '@components/modals-module/create-proposal-modal/create-proposal-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { UserContextService } from '@services/utility/user-context.service';
@@ -48,7 +50,8 @@ export class VaultComponent implements OnInit, OnDestroy {
     private _vaultService: VaultService,
     private _tokenService: TokenService,
     private _userContextService: UserContextService,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    public dialog: MatDialog
   ) {
     this.statCards = this._getStatCards(null, null);
   }
@@ -84,6 +87,10 @@ export class VaultComponent implements OnInit, OnDestroy {
 
   certificatesTrackBy(index: number, certificate: VaultCertificate): string {
     return `${index}-${certificate?.trackBy}`;
+  }
+
+  createProposal(): void {
+    this.dialog.open(CreateProposalModalComponent, { width: '500px' });
   }
 
   private _getStatCards(vault: Vault, token: Token): StatCardInfo[] {
