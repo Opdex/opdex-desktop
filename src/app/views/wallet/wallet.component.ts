@@ -15,18 +15,23 @@ import { UserContextService } from '@services/utility/user-context.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { Token } from '@models/platform/token';
+import { Icons } from '@enums/icons';
+import { CollapseAnimation } from '@animations/collapse';
 
 @Component({
   selector: 'opdex-wallet',
   templateUrl: './wallet.component.html',
-  styleUrls: ['./wallet.component.scss']
+  styleUrls: ['./wallet.component.scss'],
+  animations: [CollapseAnimation]
 })
 export class WalletComponent implements OnInit, OnDestroy {
   context: UserContext;
+  showPreferences: boolean = true;
   crs: Token;
   selectedCurrency: ICurrency;
   crsBalance: FixedDecimal;
   crsBalanceValue: FixedDecimal;
+  icons = Icons;
   subscription = new Subscription();
 
   constructor(
@@ -56,6 +61,20 @@ export class WalletComponent implements OnInit, OnDestroy {
         )
         .subscribe()
     )
+  }
+
+  handleDeadlineChange(threshold: number): void {
+    this.context.preferences.deadlineThreshold = threshold;
+    this._userContextService.setUserPreferences(this.context.wallet, this.context.preferences);
+  }
+
+  handleToleranceChange(threshold: number): void {
+    this.context.preferences.toleranceThreshold = threshold;
+    this._userContextService.setUserPreferences(this.context.wallet, this.context.preferences);
+  }
+
+  togglePreferences(): void {
+    this.showPreferences = !this.showPreferences;
   }
 
   private _setCrsBalance(balance: BigInt): void {

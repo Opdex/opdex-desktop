@@ -34,4 +34,45 @@
       </div>
     </div>
   </div>
+
+  <div class="standard-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-sm-6 col-xl-8"></div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+          <opdex-card>
+            <div class="preferences">
+              <div class="flex-row-center-between">
+                <h4 class="mb-0">Preferences</h4>
+                <button mat-icon-button class="small" (click)="togglePreferences()" color="primary"><mat-icon>{{showPreferences ? icons.remove : icons.add}}</mat-icon></button>
+              </div>
+            </div>
+
+            <div [@collapse]="!showPreferences">
+              <div class="theme mt-3 mb-3 flex-row-center">
+                <div class="mr-5">
+                  <label class="d-block mb-2">Theme</label>
+                  <opdex-theme-toggle></opdex-theme-toggle>
+                </div>
+
+                <div>
+                  <label class="d-block mb-2">Currency</label>
+                  <opdex-currency-select></opdex-currency-select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <opdex-tolerance [value]="context.preferences?.toleranceThreshold" (onToleranceChange)="handleToleranceChange($event)"></opdex-tolerance>
+              </div>
+
+              <opdex-deadline [value]="context.preferences?.deadlineThreshold" (onDeadlineChange)="handleDeadlineChange($event)"></opdex-deadline>
+            </div>
+          </opdex-card>
+
+          <!-- <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="m"></opdex-tx-feed> -->
+        </div>
+      </div>
+    </div>
+  </div>
 </ng-container>

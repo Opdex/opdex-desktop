@@ -1,4 +1,4 @@
-import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
+import { ControlsModule } from '@components/controls-module/controls.module';
 import { TransactionModule } from './components/tx-module/tx.module';
 import { TablesModule } from './components/tables-module/tables.module';
 import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
@@ -39,6 +39,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { TradeComponent } from './views/trade/trade.component';
 import { WalletComponent } from './views/wallet/wallet.component';
+import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import { WalletComponent } from './views/wallet/wallet.component';
     TxFeedModule,
     MatSelectModule,
     TablesModule,
-    TransactionModule
+    TransactionModule,
+    ControlsModule
   ],
   providers: [
     {
