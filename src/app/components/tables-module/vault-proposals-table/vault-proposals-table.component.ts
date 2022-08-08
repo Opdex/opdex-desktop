@@ -4,7 +4,6 @@ import { NodeService } from '@services/platform/node.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Vault } from '@models/platform/vault';
-import { EnvironmentsService } from '@services/utility/environments.service';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Component, Input, OnDestroy, ViewChild, OnInit } from '@angular/core';
@@ -14,6 +13,8 @@ import { Subscription } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { Icons } from 'src/app/enums/icons';
 import { VaultProposal } from '@models/platform/vault-proposal';
+import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'opdex-vault-proposals-table',
@@ -37,13 +38,11 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
   oneHundred = FixedDecimal.OneHundred(0);
 
   constructor(
-    private _vaultsService: VaultService,
+    private _vaultService: VaultService,
     private _nodeService: NodeService,
-    // private _sidebar: SidenavService,
     private _userContext: UserContextService,
-    private _env: EnvironmentsService,
-    // private _platformApiService: PlatformApiService,
-    private _bottomSheet: MatBottomSheet
+    private _bottomSheet: MatBottomSheet,
+    private _router: Router
   ) {
     this.dataSource = new MatTableDataSource<any>();
     this.displayedColumns = ['proposalId', 'type', 'proposed', 'status', 'minimums', 'progress', 'expiration', 'actions'];
@@ -54,7 +53,7 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
       this._nodeService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
-          switchMap(_ => this._vaultsService.getVault()),
+          switchMap(_ => this._vaultService.getVault()),
           tap(vault => this.vault = vault),
           switchMap(_ => this.getProposals$(this.skip, this.take)))
         .subscribe(_ => this.loading = false));
@@ -65,20 +64,19 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
   }
 
   openSidebar(childView: string, proposalId: number, withdraw: boolean): void {
-    // this._sidebar.openSidenav(TransactionView.vaultProposal, { child: childView, proposalId, withdraw })
+    this._router.navigate(['vault/proposal', proposalId], { queryParams: { txView: childView, withdraw }})
   }
 
-  quoteCompleteProposal(proposalId: number): void {
-    // if (!this.context?.wallet) return;
+  async quoteCompleteProposal(proposalId: number): Promise<void> {
+    if (!this.context?.wallet) return;
 
-    // this._platformApiService
-    //   .completeVaultProposal(this._env.vaultAddress, proposalId)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this._bottomSheet.open(ReviewQuoteComponent, { data: quote }));
+    const quote = await this._vaultService.completeProposalQuote(proposalId);
+
+    this._bottomSheet.open(ReviewQuoteComponent, { data: quote });
   }
 
   private async getProposals$(skip: number, take: number): Promise<IPagination<VaultProposal>> {
-    const result = await this._vaultsService.getProposals(skip, take)
+    const result = await this._vaultService.getProposals(skip, take)
     this.dataSource.data = [...result.results];
     this.previous = this.skip > 0 && result.count > this.skip;
     this.next = result.count > this.take + this.skip;

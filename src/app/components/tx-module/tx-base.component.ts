@@ -84,7 +84,7 @@ export abstract class TxBase {
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
     const vote = await this._walletService.getVaultVotePosition(proposalId, this.context.wallet);
-    return this._isEnough(FixedDecimal.FromBigInt(vote, 8), amountToSpend);
+    return this._isEnough(FixedDecimal.FromBigInt(vote.balance, 8), amountToSpend);
   }
 
   private _isEnough(actualAmount: FixedDecimal, neededAmount: FixedDecimal) {

@@ -1,3 +1,4 @@
+import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
 import { TransactionModule } from './components/tx-module/tx.module';
 import { TablesModule } from './components/tables-module/tables.module';
 import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
@@ -51,7 +52,8 @@ import { WalletComponent } from './views/wallet/wallet.component';
     PoolComponent,
     TokenComponent,
     TradeComponent,
-    WalletComponent
+    WalletComponent,
+    VaultProposalComponent
   ],
   imports: [
     BrowserModule,

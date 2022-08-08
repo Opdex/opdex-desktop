@@ -1,0 +1,196 @@
+<div class="header-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-1">
+        <a class="flex-row-center-center pl-0 pr-0" mat-button color="primary" routerLink="/vault">
+          <mat-icon class="tiny">{{icons.arrowLeft}}</mat-icon>
+          Vault
+        </a>
+      </div>
+      <div class="col-12">
+        <h1 class="mb-2">Proposal #{{proposal?.proposalId}}</h1>
+      </div>
+    </div>
+
+    <div class="row" *ngIf="proposal">
+      <div class="col-12 col-md-6">
+        <div class="flex-row-center flex-wrap mb-3">
+          <h5 class="d-flex no-wrap mb-0 mr-2">
+            <span *ngIf="proposal.type === 'Create'">New Certificate</span>
+            <span *ngIf="proposal.type === 'Revoke'">Revoke Certificate</span>
+            <span *ngIf="proposal.type === 'TotalPledgeMinimum'">Change Pledge Minimum</span>
+            <span *ngIf="proposal.type === 'TotalVoteMinimum'">Change Vote Minimum</span>
+          </h5>
+
+          <span class="badge" *ngIf="proposal.status === 'Pledge' || proposal.status === 'Vote'" [ngClass]="{
+            'blue': proposal.status === 'Pledge',
+            'purple': proposal.status === 'Vote'}">{{proposal.status}}</span>
+
+          <span class="badge" *ngIf="proposal.status === 'Complete'" [ngClass]="{
+            'green': proposal.status === 'Complete' && proposal.approved,
+            'red': proposal.status === 'Complete' && !proposal.approved}">{{proposal.approved ? 'Approved' : 'Denied'}}</span>
+        </div>
+
+        <p class="mb-0" style="font-size: 2.4em; line-height: 1.3em" *ngIf="proposal.type !== 'Revoke'">
+          <opdex-number [suffix]="proposal.type === 'Create' ? 'ODX' : 'CRS'" [value]="proposal.amount" [short]="true"></opdex-number>
+        </p>
+
+        <p class="mb-0 flex-row align-items-end">
+          <small class="mr-2">By</small>
+          <opdex-copy-address [address]="proposal.creator"></opdex-copy-address>
+        </p>
+
+        <p class="mb-0 flex-row align-items-end" *ngIf="proposal.type === 'Create' || proposal.type === 'Revoke'">
+          <small class="mr-2" *ngIf="proposal.type === 'Create'">For</small>
+          <small class="mr-2" *ngIf="proposal.type === 'Revoke'">Holder</small>
+          <opdex-copy-address [address]="proposal.wallet"></opdex-copy-address>
+        </p>
+
+        <div class="description mb-3 mt-3">
+          <small class="b-400 light">Description</small>
+          <p class="mb-0">{{proposal.description}}</p>
+        </div>
+
+        <div *ngIf="proposal.expiration >= latestBlock" class="mb-3" style="max-width: 600px;">
+          <mat-progress-bar color="primary" mode="determinate" [value]="getExpirationPercentage(proposal)"></mat-progress-bar>
+
+          <div class="mt-2 flex-row-center-between">
+            <small class="light">{{proposal.expiration - latestBlock | formatNumber:0}} blocks remaining</small>
+          </div>
+        </div>
+
+        <button mat-flat-button
+          color="primary"
+          class="small"
+          (click)="quoteCompleteProposal(proposal.proposalId)"
+          *ngIf="context?.wallet && proposal.expiration < latestBlock && proposal.status !== 'Complete'">
+          Finalize
+        </button>
+
+        <button mat-flat-button
+          color="primary"
+          class="small"
+          (click)="openTransactionView('pledge', false)"
+          *ngIf="context?.wallet && proposal.status === 'Pledge' && proposal.expiration >= latestBlock">
+          Pledge
+        </button>
+
+        <button mat-flat-button
+          color="primary"
+          class="small"
+          (click)="openTransactionView('vote', false)"
+          *ngIf="context?.wallet && proposal.status === 'Vote' && proposal.expiration >= latestBlock">
+          Vote
+        </button>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="h-100 w-100 flex-column-center-center">
+          <ng-container *ngIf="proposal.status === 'Pledge'">
+            <p class="light b-400">Pledges</p>
+
+            <div style="position: relative;" class="d-flex align-items-center">
+              <mat-spinner style="position: relative; z-index: 1" class="xl"
+                color="primary"
+                mode="determinate"
+                [value]="pledgePercentage.formattedValue">
+              </mat-spinner>
+              <mat-spinner style="position: absolute; z-index: 0;"
+                class="gray xl"
+                mode="determinate"
+                value="100">
+              </mat-spinner>
+
+              <p style="position: absolute; left: 0; right: 0; margin: 0; text-align: center;">
+                <opdex-number [value]="proposal.pledgeAmount" suffix="CRS" [short]="true"></opdex-number>
+                <br>
+                of <opdex-number [value]="vault.totalPledgeMinimum" [short]="true"></opdex-number>
+                <br>
+                minimum
+              </p>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="proposal.status !== 'Pledge'">
+            <div class="flex-column w-100">
+              <div class="mb-3">
+                <p class="light b-400 mb-1">Votes</p>
+                <p class="mb-0" *ngIf="proposal.status !== 'Completed'">
+                  <opdex-number [value]="proposal.yesAmount.add(proposal.noAmount)" [short]="true" suffix="CRS"></opdex-number>
+                  voted of
+                  <opdex-number [value]="vault.totalVoteMinimum" [short]="true"></opdex-number>
+                  minimum
+                </p>
+              </div>
+
+              <div class="vote-bar-container">
+                <div class="vote-bar yes mb-1 no-wrap" [ngStyle]="{'min-width': getVotePercentage(proposal.yesAmount, proposal.noAmount).wholeNumber + '%' }">
+                  <div class="flex-row-center">
+                    <mat-icon class="mr-1 tiny">{{icons.thumbUp}}</mat-icon>
+                    <opdex-number [value]="proposal.yesAmount" [short]="true" suffix="CRS"></opdex-number>
+                  </div>
+                </div>
+              </div>
+
+              <div class="vote-bar-container">
+                <div class="vote-bar no no-wrap flex-row-center" [ngStyle]="{'min-width': getVotePercentage(proposal.noAmount, proposal.yesAmount).wholeNumber + '%' }">
+                  <mat-icon class="mr-1 tiny">{{icons.thumbDown}}</mat-icon>
+                  <opdex-number [value]="proposal.noAmount" [short]="true" suffix="CRS"></opdex-number>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="offset-section pt-5 pb-4" *ngIf="!!context?.wallet && (userPledge || userVote)">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h3>Current Positions</h3>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+        <opdex-card>
+          <div class="flex-row-center-between mb-2">
+            <div class="flex-column">
+              <p class="light mb-1">Pledge Balance</p>
+              <opdex-number [value]="userPledge" [short]="true" suffix="CRS"></opdex-number>
+            </div>
+          </div>
+
+          <div class="btn-group flex-row-center-end w-100" *ngIf="proposal">
+            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Pledge', true)" [disabled]="userPledge?.bigInt <= 0">Withdraw</button>
+            <button mat-flat-button color="primary" class="w-100 small ml-3" (click)="openTransactionView('Pledge', false)" *ngIf="proposal.status === 'Pledge' && proposal.expiration >= latestBlock">Pledge</button>
+          </div>
+        </opdex-card>
+
+        <opdex-card  *ngIf="proposal && proposal.status !== 'Pledge' && userVote">
+          <div class="flex-row-center-between mb-2">
+            <div class="flex-column">
+              <p class="light mb-1">Vote Balance</p>
+
+              <div class="flex-row-center">
+                <mat-icon *ngIf="userVote && userVote.balance.bigInt > 0" class="tiny mr-1 {{userVote.inFavor ? 'green' : 'red'}}">{{userVote?.inFavor ? icons.thumbUp : icons.thumbDown}}</mat-icon>
+                <opdex-number [value]="userVote?.balance" [short]="true" suffix="CRS"></opdex-number>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group flex-row-center-end w-100" *ngIf="proposal">
+            <button mat-stroked-button color="primary" class="w-100 small" (click)="openTransactionView('Vote', true)" [disabled]="userVote?.balance?.bigInt <= 0">Withdraw</button>
+            <button mat-flat-button color="primary" class="w-100 small ml-3" (click)="openTransactionView('Vote', false)" *ngIf="proposal.status === 'Vote' && proposal.expiration >= latestBlock">Vote</button>
+          </div>
+        </opdex-card>
+      </div>
+
+      <div class="col-12 col-sm-6 col-lg-5 col-xl-4">
+        <opdex-tx-vault-proposal [data]="{ proposal, child: txView, withdraw }"></opdex-tx-vault-proposal>
+      </div>
+    </div>
+  </div>
+</div>
+

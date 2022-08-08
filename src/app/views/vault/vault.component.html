@@ -38,12 +38,12 @@
           <div class="flex-row-center-between mb-1">
             <h3 class="mb-0">Proposals</h3>
 
-            <!-- <button mat-stroked-button
-              color="primary"
-              (click)="openTransactionView('Create')"
-              *ngIf="context.wallet">
-              Create <mat-icon class="small">{{icons.add}}</mat-icon>
-            </button> -->
+            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.wallet">
+              <span class="flex-row-center">
+                Create Proposal
+                <mat-icon class="small ml-1">{{icons.add}}</mat-icon>
+              </span>
+            </button>
           </div>
 
          <opdex-vault-proposals-table></opdex-vault-proposals-table>
@@ -64,14 +64,14 @@
         <opdex-vault-certificate-card [cert]="certificate"></opdex-vault-certificate-card>
       </div>
 
-      <!-- <div class="col-12">
+      <div class="col-12">
         <div class="paginator">
           <div class="flex-row-center-center">
-            <button mat-icon-button [disabled]="!certificates?.paging?.previous" (click)="certificatesPageChange(certificates?.paging?.previous)"><mat-icon>{{icons.previous}}</mat-icon></button>
-            <button mat-icon-button [disabled]="!certificates?.paging?.next" (click)="certificatesPageChange(certificates?.paging?.next)"><mat-icon>{{icons.next}}</mat-icon></button>
+            <button mat-icon-button [disabled]="!previousCertificate" (click)="pageChange(false)"><mat-icon>{{icons.previous}}</mat-icon></button>
+            <button mat-icon-button [disabled]="!nextCertificate" (click)="pageChange(true)"><mat-icon>{{icons.next}}</mat-icon></button>
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </div>

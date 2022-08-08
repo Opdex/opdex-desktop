@@ -1,3 +1,5 @@
+import { SharedPipesModule } from '@pipes/shared-pipes.module';
+import { VaultProposalCardComponent } from './vault-proposal-card/vault-proposal-card.component';
 import { VaultCertificateCardComponent } from './vault-certificate-card/vault-certificate-card.component';
 import { MarketTokenCardComponent } from './market-token-card/market-token-card.component';
 import { StakingPoolCardComponent } from './staking-pool-card/staking-pool-card.component';
@@ -32,7 +34,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     MiningPoolCardComponent,
     MarketTokenCardComponent,
     TokenSummaryCardComponent,
-    VaultCertificateCardComponent
+    VaultCertificateCardComponent,
+    VaultProposalCardComponent
   ],
   imports: [
     CommonModule,
@@ -45,7 +48,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     MatProgressBarModule,
     MatDividerModule,
     MatBottomSheetModule,
-    SharedModule
+    SharedModule,
+    SharedPipesModule
   ],
   exports: [
     CardComponent,
@@ -55,7 +59,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     MarketTokenCardComponent,
     MiningPoolCardComponent,
     TokenSummaryCardComponent,
-    VaultCertificateCardComponent
+    VaultCertificateCardComponent,
+    VaultProposalCardComponent
   ]
 })
 export class CardsModule { }

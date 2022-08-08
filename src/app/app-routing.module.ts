@@ -10,6 +10,7 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PoolComponent } from './views/pool/pool.component';
+import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'tokens', component: TokensComponent },
   { path: 'tokens/:address', component: TokenComponent },
   { path: 'vault', component: VaultComponent },
+  { path: 'vault/proposal/:proposalId', component: VaultProposalComponent },
   { path: 'mining', component: MiningComponent },
   { path: 'trade', component: TradeComponent },
   { path: 'wallet', component: WalletComponent },

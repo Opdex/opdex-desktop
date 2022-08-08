@@ -1,3 +1,5 @@
+import { CreateProposalModalComponent } from '@components/modals-module/create-proposal-modal/create-proposal-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { UserContextService } from '@services/utility/user-context.service';
@@ -13,6 +15,7 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
 import { HelpInfo } from '@components/shared-module/help-button/help-button.component';
 import { UserContext } from '@models/user-context';
 import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
+import { IPagination } from '@interfaces/database.interface';
 
 export class StatCardInfo {
   daily?: boolean;
@@ -42,13 +45,18 @@ export class VaultComponent implements OnInit, OnDestroy {
   transactionsRequest: ReceiptSearchRequest;
   icons = Icons;
   subscription = new Subscription();
+  skipCertificates = 0;
+  takeCertificates = 4;
+  previousCertificate: boolean;
+  nextCertificate: boolean;
 
   constructor(
     private _nodeService: NodeService,
     private _vaultService: VaultService,
     private _tokenService: TokenService,
     private _userContextService: UserContextService,
-    private _env: EnvironmentsService
+    private _env: EnvironmentsService,
+    public dialog: MatDialog
   ) {
     this.statCards = this._getStatCards(null, null);
   }
@@ -64,8 +72,7 @@ export class VaultComponent implements OnInit, OnDestroy {
           tap(vault => this.vault = vault),
           switchMap(vault => this._tokenService.buildToken(vault.token)),
           tap(token => this.token = token),
-          switchMap(_ => this._vaultService.getCertificates()),
-          tap(certificates => this.certificates = certificates))
+          switchMap(_ => this._getCertificates(this.skipCertificates, this.takeCertificates)))
         .subscribe(_ => {
           this.statCards = this._getStatCards(this.vault, this.token);
         })
@@ -84,6 +91,26 @@ export class VaultComponent implements OnInit, OnDestroy {
 
   certificatesTrackBy(index: number, certificate: VaultCertificate): string {
     return `${index}-${certificate?.trackBy}`;
+  }
+
+  createProposal(): void {
+    this.dialog.open(CreateProposalModalComponent, { width: '500px' });
+  }
+
+  async pageChange(isNext: boolean): Promise<void> {
+    this.skipCertificates = isNext
+      ? this.skipCertificates + this.takeCertificates
+      : this.skipCertificates - this.takeCertificates;
+
+    await this._getCertificates(this.skipCertificates, this.takeCertificates)
+  }
+
+  private async _getCertificates(skip: number, take: number): Promise<IPagination<VaultCertificate>> {
+    const result = await this._vaultService.getCertificates(skip, take)
+    this.certificates = result.results;
+    this.previousCertificate = this.skipCertificates > 0 && result.count > this.skipCertificates;
+    this.nextCertificate = result.count > this.takeCertificates + this.skipCertificates;
+    return result;
   }
 
   private _getStatCards(vault: Vault, token: Token): StatCardInfo[] {

@@ -1,0 +1,70 @@
+<div class="create-vault-proposal">
+  <h3>Create a New Proposal</h3>
+
+  <form [formGroup]="form" name="create-vault-proposal-form" id="create-vault-proposal-form">
+    <div class="mb-3">
+      <opdex-input-control
+        [suffixDisabled]="true"
+        suffix="CRS"
+        label="Deposit"
+        [formControl]="deposit"
+        [numbersOnly]="true">
+        <small>Returned after proposal completion</small>
+      </opdex-input-control>
+
+      <div class="mt-2" *ngIf="balanceError">
+        <opdex-tx-quote-error
+          [warn]="true"
+          message="Insufficient Deposit Balance">
+        </opdex-tx-quote-error>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <mat-form-field appearance="legacy" floatLabel="always">
+        <mat-label>Proposal Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let option of proposalTypes" [value]="option.value">
+            {{option.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="mb-3" *ngIf="type.value !== 2">
+      <opdex-input-control
+        [suffixDisabled]="true"
+        label="Amount"
+        [formControl]="amount"
+        [numbersOnly]="true">
+      </opdex-input-control>
+    </div>
+
+    <div class="mb-3">
+      <opdex-input-control
+        placeholder="torAyErDvMdZqNdVU8kmiLaykuE5L2UfwJ"
+        [suffixDisabled]="true"
+        [label]="type.value === 2 ? 'Holder' : 'Recipient'"
+        [formControl]="recipient"
+        *ngIf="type.value <= 2">
+      </opdex-input-control>
+    </div>
+
+    <mat-form-field appearance="legacy" floatLabel="always">
+      <mat-label>Description</mat-label>
+      <textarea matInput
+        placeholder="OVP-1 Short Title https://some.link.com"
+        formControlName="description">
+      </textarea>
+      <mat-hint>{{200 - (description.value?.length || 0)}}</mat-hint>
+    </mat-form-field>
+
+    <opdex-tx-quote-submit-button
+      [warn]="balanceError"
+      [disabled]="!form.valid || !context?.wallet || balanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

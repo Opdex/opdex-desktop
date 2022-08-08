@@ -18,6 +18,7 @@ interface IVaultProposalSummary {
   createOrComplete: IVaultProposalCreateOrCompleteSummary;
   crs: Token;
   vaultToken: Token;
+  proposalId: number;
 }
 
 interface IVaultProposalPledgeOrVoteSummary {
@@ -79,7 +80,7 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
 
     const proposal = await this._vaultService.getProposal(proposalId);
 
-    let proposalSummary = { proposal } as IVaultProposalSummary;
+    let proposalSummary = { proposal, proposalId } as IVaultProposalSummary;
     proposalSummary = await this.buildPledgeOrVoteSummary(proposalSummary);
     this.summary = await this.buildCreateOrCompleteSummary(proposalSummary);
   }

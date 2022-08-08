@@ -54,7 +54,7 @@ export class PercentageAmountButtonsComponent implements OnChanges {
         balance$ = this._walletService.getMiningPosition(this.contract, this.context.wallet);
       }
       else if (this.positionType === 'ProposalVote' && this.proposalId > 0) {
-        balance$ = this._walletService.getVaultVotePosition(this.proposalId, this.context.wallet);
+        balance$ = this._getVaultVote();
       }
       else if (this.positionType === 'ProposalPledge' && this.proposalId > 0) {
         balance$ = this._walletService.getVaultPledgePosition(this.proposalId, this.context.wallet);
@@ -73,6 +73,11 @@ export class PercentageAmountButtonsComponent implements OnChanges {
           .pipe(switchMap(_ => balance$))
           .subscribe(result => this.balance = FixedDecimal.FromBigInt(result, this.token.decimals)));
     }
+  }
+
+  private async _getVaultVote(): Promise<BigInt> {
+    const response = await this._walletService.getVaultVotePosition(this.proposalId, this.context.wallet);
+    return response.balance;
   }
 
   selectPercentage(value: string) {
