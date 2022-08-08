@@ -1,5 +1,4 @@
 import { VaultService } from '@services/platform/vault.service';
-import { NodeService } from '@services/platform/node.service';
 import { Component, OnDestroy, Input, Output, EventEmitter } from "@angular/core";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { ReviewQuoteComponent } from "@components/tx-module/shared/review-quote/review-quote.component";
@@ -27,14 +26,9 @@ export class VaultProposalCardComponent implements OnDestroy {
   constructor(
     private _bottomSheet: MatBottomSheet,
     private _userContextService: UserContextService,
-    private _vaultService: VaultService,
-    private _nodeService: NodeService
+    private _vaultService: VaultService
   ) {
     this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
-  }
-
-  openSidenav(childView: string, inFavor?: boolean) {
-    // this._sidenav.openSidenav(TransactionView.vaultProposal, { child: childView, inFavor, proposalId: this.proposal.proposalId});
   }
 
   getExpirationPercentage() {
