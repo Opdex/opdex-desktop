@@ -1,8 +1,8 @@
 import { WalletService } from '@services/platform/wallet.service';
 import { NodeService } from '@services/platform/node.service';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
 import { Icons } from '@enums/icons';
 import { Vault } from '@models/platform/vault';
@@ -21,7 +21,7 @@ import { Token } from '@models/platform/token';
   templateUrl: './vault-proposal.component.html',
   styleUrls: ['./vault-proposal.component.scss']
 })
-export class VaultProposalComponent {
+export class VaultProposalComponent implements OnDestroy {
   subscription: Subscription = new Subscription();
   vault: Vault;
   token: Token;
@@ -32,6 +32,8 @@ export class VaultProposalComponent {
   userPledge: FixedDecimal;
   pledgePercentage: FixedDecimal;
   icons = Icons;
+  txView: string;
+  withdraw: boolean;
 
   constructor(
     private _vaultService: VaultService,
@@ -40,9 +42,17 @@ export class VaultProposalComponent {
     private _route: ActivatedRoute,
     private _userContextService: UserContextService,
     private _bottomSheet: MatBottomSheet,
-    private _walletService: WalletService
+    private _walletService: WalletService,
+    private _router: Router
   ) {
     const proposalId = parseInt(this._route.snapshot.paramMap.get('proposalId'));
+
+    this.subscription.add(
+      this._route.queryParams
+        .subscribe(params => {
+          this.txView = params['txView'];
+          this.withdraw = params['withdraw'] === 'true';
+        }))
 
     this.subscription.add(
       this._userContextService.context$
@@ -61,6 +71,7 @@ export class VaultProposalComponent {
 
   async getProposal(proposalId: number): Promise<void> {
     this.proposal = await this._vaultService.getProposal(proposalId);
+    if (!this.txView && this.proposal.status !== 'Complete') this.txView = this.proposal.status;
     this.setPledgePercentage();
   }
 
@@ -109,7 +120,13 @@ export class VaultProposalComponent {
   }
 
   openTransactionView(view: string, withdraw: boolean) {
-    // this._sidebar.openSidenav(TransactionView.vaultProposal, { child: view, withdraw, proposalId: this.proposal.proposalId });
+    this._router.navigate(
+      ['/vault/proposal', this.proposal.proposalId],
+      {
+        relativeTo: this._route,
+        queryParams: { txView: view, withdraw },
+        queryParamsHandling: 'merge'
+      });
   }
 
   proposalsTrackBy(index: number, proposal: VaultProposal) {

@@ -4,7 +4,7 @@ import { UserContextService } from '@services/utility/user-context.service';
 import { UserContext } from '@models/user-context';
 import { VaultService } from '@services/platform/vault.service';
 import { NodeService } from '@services/platform/node.service';
-import { Component, OnChanges, OnDestroy, Input } from '@angular/core';
+import { Component, OnDestroy, Inject } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Icons } from '@enums/icons';
 import { PositiveDecimalNumberRegex } from '@lookups/regex.lookup';
@@ -12,14 +12,14 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Subscription, switchMap } from 'rxjs';
 import { TransactionQuote } from '@models/platform/transaction-quote';
 import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'opdex-create-proposal-modal',
   templateUrl: './create-proposal-modal.component.html',
   styleUrls: ['./create-proposal-modal.component.scss']
 })
-export class CreateProposalModalComponent implements OnChanges, OnDestroy {
-  @Input() data;
+export class CreateProposalModalComponent implements OnDestroy {
   form: FormGroup;
   icons = Icons;
   balanceError: boolean;
@@ -71,7 +71,8 @@ export class CreateProposalModalComponent implements OnChanges, OnDestroy {
     private _vaultService: VaultService,
     private _contextService: UserContextService,
     private _walletService: WalletService,
-    private _bottomSheet: MatBottomSheet
+    private _bottomSheet: MatBottomSheet,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.form = this._fb.group({
       type: [1, [Validators.required]],
@@ -89,9 +90,7 @@ export class CreateProposalModalComponent implements OnChanges, OnDestroy {
       this._nodeService.latestBlock$
         .pipe(switchMap(_ => this._validateBalance()))
         .subscribe());
-  }
 
-  ngOnChanges(): void {
     if (this.data?.form) this.form.patchValue(this.data.form);
   }
 

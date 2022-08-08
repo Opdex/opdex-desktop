@@ -17,8 +17,10 @@ export class VaultRepositoryService {
     return { skip, take, count, results };
   }
 
-  async getCertificates(): Promise<IVaultCertificateEntity[]> {
-    return await this._db.certificate.toArray();
+  async getCertificates(skip: number = 0, take: number = 4): Promise<IPagination<IVaultCertificateEntity>> {
+    const count = await this._db.certificate.count();
+    const results = await this._db.certificate.toArray();
+    return { skip, take, count, results };
   }
 
   async getCertificateByOwner(owner: string): Promise<IVaultCertificateEntity> {

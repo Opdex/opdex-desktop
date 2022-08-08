@@ -167,9 +167,7 @@
             <button mat-flat-button color="primary" class="w-100 small ml-3" (click)="openTransactionView('Pledge', false)" *ngIf="proposal.status === 'Pledge' && proposal.expiration >= latestBlock">Pledge</button>
           </div>
         </opdex-card>
-      </div>
 
-      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
         <opdex-card  *ngIf="proposal && proposal.status !== 'Pledge' && userVote">
           <div class="flex-row-center-between mb-2">
             <div class="flex-column">
@@ -188,16 +186,11 @@
           </div>
         </opdex-card>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="standard-section tx-bg">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-sm-8 col-md-6 col-xl-4">
-        <opdex-tx-vault-proposal [data]="{ proposal }"></opdex-tx-vault-proposal>
+      <div class="col-12 col-sm-6 col-lg-5 col-xl-4">
+        <opdex-tx-vault-proposal [data]="{ proposal, child: txView, withdraw }"></opdex-tx-vault-proposal>
       </div>
     </div>
   </div>
 </div>
+

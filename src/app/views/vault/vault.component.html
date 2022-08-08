@@ -64,14 +64,14 @@
         <opdex-vault-certificate-card [cert]="certificate"></opdex-vault-certificate-card>
       </div>
 
-      <!-- <div class="col-12">
+      <div class="col-12">
         <div class="paginator">
           <div class="flex-row-center-center">
-            <button mat-icon-button [disabled]="!certificates?.paging?.previous" (click)="certificatesPageChange(certificates?.paging?.previous)"><mat-icon>{{icons.previous}}</mat-icon></button>
-            <button mat-icon-button [disabled]="!certificates?.paging?.next" (click)="certificatesPageChange(certificates?.paging?.next)"><mat-icon>{{icons.next}}</mat-icon></button>
+            <button mat-icon-button [disabled]="!previousCertificate" (click)="pageChange(false)"><mat-icon>{{icons.previous}}</mat-icon></button>
+            <button mat-icon-button [disabled]="!nextCertificate" (click)="pageChange(true)"><mat-icon>{{icons.next}}</mat-icon></button>
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </div>

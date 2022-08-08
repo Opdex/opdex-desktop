@@ -38,6 +38,7 @@ export class VaultService {
 
   async getProposal(proposalId: number): Promise<VaultProposal> {
     const entity = await this._vaultRepository.getProposalById(proposalId);
+    if (!entity) return undefined;
     return await this._buildProposal(entity);
   }
 
@@ -47,9 +48,10 @@ export class VaultService {
     return { skip: result.skip, take: result.take, results: proposals, count: result.count };
   }
 
-  async getCertificates(): Promise<VaultCertificate[]> {
-    const entities = await this._vaultRepository.getCertificates();
-    return entities.map(entity => new VaultCertificate(entity));
+  async getCertificates(skip: number, take: number): Promise<IPagination<VaultCertificate>> {
+    const result = await this._vaultRepository.getCertificates(skip, take);
+    const certificates = result.results.map(entity => new VaultCertificate(entity));
+    return { skip: result.skip, take: result.take, results: certificates, count: result.count };
   }
 
   public async pledgeQuote(proposalId: number, amount: FixedDecimal): Promise<TransactionQuote> {

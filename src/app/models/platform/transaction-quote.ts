@@ -25,7 +25,6 @@ export class TransactionQuote implements ITransactionQuote {
 
   public get error(): ITransactionError {
     if (this.response.errorMessage) {
-      console.log(this.response.errorMessage)
       return {
         raw: this.response.errorMessage.value,
         friendly: ''

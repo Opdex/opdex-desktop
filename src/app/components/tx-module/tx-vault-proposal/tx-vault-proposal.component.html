@@ -4,6 +4,7 @@
   </mat-button-toggle-group>
 
   <opdex-vault-proposal-selector
+    *ngIf="!data?.proposal"
     [data]="data"
     (onProposalChange)="handleProposalChange($event)">
   </opdex-vault-proposal-selector>

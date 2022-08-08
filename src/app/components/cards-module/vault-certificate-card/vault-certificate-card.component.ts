@@ -1,18 +1,15 @@
+import { VaultService } from '@services/platform/vault.service';
+import { CreateProposalModalComponent } from '@components/modals-module/create-proposal-modal/create-proposal-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 import { NodeService } from '@services/platform/node.service';
-// import { MatBottomSheet } from '@angular/material/bottom-sheet';
-// import { EnvironmentsService } from '@services/utility/environments.service';
-// import { PlatformApiService } from '@services/api/platform-api.service';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Icons } from 'src/app/enums/icons';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-// import { ReviewQuoteComponent } from '@sharedComponents/tx-module/shared/review-quote/review-quote.component';
-// import { ITransactionQuote } from '@models/platform-api/responses/transactions/transaction-quote.interface';
-// import { take } from 'rxjs/operators';
-// import { SidenavService } from '@services/utility/sidenav.service';
-// import { TransactionView } from '@models/transaction-view';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
 
 @Component({
   selector: 'opdex-vault-certificate-card',
@@ -45,10 +42,9 @@ export class VaultCertificateCardComponent implements OnDestroy {
   constructor(
     private _nodeService: NodeService,
     private _userContextService: UserContextService,
-    // private _platformApiService: PlatformApiService,
-    // private _env: EnvironmentsService,
-    // private _bottomSheet: MatBottomSheet,
-    // private _sidebar: SidenavService
+    private _dialog: MatDialog,
+    private _vaultService: VaultService,
+    private _bottomSheet: MatBottomSheet,
   ) {
     this.subscription.add(
       this._nodeService.latestBlock$
@@ -62,24 +58,23 @@ export class VaultCertificateCardComponent implements OnDestroy {
   revokeProposal(): void {
     if (!this.context?.wallet || !this.cert) return;
 
-    // const data = {
-    //   childView: 'Revoke',
-    //   form: {
-    //     type: 2,
-    //     recipient: this.cert.owner
-    //   }
-    // }
+    const data = {
+      childView: 'Revoke',
+      form: {
+        type: 2,
+        recipient: this.cert.owner
+      }
+    }
 
-    // this._sidebar.openSidenav(TransactionView.vaultProposal, data);
+    this._dialog.open(CreateProposalModalComponent, { width: '500px', data });
   }
 
-  quoteRedemption(): void {
-    // if (!this.context?.wallet) return;
+  async quoteRedemption(): Promise<void> {
+    if (!this.context?.wallet) return;
 
-    // this._platformApiService
-    //   .redeemVaultCertificate(this._env.vaultAddress)
-    //     .pipe(take(1))
-    //     .subscribe((quote: ITransactionQuote) => this._bottomSheet.open(ReviewQuoteComponent, { data: quote }));
+    const quote = await this._vaultService.redeemCertificateQuote();
+
+    this._bottomSheet.open(ReviewQuoteComponent, { data: quote });
   }
 
   ngOnDestroy(): void {
