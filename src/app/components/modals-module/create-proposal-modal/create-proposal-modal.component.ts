@@ -134,7 +134,7 @@ export class CreateProposalModalComponent implements OnDestroy {
     if (!this.context?.wallet) return false;
 
     const amountNeeded = new FixedDecimal('500', 8);
-    const balance = await this._walletService.getBalance('CRS', this.context.wallet);
+    const balance = await this._walletService.getBalance('CRS', this.context.wallet.address);
     const isEnough = balance >= amountNeeded.bigInt;
 
     this.balanceError = !isEnough;

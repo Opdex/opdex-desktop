@@ -51,7 +51,7 @@ export abstract class TxBase {
     if (!token) return false;
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
-    const balance = await this._walletService.getBalance(token.address, this.context.wallet);
+    const balance = await this._walletService.getBalance(token.address, this.context.wallet.address);
     return this._isEnough(FixedDecimal.FromBigInt(balance, token.decimals), amountToSpend);
   }
 
@@ -59,7 +59,7 @@ export abstract class TxBase {
     if (!liquidityPool) return false;
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
-    const balance = await this._walletService.getStakingPosition(liquidityPool.address, this.context.wallet);
+    const balance = await this._walletService.getStakingPosition(liquidityPool.address, this.context.wallet.address);
     return this._isEnough(FixedDecimal.FromBigInt(balance, liquidityPool.stakingToken.decimals), amountToSpend);
   }
 
@@ -67,7 +67,7 @@ export abstract class TxBase {
     if (!liquidityPool) return false;
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
-    const balance = await this._walletService.getMiningPosition(liquidityPool.miningPool.address, this.context.wallet);
+    const balance = await this._walletService.getMiningPosition(liquidityPool.miningPool.address, this.context.wallet.address);
     return this._isEnough(FixedDecimal.FromBigInt(balance, liquidityPool.lpToken.decimals), amountToSpend);
   }
 
@@ -75,7 +75,7 @@ export abstract class TxBase {
     if (proposalId === 0) return false;
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
-    const pledge = await this._walletService.getVaultPledgePosition(proposalId, this.context.wallet)
+    const pledge = await this._walletService.getVaultPledgePosition(proposalId, this.context.wallet.address)
     return this._isEnough(FixedDecimal.FromBigInt(pledge, 8), amountToSpend);
   }
 
@@ -83,7 +83,7 @@ export abstract class TxBase {
     if (proposalId === 0) return false;
     if (amountToSpend.bigInt === BigInt(0)) return true;
 
-    const vote = await this._walletService.getVaultVotePosition(proposalId, this.context.wallet);
+    const vote = await this._walletService.getVaultVotePosition(proposalId, this.context.wallet.address);
     return this._isEnough(FixedDecimal.FromBigInt(vote.balance, 8), amountToSpend);
   }
 

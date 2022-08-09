@@ -13,7 +13,7 @@
       <mat-icon>{{icons.wallet}}</mat-icon>
     </button>
 
-    <button mat-button routerLink="/wallet" *ngIf="context?.wallet">
+    <button mat-button routerLink="/wallet" *ngIf="context?.wallet?.address">
       <span class="wallet-indicator valid"></span>
       <mat-icon>{{icons.wallet}}</mat-icon>
     </button>

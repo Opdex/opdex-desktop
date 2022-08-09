@@ -1,4 +1,4 @@
-import { UserContext, UserContextPreferences } from '@models/user-context';
+import { UserContext, UserContextPreferences, UserContextWallet } from '@models/user-context';
 import { StorageService } from './storage.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -18,8 +18,8 @@ export class UserContextService {
     return this._context;
   }
 
-  set(wallet: string): void {
-    this._storage.setSessionStorage('user', wallet)
+  set(name: string, address: string): void {
+    this._storage.setSessionStorage('user', { name, address })
     this._context = this._buildUserContext();
     this._context$.next(this._context)
   }
@@ -36,12 +36,12 @@ export class UserContextService {
   }
 
   private _buildUserContext(): UserContext {
-    const wallet = this._storage.getSessionStorage<string>('user');
+    const wallet = this._storage.getSessionStorage<UserContextWallet>('user', true);
 
     let preferences = new UserContextPreferences();
 
     if (wallet) {
-      preferences = this._storage.getLocalStorage(wallet, true);
+      preferences = this._storage.getLocalStorage(wallet.address, true);
     }
 
     return new UserContext(wallet, preferences);

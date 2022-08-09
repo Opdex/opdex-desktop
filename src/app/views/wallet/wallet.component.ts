@@ -56,7 +56,7 @@ export class WalletComponent implements OnInit, OnDestroy {
       this._nodeService.latestBlock$
         .pipe(
           switchMap(_ => this._setCrsToken()),
-          switchMap(_ => this._walletService.getBalance('CRS', this.context.wallet)),
+          switchMap(_ => this._walletService.getBalance('CRS', this.context.wallet.address)),
           tap(balance => this._setCrsBalance(balance))
         )
         .subscribe()
@@ -65,12 +65,12 @@ export class WalletComponent implements OnInit, OnDestroy {
 
   handleDeadlineChange(threshold: number): void {
     this.context.preferences.deadlineThreshold = threshold;
-    this._userContextService.setUserPreferences(this.context.wallet, this.context.preferences);
+    this._userContextService.setUserPreferences(this.context.wallet.address, this.context.preferences);
   }
 
   handleToleranceChange(threshold: number): void {
     this.context.preferences.toleranceThreshold = threshold;
-    this._userContextService.setUserPreferences(this.context.wallet, this.context.preferences);
+    this._userContextService.setUserPreferences(this.context.wallet.address, this.context.preferences);
   }
 
   togglePreferences(): void {

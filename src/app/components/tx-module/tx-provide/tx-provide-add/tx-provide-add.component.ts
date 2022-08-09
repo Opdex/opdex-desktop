@@ -113,7 +113,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
             if (amount !== '') this.amountSrc.setValue(amount, { emitEvent: false })
           }),
           tap(_ => this.calcTolerance()),
-          filter(_ => !!this.context.wallet),
+          filter(_ => !!this.context.wallet.address),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -134,7 +134,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
             if (quoteAmount !== '') this.amountCrs.setValue(quoteAmount, { emitEvent: false })
           }),
           tap(_ => this.calcTolerance()),
-          filter(_ => !!this.context.wallet),
+          filter(_ => !!this.context.wallet.address),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -144,7 +144,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
         .pipe(
           tap(block => this.latestBlock = block),
           tap(_ => this.calcDeadline(this.deadlineThreshold)),
-          filter(_ => !!this.context.wallet),
+          filter(_ => !!this.context.wallet.address),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -267,7 +267,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   private async getAllowance(): Promise<AllowanceValidation> {
     if (!!this.pool === false) return null;
 
-    this.allowance = await this._validateAllowance(this.context.wallet, this._env.contracts.router, this.pool.srcToken, this.amountSrc.value);
+    this.allowance = await this._validateAllowance(this.context.wallet.address, this._env.contracts.router, this.pool.srcToken, this.amountSrc.value);
 
     return this.allowance;
   }

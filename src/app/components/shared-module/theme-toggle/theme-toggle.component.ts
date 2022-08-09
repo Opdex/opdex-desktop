@@ -49,7 +49,7 @@ export class ThemeToggleComponent implements OnDestroy {
         if (!preferences) preferences = new UserContextPreferences();
 
         preferences.theme = theme;
-        this._userContextService.setUserPreferences(wallet, preferences);
+        this._userContextService.setUserPreferences(wallet.address, preferences);
       }
     }
   }

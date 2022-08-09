@@ -69,12 +69,12 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // UInt256[] AddLiquidity(Address token, UInt256 amountSrcDesired, ulong amountCrsMin, UInt256 amountSrcMin, Address to, ulong deadline);
-    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.AddLiquidity, wallet, [
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.AddLiquidity, wallet.address, [
       new Parameter(ParameterType.Address, token, 'Token'),
       new Parameter(ParameterType.UInt256, amountSrc.bigInt.toString(), 'SRC Amount'),
       new Parameter(ParameterType.ULong, amountCrsMin.bigInt.toString(), 'Min CRS Amount'),
       new Parameter(ParameterType.UInt256, amountSrcMin.bigInt.toString(), 'Min SRC Amount'),
-      new Parameter(ParameterType.Address, wallet, 'Recipient'),
+      new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
       new Parameter(ParameterType.ULong, deadline, 'Deadline'),
     ], amountCrs.formattedValue);
 
@@ -85,12 +85,12 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // UInt256[] RemoveLiquidity(Address token, UInt256 liquidity, ulong amountCrsMin, UInt256 amountSrcMin, Address to, ulong deadline);
-    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.RemoveLiquidity, wallet, [
+    const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.RemoveLiquidity, wallet.address, [
       new Parameter(ParameterType.Address, token, 'Token'),
       new Parameter(ParameterType.UInt256, liquidity.bigInt.toString(), 'Liquidity'),
       new Parameter(ParameterType.ULong, amountCrsMin.bigInt.toString(), 'Min CRS Amount'),
       new Parameter(ParameterType.UInt256, amountSrcMin.bigInt.toString(), 'Min SRC Amount'),
-      new Parameter(ParameterType.Address, wallet, 'Recipient'),
+      new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
       new Parameter(ParameterType.ULong, deadline, 'Deadline'),
     ]);
 
@@ -99,7 +99,7 @@ export class LiquidityPoolService {
 
   public async provideAmountInQuote(amountA: FixedDecimal, reserveA: FixedDecimal, reserveB: FixedDecimal): Promise<TransactionQuote> {
     // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
-    const sender = this._context.userContext.wallet || this._env.contracts.router;
+    const sender = this._context.userContext.wallet.address || this._env.contracts.router;
 
     // UInt256 GetLiquidityQuote(UInt256 amountA, UInt256 reserveA, UInt256 reserveB);
     const request = new LocalCallRequest(this._env.contracts.router, RouterMethods.GetLiquidityQuote, sender, [
@@ -115,7 +115,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void StartStaking(UInt256 amount);
-    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.StartStaking, wallet, [
+    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.StartStaking, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount')
     ]);
 
@@ -126,7 +126,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void CollectStakingRewards(bool liquidate);
-    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.CollectStakingRewards, wallet, [
+    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.CollectStakingRewards, wallet.address, [
       new Parameter(ParameterType.Bool, liquidate.toString(), 'Liquidate')
     ]);
 
@@ -137,7 +137,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void StopStaking(UInt256 amount, bool liquidate);
-    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.StopStaking, wallet, [
+    const request = new LocalCallRequest(liquidityPool, LiquidityPoolMethods.StopStaking, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.Bool, liquidate.toString(), 'Liquidate')
     ]);
@@ -149,7 +149,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void StartMining(UInt256 amount);
-    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StartMining, wallet, [
+    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StartMining, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount')
     ]);
 
@@ -160,7 +160,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void StopMining(UInt256 amount);
-    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StoptMining, wallet, [
+    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StoptMining, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount')
     ]);
 
@@ -171,7 +171,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void CollectMiningRewards();
-    const request = new LocalCallRequest(miningPool, MiningPoolMethods.CollectMiningRewards, wallet);
+    const request = new LocalCallRequest(miningPool, MiningPoolMethods.CollectMiningRewards, wallet.address);
     return await this._submitQuote(request);
   }
 

@@ -54,7 +54,7 @@ export class PoolComponent implements OnInit, OnDestroy {
           switchMap(_ =>  this._liquidityPoolService.buildLiquidityPool(address)))
         .subscribe(pool => this.pool = pool));
 
-    this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400)
+    this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - (5400 * 7))
   }
 
   handleTxOption(view: TransactionView) {

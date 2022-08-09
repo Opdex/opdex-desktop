@@ -1,3 +1,5 @@
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClipboardModule } from '@angular/cdk/clipboard';
@@ -27,6 +29,8 @@ import { SwapTransactionSummaryComponent } from './tx-summaries/swap-transaction
 import { VaultCertificateTransactionSummaryComponent } from './tx-summaries/vault-certificate-transaction-summary/vault-certificate-transaction-summary.component';
 import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
 import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-proposal-transaction-summary/vault-proposal-transaction-summary.component';
+import { ContractFeedComponent } from './contract-feed/contract-feed.component';
+import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +45,9 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     VaultCertificateTransactionSummaryComponent,
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
-    VaultProposalTransactionSummaryComponent
+    VaultProposalTransactionSummaryComponent,
+    ContractFeedComponent,
+    WalletFeedComponent
   ],
   imports: [
     CommonModule,
@@ -59,9 +65,12 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     MatProgressSpinnerModule,
     InfiniteScrollModule,
     CardsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   exports: [
     TxFeedComponent,
+    ContractFeedComponent,
     SwapTransactionSummaryComponent,
     ProvideTransactionSummaryComponent,
     MineTransactionSummaryComponent,
@@ -73,7 +82,8 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
     SharedModule,
-    VaultProposalTransactionSummaryComponent
+    VaultProposalTransactionSummaryComponent,
+    WalletFeedComponent
   ]
 })
 export class TxFeedModule { }

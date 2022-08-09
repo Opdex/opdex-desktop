@@ -89,7 +89,7 @@ export class VaultProposalComponent implements OnDestroy {
     if (this.proposal.status === 'Pledge' || !!this.context?.wallet === false) return null;
 
     try {
-      const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet);
+      const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet.address);
       const fixed = FixedDecimal.FromBigInt(response.balance, 8); // CRS 8 decimals
       this.userVote = {balance: fixed, inFavor: response.inFavor};
       return fixed;
@@ -102,7 +102,7 @@ export class VaultProposalComponent implements OnDestroy {
     if (!!this.context?.wallet === false) return null;
 
     try {
-      const bigInt = await this._walletService.getVaultPledgePosition(this.proposal.proposalId, this.context.wallet);
+      const bigInt = await this._walletService.getVaultPledgePosition(this.proposal.proposalId, this.context.wallet.address);
       const fixed = FixedDecimal.FromBigInt(bigInt, 8); // CRS 8 decimals
       this.userPledge = fixed;
       return fixed;

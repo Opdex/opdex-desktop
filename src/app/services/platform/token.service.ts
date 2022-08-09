@@ -78,7 +78,7 @@ export class TokenService {
 
   public async amountInQuote(amountOut: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
     // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
-    const sender = this._context.userContext.wallet || this._env.contracts.router;
+    const sender = this._context.userContext.wallet.address || this._env.contracts.router;
 
     let parameters: Parameter[];
 
@@ -113,7 +113,7 @@ export class TokenService {
 
   public async amountOutQuote(amountIn: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
     // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
-    const sender = this._context.userContext.wallet || this._env.contracts.router;
+    const sender = this._context.userContext.wallet.address || this._env.contracts.router;
     let parameters: Parameter[];
 
     if (!poolOut || poolIn.address === poolOut.address) {
@@ -164,7 +164,7 @@ export class TokenService {
         parameters = [
           new Parameter(ParameterType.UInt256, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
@@ -175,7 +175,7 @@ export class TokenService {
         parameters = [
           new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
@@ -188,7 +188,7 @@ export class TokenService {
           new Parameter(ParameterType.UInt256, tokenInAmount.bigInt.toString(), 'Amount Spent'),
           new Parameter(ParameterType.ULong, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
@@ -199,7 +199,7 @@ export class TokenService {
           new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString(), 'Amount Received'),
           new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
@@ -213,7 +213,7 @@ export class TokenService {
           new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
           new Parameter(ParameterType.UInt256, tokenOutMinAmount.bigInt.toString(), 'Minimum Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       } else {
@@ -225,13 +225,13 @@ export class TokenService {
           new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
           new Parameter(ParameterType.UInt256, tokenOutAmount.bigInt.toString(), 'Amount Received'),
           new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
-          new Parameter(ParameterType.Address, wallet, 'Recipient'),
+          new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];
       }
     }
 
-    const request = new LocalCallRequest(this._env.contracts.router, methodName, wallet, parameters, amount.formattedValue);
+    const request = new LocalCallRequest(this._env.contracts.router, methodName, wallet.address, parameters, amount.formattedValue);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }
@@ -240,7 +240,7 @@ export class TokenService {
     const { wallet } = this._context.userContext;
 
     // void Distribute();
-    const request = new LocalCallRequest(this._env.contracts.odx, TokenMethods.Distribute, wallet);
+    const request = new LocalCallRequest(this._env.contracts.odx, TokenMethods.Distribute, wallet.address);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }
@@ -249,7 +249,7 @@ export class TokenService {
     const { wallet } = this._context.userContext;
 
     // UInt256 Approve(Address spender, UInt256 currentAmount, UInt256 amount);
-    const request = new LocalCallRequest(token, TokenMethods.Approve, wallet, [
+    const request = new LocalCallRequest(token, TokenMethods.Approve, wallet.address, [
       new Parameter(ParameterType.Address, spender, 'Spender'),
       new Parameter(ParameterType.UInt256, currentAmount.bigInt.toString(), 'Current Amount'),
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'New Amount'),

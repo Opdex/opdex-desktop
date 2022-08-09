@@ -194,7 +194,7 @@ export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
   private async getAllowance(amount?: string): Promise<AllowanceValidation> {
     amount = amount || this.liquidity.value;
 
-    this.allowance = await this._validateAllowance(this.context.wallet, this._env.contracts.router, this.pool?.lpToken, amount);
+    this.allowance = await this._validateAllowance(this.context.wallet.address, this._env.contracts.router, this.pool?.lpToken, amount);
 
     return this.allowance;
   }

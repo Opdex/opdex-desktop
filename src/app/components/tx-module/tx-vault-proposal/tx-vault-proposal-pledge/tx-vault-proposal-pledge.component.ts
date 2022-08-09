@@ -80,7 +80,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
   }
 
   async submit(): Promise<void> {
-    if (!this.vaultAddress || !this.context.wallet) return;
+    if (!this.vaultAddress || !this.context.wallet.address) return;
 
     const amount = new FixedDecimal(this.amount.value, this.crs.decimals);
 

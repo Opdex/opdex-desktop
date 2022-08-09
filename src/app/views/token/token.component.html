@@ -78,7 +78,7 @@
       </div>
 
       <div class="col-12 col-sm-6 col-xl-4" *ngIf="!token?.isCrs">
-        <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="l"></opdex-tx-feed>
+        <opdex-contract-feed [contract]="token?.address"></opdex-contract-feed>
       </div>
     </div>
   </div>

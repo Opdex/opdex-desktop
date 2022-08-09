@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
   }
 
   public login():void {
-    this._userContextService.set(this.address.value);
+    this._userContextService.set(this.wallet.value, this.address.value);
 
     const { preferences } = this._userContextService.userContext;
     if (preferences?.theme) this._theme.setTheme(preferences.theme);

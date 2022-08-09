@@ -45,19 +45,19 @@ export class PercentageAmountButtonsComponent implements OnChanges {
       let balance$: Promise<BigInt>;
 
       if (this.positionType === 'Balance') {
-        balance$ = this._walletService.getBalance(this.contract, this.context.wallet);
+        balance$ = this._walletService.getBalance(this.contract, this.context.wallet.address);
       }
       else if (this.positionType === 'Staking') {
-        balance$ = this._walletService.getStakingPosition(this.contract, this.context.wallet);
+        balance$ = this._walletService.getStakingPosition(this.contract, this.context.wallet.address);
       }
       else if (this.positionType === 'Mining') {
-        balance$ = this._walletService.getMiningPosition(this.contract, this.context.wallet);
+        balance$ = this._walletService.getMiningPosition(this.contract, this.context.wallet.address);
       }
       else if (this.positionType === 'ProposalVote' && this.proposalId > 0) {
         balance$ = this._getVaultVote();
       }
       else if (this.positionType === 'ProposalPledge' && this.proposalId > 0) {
-        balance$ = this._walletService.getVaultPledgePosition(this.proposalId, this.context.wallet);
+        balance$ = this._walletService.getVaultPledgePosition(this.proposalId, this.context.wallet.address);
       }
       else {
         balance$ = new Promise(() => BigInt('0'));
@@ -76,7 +76,7 @@ export class PercentageAmountButtonsComponent implements OnChanges {
   }
 
   private async _getVaultVote(): Promise<BigInt> {
-    const response = await this._walletService.getVaultVotePosition(this.proposalId, this.context.wallet);
+    const response = await this._walletService.getVaultVotePosition(this.proposalId, this.context.wallet.address);
     return response.balance;
   }
 

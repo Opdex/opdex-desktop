@@ -31,7 +31,7 @@ export class MiningGovernanceService {
 
   public async rewardMiningPools(): Promise<TransactionQuote> {
     const { wallet } = this._userContextService.userContext;
-    const request = new LocalCallRequest(this._miningGovernance, MiningGovernanceMethods.RewardMiningPools, wallet);
+    const request = new LocalCallRequest(this._miningGovernance, MiningGovernanceMethods.RewardMiningPools, wallet.address);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }

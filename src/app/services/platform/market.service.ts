@@ -26,7 +26,7 @@ export class MarketService {
     const { wallet } = this._context.userContext;
 
     // Address CreatePool(Address token);
-    const request = new LocalCallRequest(this._market, MarketMethods.CreatePool, wallet, [
+    const request = new LocalCallRequest(this._market, MarketMethods.CreatePool, wallet.address, [
       new Parameter(ParameterType.Address, token, 'Token')
     ]);
 
