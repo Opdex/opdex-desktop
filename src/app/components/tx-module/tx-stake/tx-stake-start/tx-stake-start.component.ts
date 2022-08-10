@@ -73,7 +73,7 @@ export class TxStakeStartComponent extends TxBase implements OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
       .pipe(
-        filter(_ => !!this.context.wallet),
+        filter(_ => !!this.context.wallet.address),
         switchMap(_ => this.getAllowance()),
         switchMap(_ => this.validateBalance()))
       .subscribe());
@@ -143,7 +143,7 @@ export class TxStakeStartComponent extends TxBase implements OnDestroy {
     const spender = this.pool?.address;
     const token = this.pool?.stakingToken;
 
-    this.allowance = await this._validateAllowance(this.context.wallet, spender, token, amount);
+    this.allowance = await this._validateAllowance(this.context.wallet.address, spender, token, amount);
 
     return this.allowance;
   }

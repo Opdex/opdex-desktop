@@ -88,7 +88,7 @@ export class TxMineStartComponent extends TxBase implements OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
       .pipe(
-        filter(_ => !!this.context.wallet),
+        filter(_ => !!this.context.wallet.address),
         switchMap(_ => this.getAllowance$()))
       .subscribe());
   }
@@ -143,7 +143,7 @@ export class TxMineStartComponent extends TxBase implements OnDestroy {
     const spender = this.pool?.miningPool?.address;
     const token = this.pool?.lpToken;
 
-    this.allowance = await this._validateAllowance(this.context.wallet, spender, token, amount);
+    this.allowance = await this._validateAllowance(this.context.wallet.address, spender, token, amount);
 
     return this.allowance;
   }

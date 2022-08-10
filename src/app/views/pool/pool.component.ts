@@ -6,7 +6,6 @@ import { LiquidityPoolService } from '@services/platform/liquidity-pool.service'
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 
 @Component({
   selector: 'opdex-pool',
@@ -16,7 +15,6 @@ import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 export class PoolComponent implements OnInit, OnDestroy {
   pool: LiquidityPool;
   latestBlock: number;
-  transactionsRequest: ReceiptSearchRequest;
   icons = Icons;
   subscription = new Subscription();
   routerSubscription = new Subscription();
@@ -53,8 +51,6 @@ export class PoolComponent implements OnInit, OnDestroy {
           tap(block => this.latestBlock = block),
           switchMap(_ =>  this._liquidityPoolService.buildLiquidityPool(address)))
         .subscribe(pool => this.pool = pool));
-
-    this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400)
   }
 
   handleTxOption(view: TransactionView) {

@@ -1,7 +1,6 @@
 import { TransactionView } from '@enums/transaction-view';
 import { TokenService } from '@services/platform/token.service';
 import { Subscription, tap, switchMap } from 'rxjs';
-import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
@@ -24,7 +23,6 @@ export class TokenComponent implements OnInit, OnDestroy {
   crsPerOlpt: FixedDecimal;
   srcPerOlpt: FixedDecimal;
   latestBlock: number;
-  transactionsRequest: ReceiptSearchRequest;
   subscription = new Subscription();
   routerSubscription = new Subscription();
 
@@ -61,8 +59,6 @@ export class TokenComponent implements OnInit, OnDestroy {
           tap(latestBlock => this.latestBlock = latestBlock),
           switchMap(_ => this._setPoolAndToken(address)))
         .subscribe());
-
-    this.transactionsRequest = new ReceiptSearchRequest(address, this.latestBlock - 5400);
   }
 
   handleTxOption(option: TransactionView) {

@@ -1,20 +1,18 @@
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// import { TxFeedComponent } from './tx-feed.component';
+// import { ContractFeedComponent } from './contract-feed.component';
 
-// describe('TxFeedComponent', () => {
-//   let component: TxFeedComponent;
-//   let fixture: ComponentFixture<TxFeedComponent>;
+// describe('ContractFeedComponent', () => {
+//   let component: ContractFeedComponent;
+//   let fixture: ComponentFixture<ContractFeedComponent>;
 
 //   beforeEach(async () => {
 //     await TestBed.configureTestingModule({
-//       declarations: [ TxFeedComponent ]
+//       declarations: [ ContractFeedComponent ]
 //     })
 //     .compileComponents();
-//   });
 
-//   beforeEach(() => {
-//     fixture = TestBed.createComponent(TxFeedComponent);
+//     fixture = TestBed.createComponent(ContractFeedComponent);
 //     component = fixture.componentInstance;
 //     fixture.detectChanges();
 //   });

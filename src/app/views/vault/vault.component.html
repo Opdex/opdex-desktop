@@ -38,7 +38,7 @@
           <div class="flex-row-center-between mb-1">
             <h3 class="mb-0">Proposals</h3>
 
-            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.wallet">
+            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.wallet?.address">
               <span class="flex-row-center">
                 Create Proposal
                 <mat-icon class="small ml-1">{{icons.add}}</mat-icon>
@@ -81,7 +81,7 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-6 col-xl-5">
-        <opdex-tx-feed [transactionsRequest]="transactionsRequest" size="l"></opdex-tx-feed>
+        <opdex-contract-feed [contract]="vault?.vault"></opdex-contract-feed>
       </div>
     </div>
   </div>

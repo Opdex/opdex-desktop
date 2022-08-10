@@ -307,7 +307,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.tokenInAmount.setValue(result.formattedValue, { emitEvent: false });
       this.calcTotals();
 
-      if (this.context.wallet === undefined) return null;
+      if (this.context.wallet.address === undefined) return null;
       return await this.validateAllowance();
     } catch (error) {
       console.log(error)
@@ -335,7 +335,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.tokenOutAmount.setValue(result.formattedValue, { emitEvent: false });
       this.calcTotals();
 
-      if (this.context.wallet === undefined) return null;
+      if (this.context.wallet.address === undefined) return null;
       return await this.validateAllowance();
     } catch (error) {
       console.log(error)
@@ -351,7 +351,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       return false;
     }
 
-    this.allowance = await this._validateAllowance(this.context.wallet, this._env.contracts.router, this.tokenIn, this.tokenInAmount.value);
+    this.allowance = await this._validateAllowance(this.context.wallet.address, this._env.contracts.router, this.tokenIn, this.tokenInAmount.value);
     return this.allowance.isApproved;
   }
 

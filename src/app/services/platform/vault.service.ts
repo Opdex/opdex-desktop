@@ -58,7 +58,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void Pledge(ulong proposalId);
-    const request = new LocalCallRequest(this._vault, VaultMethods.Pledge, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.Pledge, wallet.address, [
       new Parameter(ParameterType.ULong, proposalId, 'Proposal No.')
     ], amount.formattedValue);
 
@@ -70,7 +70,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void WithdrawPledge(ulong proposalId, ulong withdrawAmount);
-    const request = new LocalCallRequest(this._vault, VaultMethods.WithdrawPledge, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.WithdrawPledge, wallet.address, [
       new Parameter(ParameterType.ULong, proposalId, 'Proposal No.'),
       new Parameter(ParameterType.ULong, amount.bigInt.toString(), 'Withdraw Amount')
     ]);
@@ -83,7 +83,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void Vote(ulong proposalId, bool inFavor);
-    const request = new LocalCallRequest(this._vault, VaultMethods.Vote, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.Vote, wallet.address, [
       new Parameter(ParameterType.ULong, proposalId, 'Proposal No.'),
       new Parameter(ParameterType.ULong, inFavor.toString(), 'In Favor')
     ], amount.formattedValue);
@@ -96,7 +96,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void WithdrawVote(ulong proposalId, ulong withdrawAmount);
-    const request = new LocalCallRequest(this._vault, VaultMethods.WithdrawVote, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.WithdrawVote, wallet.address, [
       new Parameter(ParameterType.ULong, proposalId, 'Proposal No.'),
       new Parameter(ParameterType.ULong, amount.bigInt.toString(), 'Withdraw Amount')
     ]);
@@ -109,7 +109,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void RedeemCertificate();
-    const request = new LocalCallRequest(this._vault, VaultMethods.RedeemCertificate, wallet);
+    const request = new LocalCallRequest(this._vault, VaultMethods.RedeemCertificate, wallet.address);
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
   }
@@ -118,7 +118,7 @@ export class VaultService {
     const {wallet} = this._context.userContext;
 
     // void CompleteProposal(ulong proposalId);
-    const request = new LocalCallRequest(this._vault, VaultMethods.CompleteProposal, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.CompleteProposal, wallet.address, [
       new Parameter(ParameterType.ULong, proposalId, 'Proposal No.')
     ]);
 
@@ -131,7 +131,7 @@ export class VaultService {
     const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateNewCertificateProposal(UInt256 amount, Address recipient, string description);
-    const request = new LocalCallRequest(this._vault, VaultMethods.CreateNewCertificateProposal, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.CreateNewCertificateProposal, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.Address, recipient, 'Recipient'),
       new Parameter(ParameterType.String, description, 'Description'),
@@ -146,7 +146,7 @@ export class VaultService {
     const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateRevokeCertificateProposal(Address recipient, string description);
-    const request = new LocalCallRequest(this._vault, VaultMethods.CreateRevokeCertificateProposal, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.CreateRevokeCertificateProposal, wallet.address, [
       new Parameter(ParameterType.Address, recipient, 'Recipient'),
       new Parameter(ParameterType.String, description, 'Description'),
     ], deposit);
@@ -160,7 +160,7 @@ export class VaultService {
     const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateTotalPledgeMinimumProposal(UInt256 amount, string description);
-    const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalPledgeMinimumProposal, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalPledgeMinimumProposal, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.String, description, 'Description'),
     ], deposit);
@@ -174,7 +174,7 @@ export class VaultService {
     const deposit = new FixedDecimal('500', 8).formattedValue;
 
     // ulong CreateTotalVoteMinimumProposal(UInt256 amount, string description);
-    const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalVoteMinimumProposal, wallet, [
+    const request = new LocalCallRequest(this._vault, VaultMethods.CreateTotalVoteMinimumProposal, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount'),
       new Parameter(ParameterType.String, description, 'Description'),
     ], deposit);

@@ -32,7 +32,7 @@ export class VaultCertificateCardComponent implements OnDestroy {
   }
 
   public get showRedemption(): boolean {
-    return this.context?.wallet === this.cert.owner && !this.cert.redeemed && this.vested;
+    return this.context?.wallet?.address === this.cert.owner && !this.cert.redeemed && this.vested;
   }
 
   public get showRevocation(): boolean {

@@ -40,7 +40,7 @@ export class CurrencyService {
 
     if (context.wallet) {
       context.preferences.currency = currency.abbreviation;
-      this._userContext.setUserPreferences(context.wallet, context.preferences);
+      this._userContext.setUserPreferences(context.wallet.address, context.preferences);
     }
 
     currency.price = new FixedDecimal(this._pricing[currency.abbreviation], 8);

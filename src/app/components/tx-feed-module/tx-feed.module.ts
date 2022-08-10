@@ -1,3 +1,5 @@
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClipboardModule } from '@angular/cdk/clipboard';
@@ -15,7 +17,6 @@ import { SharedPipesModule } from '@pipes/shared-pipes.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { CardsModule } from '@components/cards-module/cards.module';
 
-import { TxFeedComponent } from './tx-feed/tx-feed.component';
 import { AllowanceTransactionSummaryComponent } from './tx-summaries/allowance-transaction-summary/allowance-transaction-summary.component';
 import { CreatePoolTransactionSummaryComponent } from './tx-summaries/create-pool-transaction-summary/create-pool-transaction-summary.component';
 import { DistributeTransactionSummaryComponent } from './tx-summaries/distribute-transaction-summary/distribute-transaction-summary.component';
@@ -27,10 +28,11 @@ import { SwapTransactionSummaryComponent } from './tx-summaries/swap-transaction
 import { VaultCertificateTransactionSummaryComponent } from './tx-summaries/vault-certificate-transaction-summary/vault-certificate-transaction-summary.component';
 import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
 import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-proposal-transaction-summary/vault-proposal-transaction-summary.component';
+import { ContractFeedComponent } from './contract-feed/contract-feed.component';
+import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
 
 @NgModule({
   declarations: [
-    TxFeedComponent,
     SwapTransactionSummaryComponent,
     ProvideTransactionSummaryComponent,
     MineTransactionSummaryComponent,
@@ -41,7 +43,9 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     VaultCertificateTransactionSummaryComponent,
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
-    VaultProposalTransactionSummaryComponent
+    VaultProposalTransactionSummaryComponent,
+    ContractFeedComponent,
+    WalletFeedComponent
   ],
   imports: [
     CommonModule,
@@ -59,9 +63,11 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     MatProgressSpinnerModule,
     InfiniteScrollModule,
     CardsModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   exports: [
-    TxFeedComponent,
+    ContractFeedComponent,
     SwapTransactionSummaryComponent,
     ProvideTransactionSummaryComponent,
     MineTransactionSummaryComponent,
@@ -73,7 +79,8 @@ import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-p
     AllowanceTransactionSummaryComponent,
     TxReceiptComponent,
     SharedModule,
-    VaultProposalTransactionSummaryComponent
+    VaultProposalTransactionSummaryComponent,
+    WalletFeedComponent
   ]
 })
 export class TxFeedModule { }

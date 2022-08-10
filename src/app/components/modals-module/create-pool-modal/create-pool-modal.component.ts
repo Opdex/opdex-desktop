@@ -66,7 +66,7 @@ export class CreatePoolModalComponent implements OnInit, OnDestroy {
   }
 
   async createPool(): Promise<void> {
-    if (this.validationError || !this.context.wallet) return;
+    if (this.validationError || !this.context.wallet.address) return;
 
     const quote = await this._marketService.createLiquidityPoolQuote(this.validatedToken.address);
 

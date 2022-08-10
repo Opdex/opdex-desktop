@@ -1,10 +1,10 @@
 import { Currencies } from '@enums/currencies';
 
 export class UserContext {
-  private _wallet: string;
+  private _wallet: UserContextWallet;
   private _preferences: UserContextPreferences;
 
-  public get wallet(): string {
+  public get wallet(): UserContextWallet {
     return this._wallet;
   }
 
@@ -12,10 +12,15 @@ export class UserContext {
     return this._preferences;
   }
 
-  constructor (wallet?: string, preferences?: UserContextPreferences) {
-    this._wallet = wallet;
+  constructor (wallet?: UserContextWallet, preferences?: UserContextPreferences) {
+    this._wallet = wallet || new UserContextWallet();
     this._preferences = preferences || new UserContextPreferences();
   }
+}
+
+export class UserContextWallet {
+  name: string;
+  address: string;
 }
 
 export class UserContextPreferences {

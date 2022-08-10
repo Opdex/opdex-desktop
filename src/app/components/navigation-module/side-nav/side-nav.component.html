@@ -42,7 +42,7 @@
           <span class="secondary">Vault</span>
         </a>
       </li>
-      <li *ngIf="!context?.wallet">
+      <li *ngIf="!context?.wallet?.address">
         <a mat-button
           class="transparent"
           routerLink="/login"
@@ -52,7 +52,7 @@
           <span class="secondary">Connect</span>
         </a>
       </li>
-      <li *ngIf="context?.wallet">
+      <li *ngIf="context?.wallet?.address">
         <a mat-button
           class="transparent"
           (click)="emitRouteChange('/wallet')"
@@ -128,7 +128,7 @@
         </a>
       </div>
 
-      <div class="flex-row-center no-wrap" *ngIf="context?.wallet">
+      <div class="flex-row-center no-wrap" *ngIf="context?.wallet?.address">
         <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="logout()">
           <mat-icon class="mr-2">{{icons.exit}}</mat-icon>
           <small>Logout</small>

@@ -6,9 +6,7 @@
   </ng-container>
 
   <div #feedContainer
-    class="feed-container"
-    [ngClass]="{'large': size === 'l', 'medium': size === 'm', 'small': size === 's'}"
-    style="position: relative;"
+    class="feed-container large"
     infiniteScroll
     [infiniteScrollDistance]="2"
     [infiniteScrollThrottle]="150"
@@ -21,10 +19,11 @@
           [tx]="tx"
           [showBottomDivider]="i < transactions.length - 1"></opdex-tx-receipt>
 
-        <div class="flex-row-center justify-content-center mt-3 mb-3" *ngIf="!endReached && nextPage">
+        <div class="flex-row-center justify-content-center mt-3 mb-3" *ngIf="!endReached && refreshing">
           <mat-spinner class="tiny mr-2"></mat-spinner> Coming right up...
         </div>
       </ng-container>
+
       <ng-template #noTransactions>
         <div class="pt-3 pl-3 pr-3">
           No transactions found.
