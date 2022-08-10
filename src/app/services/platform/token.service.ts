@@ -44,12 +44,12 @@ export class TokenService {
   public async buildToken(address: string): Promise<Token> {
     let entity: ITokenEntity = address === 'CRS'
       ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8, createdBlock: 1 }
-      : await this._tokenRepository.getTokenByAddress(address);
+      : await firstValueFrom(this._tokenRepository.getTokenByAddress(address));
 
     let isLpt = false;
 
     if (entity === undefined) {
-      const pool = await this._liquidityPoolRepository.getPoolByAddress(address);
+      const pool = await firstValueFrom(this._liquidityPoolRepository.getPoolByAddress(address));
 
       // If is LP Token
       if (pool !== undefined) {
@@ -355,8 +355,8 @@ export class TokenService {
       return prices;
     }
 
-    const pool = await this._liquidityPoolRepository.getPoolBySrcAddress(token.address) ||
-                 await this._liquidityPoolRepository.getPoolByAddress(token.address);
+    const pool = await firstValueFrom(this._liquidityPoolRepository.getPoolBySrcAddress(token.address)) ||
+                 await firstValueFrom(this._liquidityPoolRepository.getPoolByAddress(token.address));
 
     if (!pool) {
       return prices;

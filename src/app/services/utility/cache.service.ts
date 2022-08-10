@@ -10,7 +10,7 @@ interface ICacheRecord {
 }
 
 export abstract class CacheService {
-  private _nodeService: NodeService;
+  protected _nodeService: NodeService;
   private cache: Record<string, ICacheRecord> = {};
 
   constructor(protected injector: Injector) {

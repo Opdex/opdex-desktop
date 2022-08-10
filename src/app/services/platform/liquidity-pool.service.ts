@@ -35,17 +35,17 @@ export class LiquidityPoolService {
   }
 
   public async buildLiquidityPool(address: string): Promise<LiquidityPool> {
-    const entity = await this._poolRepository.getPoolByAddress(address);
+    const entity = await firstValueFrom(this._poolRepository.getPoolByAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 
   public async buildLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
-    const entity = await this._poolRepository.getPoolBySrcAddress(address);
+    const entity = await firstValueFrom(this._poolRepository.getPoolBySrcAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 
   public async buildLiquidityPoolByMiningPoolAddress(address: string): Promise<LiquidityPool> {
-    const entity = await this._poolRepository.getPoolByMiningPoolAddress(address);
+    const entity = await firstValueFrom(this._poolRepository.getPoolByMiningPoolAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 

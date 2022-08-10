@@ -1,13 +1,20 @@
 import { IPagination, ITokenEntity } from '@interfaces/database.interface';
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core";
 import { OpdexDB } from "./db.service";
+import { CacheService } from '@services/utility/cache.service';
+import { from, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
-export class TokenRepositoryService {
-  constructor(private _db: OpdexDB) { }
+export class TokenRepositoryService extends CacheService {
+  constructor(
+    protected _injector: Injector,
+    private _db: OpdexDB
+  ) {
+    super(_injector);
+  }
 
-  async getTokenByAddress(address: string) {
-    return await this._db.token.get({ address });
+  getTokenByAddress(address: string): Observable<ITokenEntity> {
+    return this.getItem<ITokenEntity>(address, from(this._db.token.get({ address })), 10);
   }
 
   async searchTokens(keyword: string): Promise<ITokenEntity[]> {
