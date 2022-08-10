@@ -58,7 +58,7 @@
     <ng-template #invalid>
       <div class="icon-container-offset flex-row-center">
         <ng-container *ngIf="quote?.method !== 'CollectStakingRewards' && quote?.method !== 'CollectMiningRewards'; else noRewards">
-          <span *ngIf="tx.success">Unable to read transaction summary, no transaction events found.</span>
+          <span *ngIf="tx.success">Unable to read transaction summary, no Opdex transaction events found.</span>
           <!-- <span *ngIf="!tx.success">{{tx.error.friendly}}</span> -->
           <span *ngIf="!tx.success">{{tx.error}}</span>
         </ng-container>

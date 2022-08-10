@@ -51,8 +51,11 @@ export class CirrusApiService extends CacheService {
     return this._rest.get(`${this.api}/SmartContractWallet/address-balance?address=${address}`);
   }
 
-  getHistory(walletName: string, address: string):Observable<ISmartContractWalletHistory[]> {
-    return this._rest.get(`${this.api}/SmartContractWallet/history?walletName=${walletName}&address=${address}`);
+  getHistory(walletName: string, address: string, skip: number = 0, take: number = 10):Observable<ISmartContractWalletHistory[]> {
+    let endpoint = `${this.api}/SmartContractWallet/history?walletName=${walletName}&address=${address}`;
+    if (skip) endpoint += `&skip=${skip}`;
+    if (take) endpoint += `&take=${take}`;
+    return this._rest.get(endpoint);
   }
 
   // Smart Contracts

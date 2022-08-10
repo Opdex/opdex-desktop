@@ -17,7 +17,6 @@ import { SharedPipesModule } from '@pipes/shared-pipes.module';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { CardsModule } from '@components/cards-module/cards.module';
 
-import { TxFeedComponent } from './tx-feed/tx-feed.component';
 import { AllowanceTransactionSummaryComponent } from './tx-summaries/allowance-transaction-summary/allowance-transaction-summary.component';
 import { CreatePoolTransactionSummaryComponent } from './tx-summaries/create-pool-transaction-summary/create-pool-transaction-summary.component';
 import { DistributeTransactionSummaryComponent } from './tx-summaries/distribute-transaction-summary/distribute-transaction-summary.component';
@@ -34,7 +33,6 @@ import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
 
 @NgModule({
   declarations: [
-    TxFeedComponent,
     SwapTransactionSummaryComponent,
     ProvideTransactionSummaryComponent,
     MineTransactionSummaryComponent,
@@ -69,7 +67,6 @@ import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
     MatSelectModule
   ],
   exports: [
-    TxFeedComponent,
     ContractFeedComponent,
     SwapTransactionSummaryComponent,
     ProvideTransactionSummaryComponent,

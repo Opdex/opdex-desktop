@@ -1,6 +1,6 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { ParameterType } from '@enums/parameter-type';
-import { INodeWalletAddressModel, IContractReceiptResult } from '@interfaces/full-node.interface';
+import { INodeWalletAddressModel } from '@interfaces/full-node.interface';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
 import { firstValueFrom } from 'rxjs';
@@ -25,9 +25,11 @@ export class WalletService {
     return response?.addresses || [];
   }
 
-  public async getWalletHistory(context: UserContext, skip: number = 0, take: number = 10): Promise<IContractReceiptResult[]> {
-    const history = await firstValueFrom(this._cirrus.getHistory(context.wallet.name, context.wallet.address));
-    return await Promise.all(history.map(tx => firstValueFrom(this._cirrus.getContractReceipt(tx.hash))));
+  public async getWalletHistory(context: UserContext, skip: number = 0, take: number = 10): Promise<TransactionReceipt[]> {
+    const { wallet } = context;
+    const history = await firstValueFrom(this._cirrus.getHistory(wallet.name, wallet.address, skip, take));
+    const txs = await Promise.all(history.map(tx => firstValueFrom(this._cirrus.getContractReceipt(tx.hash))));
+    return txs.map(tx => new TransactionReceipt(tx));
   }
 
   async getAllowance(token: string, wallet: string, spender: string): Promise<BigInt> {
