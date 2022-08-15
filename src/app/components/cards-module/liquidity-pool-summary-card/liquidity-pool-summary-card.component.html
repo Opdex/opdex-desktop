@@ -13,14 +13,9 @@
       </div>
 
       <div class="flex-row-center">
-        <!-- <opdex-change-indicator
-          [value]="pool?.summary?.reserves?.dailyUsdChangePercent"
-          *ngIf="!!pool?.summary?.reserves?.dailyUsdChangePercent">
-        </opdex-change-indicator> -->
-
         <opdex-number
           [short]="true"
-          [prefix]="selectedCurrency.htmlEntity"
+          [prefix]="selectedCurrency?.htmlEntity"
           [value]="liquidityFiat">
         </opdex-number>
       </div>
@@ -80,7 +75,7 @@
 
         <opdex-number
           [short]="true"
-          [prefix]="selectedCurrency.htmlEntity"
+          [prefix]="selectedCurrency?.htmlEntity"
           [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
         </opdex-number>
       </div>
@@ -145,7 +140,7 @@
 
         <opdex-number
           [short]="true"
-          [prefix]="selectedCurrency.htmlEntity"
+          [prefix]="selectedCurrency?.htmlEntity"
           [value]="pool.lpToken.pricing[selectedCurrency.abbreviation].multiply(pool.miningPool?.tokensMining)">
         </opdex-number>
       </div>

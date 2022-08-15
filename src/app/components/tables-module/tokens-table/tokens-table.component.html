@@ -32,7 +32,7 @@
             <div class="flex-row-center-between">
               <div class="flex-row-center no-wrap mr-3">
                 <opdex-number
-                  [prefix]="selectedCurrency.htmlEntity"
+                  [prefix]="selectedCurrency?.htmlEntity"
                   [value]="element?.pricing[selectedCurrency.abbreviation]"
                   [short]="true"
                   class="ml-2"

@@ -1,3 +1,5 @@
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { EnvironmentsService } from '@services/utility/environments.service';
 import { IndexerService } from './services/platform/indexer.service';
 import { ThemeService } from './services/utility/theme.service';
 import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
@@ -11,6 +13,7 @@ import { Icons } from '@enums/icons';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { FadeAnimation } from '@animations/fade-animation';
 import { CirrusApiService } from '@services/api/cirrus-api.service';
+import { GitHubApiService } from '@services/api/github-api.service';
 
 @Component({
   selector: 'opdex-root',
@@ -21,11 +24,13 @@ import { CirrusApiService } from '@services/api/cirrus-api.service';
 export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: string;
   nodeStatus: INodeStatus;
+  selectedCurrency: ICurrency;
   theme: string;
   icons = Icons;
   menuOpen = false;
   isPinned = true;
   hasIndexed = false;
+  updateUrl: string;
 
   constructor(
     public overlayContainer: OverlayContainer,
@@ -34,19 +39,21 @@ export class AppComponent implements OnInit {
     private _coinGecko: CoinGeckoApiService,
     private _currencyService: CurrencyService,
     private _themeService: ThemeService,
-    private _indexerService: IndexerService
+    private _indexerService: IndexerService,
+    private _env: EnvironmentsService,
+    private _githubApi: GitHubApiService
   ) { }
 
   async ngOnInit(): Promise<void> {
     this.nodeStatus = await this._refreshNodeStatus();
-
     this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
 
     timer(0, 60000)
       .pipe(
         switchMap(_ => this._coinGecko.getLatestPrice()),
-        tap(pricing => this._currencyService.setPricing(pricing.stratis)))
-      .subscribe()
+        tap(pricing => this._currencyService.setPricing(pricing.stratis)),
+        switchMap(_ => this._currencyService.selectedCurrency$))
+      .subscribe(currency => this.selectedCurrency = currency);
 
     // intentionally offset 10 seconds
     timer(10000, 10000)
@@ -61,6 +68,8 @@ export class AppComponent implements OnInit {
         await this._indexerService.index();
         this.hasIndexed = true;
       });
+
+    await this._checkAppUpdate();
   }
 
   public handlePinnedToggle(event: boolean): void {
@@ -78,6 +87,13 @@ export class AppComponent implements OnInit {
 
   public prepareRoute(outlet: RouterOutlet) {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
+
+  private async _checkAppUpdate(): Promise<void> {
+    const latestVersion = await firstValueFrom(this._githubApi.getLatestVersion());
+    if (latestVersion && this._env.version.compare(latestVersion.tag_name) === 1) {
+      this.updateUrl = latestVersion.html_url;
+    }
   }
 
   private setTheme(theme: string): void {

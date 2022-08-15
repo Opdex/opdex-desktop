@@ -27,7 +27,7 @@ export class CirrusApiService extends CacheService {
   }
 
   // Node
-  getNodeStatus():Observable<INodeStatus | undefined> {
+  getNodeStatus():Observable<INodeStatus> {
     // No caching this call
     return this._rest
       .get<INodeStatus>(`${this.api}/Node/status`)

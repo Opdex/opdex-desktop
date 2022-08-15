@@ -14,8 +14,10 @@ export class CurrencyService {
 
   constructor(private _userContext: UserContextService) {
     const { userContext } = this._userContext;
-    const currency = userContext.wallet ? userContext.preferences.currency : Currencies.USD;
-    this._selectedCurrency = CurrencyDetailsLookup.find(c => c.abbreviation === currency);;
+    const currency = userContext.wallet.address && userContext.preferences.currency
+      ? userContext.preferences.currency
+      : Currencies.USD;
+    this._selectedCurrency = CurrencyDetailsLookup.find(c => c.abbreviation === currency);
   }
 
   get pricing(): ICurrency[] {

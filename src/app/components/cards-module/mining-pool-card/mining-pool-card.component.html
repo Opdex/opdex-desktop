@@ -39,7 +39,7 @@
 
       <opdex-number
         [short]="true"
-        [prefix]="selectedCurrency.htmlEntity"
+        [prefix]="selectedCurrency?.htmlEntity"
         [value]="pool.lpToken.pricing[selectedCurrency.abbreviation].multiply(pool.miningPool?.tokensMining)">
       </opdex-number>
     </div>

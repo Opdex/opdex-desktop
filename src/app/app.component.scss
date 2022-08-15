@@ -52,6 +52,11 @@ nav {
     background: $blue-primary;
     color: #fff;
     font-weight: 400;
+    text-decoration: none;
+
+    &.clickable {
+      cursor: pointer;
+    }
 
     &.warning {
       background: $red-primary;

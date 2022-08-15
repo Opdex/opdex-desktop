@@ -37,7 +37,7 @@
 
       <opdex-number
         [short]="true"
-        [prefix]="selectedCurrency.htmlEntity"
+        [prefix]="selectedCurrency?.htmlEntity"
         [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
       </opdex-number>
     </div>
@@ -46,12 +46,6 @@
       <p class="mb-0 sub-heading">Weight</p>
 
       <div class="flex-row-center">
-        <!-- <opdex-change-indicator
-          class="mr-2"
-          [value]="pool.summary.staking.dailyWeightChangePercent"
-          *ngIf="!!pool.summary.staking.dailyWeightChangePercent">
-        </opdex-change-indicator> -->
-
         <opdex-number [short]="true" [suffix]="pool.stakingToken?.symbol" [value]="pool.totalStaked"></opdex-number>
       </div>
     </div>
