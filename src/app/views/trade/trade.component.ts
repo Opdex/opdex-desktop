@@ -17,6 +17,7 @@ export class TradeComponent implements OnInit, OnDestroy {
   pool: LiquidityPool;
   subscription = new Subscription();
   view: TransactionView = TransactionView.swap;
+  childView: string;
 
   constructor(
     private _route: ActivatedRoute,
@@ -25,9 +26,10 @@ export class TradeComponent implements OnInit, OnDestroy {
     private _nodeService: NodeService
   ) {
     this.subscription.add(
-      this._route.queryParams.subscribe(async ({view, pool}) => {
+      this._route.queryParams.subscribe(async ({view, pool, childView}) => {
         if (view) this.view = view;
         if (pool) this.pool = await this._liquidityPoolService.buildLiquidityPool(pool);
+        if (childView) this.childView = childView;
       })
     );
   }

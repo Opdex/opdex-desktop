@@ -20,7 +20,7 @@ export class TxMineComponent implements OnChanges {
   ];
 
   ngOnChanges(): void {
-    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.child)?.value || 1;
+    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.childView)?.value || 1;
     this.pool = this.data?.pool;
   }
 

@@ -15,7 +15,7 @@ export class TxVaultProposalComponent implements OnChanges {
   ];
 
   ngOnChanges() {
-    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.child?.toLowerCase())?.value || 1;
+    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.childView?.toLowerCase())?.value || 1;
   }
 
   handleProposalChange($event: VaultProposal) {

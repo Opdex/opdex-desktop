@@ -1,11 +1,11 @@
+import { Router } from '@angular/router';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { CurrencyService } from '@services/platform/currency.service';
-// import { SidenavService } from '@services/utility/sidenav.service';
 import { Component, Input, OnChanges } from '@angular/core';
-// import { TransactionView } from '@models/transaction-view';
 import { Icons } from '@enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { Subscription } from 'rxjs';
+import { TransactionView } from '@enums/transaction-view';
 
 @Component({
   selector: 'opdex-mining-pool-card',
@@ -19,8 +19,8 @@ export class MiningPoolCardComponent implements OnChanges {
   subscription = new Subscription();
 
   constructor(
-    private _currency: CurrencyService
-    // private _sidebar: SidenavService
+    private _currency: CurrencyService,
+    private _router: Router
   ) { }
 
   ngOnChanges() {
@@ -37,7 +37,7 @@ export class MiningPoolCardComponent implements OnChanges {
     this.subscription.unsubscribe();
   }
 
-  // transact(childView: string) {
-  //   this._sidebar.openSidenav(TransactionView.mine, {pool: this.pool, child: childView});
-  // }
+  transact(childView: string) {
+    this._router.navigate(['/trade'], {queryParams: {pool: this.pool.address, view: TransactionView.mine, childView}})
+  }
 }

@@ -19,7 +19,7 @@ export class TxProvideComponent implements OnChanges {
   ];
 
   ngOnChanges() {
-    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.child)?.value || 1;
+    this.child = this.txOptions.find(o => o.action.toLowerCase() == this.data?.childView)?.value || 1;
     this.pool = this.data?.pool;
   }
 

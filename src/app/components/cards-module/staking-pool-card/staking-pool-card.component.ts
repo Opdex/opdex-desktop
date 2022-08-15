@@ -1,11 +1,11 @@
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-// import { TransactionView } from '@models/transaction-view';
-// import { SidenavService } from '@services/utility/sidenav.service';
 import { Icons } from '@enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { TransactionView } from '@enums/transaction-view';
 ;
 
 @Component({
@@ -17,12 +17,12 @@ export class StakingPoolCardComponent implements OnInit, OnDestroy {
   @Input() pool: LiquidityPool;
   selectedCurrency: ICurrency;
   icons = Icons;
-  // txView = TransactionView;
+  txView = TransactionView;
   subscription = new Subscription();
 
   constructor(
-    private _currency: CurrencyService
-    // private _sidebar: SidenavService
+    private _currency: CurrencyService,
+    private _router: Router
   ) { }
 
   ngOnInit(): void {
@@ -35,7 +35,7 @@ export class StakingPoolCardComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  // transact(txView: TransactionView) {
-  //   this._sidebar.openSidenav(txView, {pool: this.pool});
-  // }
+  transact(view: TransactionView) {
+    this._router.navigate(['/trade'], {queryParams: {pool: this.pool.address, view}})
+  }
 }
