@@ -1,3 +1,6 @@
+import { take } from 'rxjs/operators';
+import { ConfirmResyncModalComponent } from '@components/modals-module/confirm-resync-modal/confirm-resync-modal.component';
+import { IndexerService } from '@services/platform/indexer.service';
 import { INodeStatus } from '@interfaces/full-node.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { Icons } from '@enums/icons';
@@ -25,6 +28,7 @@ export class StatusComponent implements OnInit, OnDestroy {
   constructor(
     private _env: EnvironmentsService,
     private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     public dialog: MatDialog
   ) {
     this.appVersion = this._env.version;
@@ -41,8 +45,13 @@ export class StatusComponent implements OnInit, OnDestroy {
         .subscribe(nodeStatus => this.nodeStatus = nodeStatus));
   }
 
-  resync(): void {
-
+  async resync(): Promise<void> {
+    this.dialog.open(ConfirmResyncModalComponent, { width: '500px' })
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe(async result => {
+        if (!!result) await this._indexerService.index(true);
+      });
   }
 
   openBugReport(): void {

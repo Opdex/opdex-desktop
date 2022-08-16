@@ -7,7 +7,7 @@ import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
-import { firstValueFrom } from "rxjs";
+import { BehaviorSubject, firstValueFrom } from "rxjs";
 import { MarketService } from "./market.service";
 import { NodeService } from "./node.service";
 import { LiquidityPoolService } from './liquidity-pool.service';
@@ -16,6 +16,7 @@ import { MiningGovernanceService } from './mining-governance.service';
 @Injectable({providedIn: 'root'})
 export class IndexerService {
   indexing: boolean = false;
+  hasIndexed = new BehaviorSubject(false);
 
   constructor(
     private _nodeService: NodeService,
@@ -31,10 +32,17 @@ export class IndexerService {
     private _env: EnvironmentsService
   ) { }
 
-  public async index(): Promise<void> {
+  public async index(resync: boolean = false): Promise<void> {
     if (this.indexing) return;
 
     this.indexing = true;
+
+    if (resync) {
+      this.hasIndexed.next(false);
+
+      await this._db.delete();
+      await this._db.open();
+    }
 
     const indexer = await this._db.indexer.get(1);
     const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight
@@ -158,5 +166,6 @@ export class IndexerService {
     });
 
     this.indexing = false;
+    this.hasIndexed.next(true);
   }
 }

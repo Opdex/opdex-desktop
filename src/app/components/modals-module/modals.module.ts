@@ -19,13 +19,15 @@ import { BugReportModalComponent } from './bug-report-modal/bug-report-modal.com
 import { HelpModalComponent } from './help-modal/help-modal.component';
 import { CreateProposalModalComponent } from './create-proposal-modal/create-proposal-modal.component';
 import { CreatePoolModalComponent } from './create-pool-modal/create-pool-modal.component';
+import { ConfirmResyncModalComponent } from './confirm-resync-modal/confirm-resync-modal.component';
 
 @NgModule({
   declarations: [
     BugReportModalComponent,
     HelpModalComponent,
     CreatePoolModalComponent,
-    CreateProposalModalComponent
+    CreateProposalModalComponent,
+    ConfirmResyncModalComponent
   ],
   imports: [
     CommonModule,

@@ -47,6 +47,7 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.nodeStatus = await this._refreshNodeStatus();
     this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
+    this._indexerService.hasIndexed.subscribe(hasIndexed => this.hasIndexed = hasIndexed);
 
     timer(0, 60000)
       .pipe(
@@ -66,7 +67,6 @@ export class AppComponent implements OnInit {
       .pipe(filter(_ => !!this.nodeStatus && this.nodeStatus.state === 'Started' && !this.nodeStatus.inIbd && !this._indexerService.indexing))
       .subscribe(async block => {
         await this._indexerService.index();
-        this.hasIndexed = true;
       });
 
     await this._checkAppUpdate();
