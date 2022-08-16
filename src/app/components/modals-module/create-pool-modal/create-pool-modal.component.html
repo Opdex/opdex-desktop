@@ -72,7 +72,7 @@
 
   <opdex-tx-quote-submit-button
     label="Add Liquidity Pool"
-    [disabled]="!context?.wallet || !isTokenValid || !!validatedTokenPool"
+    [disabled]="!context?.wallet?.address  || !isTokenValid || !!validatedTokenPool"
     (onSubmit)="createPool()">
   </opdex-tx-quote-submit-button>
 </ng-container>

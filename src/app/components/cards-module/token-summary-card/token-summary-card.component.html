@@ -67,7 +67,7 @@
         <div class="distribute">
           <opdex-tx-quote-submit-button
             size="small"
-            [disabled]="!context?.wallet"
+            [disabled]="!context?.wallet?.address"
             (onSubmit)="distribute()"
             label="Distribute {{token?.symbol}}">
           </opdex-tx-quote-submit-button>

@@ -41,7 +41,7 @@ export class TradeComponent implements OnInit, OnDestroy {
           filter(_ => !!this.pool),
           switchMap(_ => this._liquidityPoolService.buildLiquidityPool(this.pool.address)),
           tap(pool => this.pool = pool))
-        .subscribe(pool => console.log(pool)));
+        .subscribe());
   }
 
   handlePoolSelection(pool: LiquidityPool) {

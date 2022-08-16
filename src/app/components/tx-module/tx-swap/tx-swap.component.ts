@@ -346,7 +346,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
   }
 
   private async validateAllowance(): Promise<boolean> {
-    if (!this.tokenIn || !this.tokenOut || this.tokenIn.address === 'CRS' || !this.context?.wallet || !this.tokenInAmount.value) {
+    if (!this.tokenIn || !this.tokenOut || this.tokenIn.address === 'CRS' || !this.context?.wallet?.address  || !this.tokenInAmount.value) {
       this.allowance = null;
       return false;
     }
@@ -356,7 +356,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
   }
 
   private async validateBalance(): Promise<boolean> {
-    if (!this.tokenIn || !this.tokenOut || !this.context?.wallet || !this.tokenInAmount.value) {
+    if (!this.tokenIn || !this.tokenOut || !this.context?.wallet?.address  || !this.tokenInAmount.value) {
       return false;
     }
 

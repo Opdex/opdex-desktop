@@ -41,7 +41,7 @@
 
     <div class="flex-row-center-between" *ngIf="proposal.expiration < latestBlock">
       <small class="light">Expired</small>
-      <a class="no-decoration" href="javascript:void(0)" (click)="completeProposal()" *ngIf="!!context?.wallet === false">
+      <a class="no-decoration" href="javascript:void(0)" (click)="completeProposal()" *ngIf="!!context?.wallet?.address  === false">
         <small>Finalize Proposal</small>
       </a>
     </div>

@@ -8,7 +8,7 @@
       <mat-icon>{{icons.swap}}</mat-icon>
     </button>
 
-    <button mat-button (click)="login()" *ngIf="!context?.wallet">
+    <button mat-button (click)="login()" *ngIf="!context?.wallet?.address">
       <span class="wallet-indicator invalid"></span>
       <mat-icon>{{icons.wallet}}</mat-icon>
     </button>

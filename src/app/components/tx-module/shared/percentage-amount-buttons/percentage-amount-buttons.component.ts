@@ -41,7 +41,7 @@ export class PercentageAmountButtonsComponent implements OnChanges {
   }
 
   async ngOnChanges(): Promise<void> {
-    if (this.context?.wallet && this.positionType && this.token && this.contract) {
+    if (this.context?.wallet?.address  && this.positionType && this.token && this.contract) {
       let balance$: Promise<BigInt>;
 
       if (this.positionType === 'Balance') {

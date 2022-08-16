@@ -36,7 +36,7 @@ export class VaultCertificateCardComponent implements OnDestroy {
   }
 
   public get showRevocation(): boolean {
-    return this.context?.wallet && !this.vested && !this.cert.revoked
+    return this.context?.wallet?.address  && !this.vested && !this.cert.revoked
   }
 
   constructor(
@@ -56,7 +56,7 @@ export class VaultCertificateCardComponent implements OnDestroy {
   }
 
   revokeProposal(): void {
-    if (!this.context?.wallet || !this.cert) return;
+    if (!this.context?.wallet?.address  || !this.cert) return;
 
     const data = {
       childView: 'Revoke',

@@ -101,7 +101,7 @@ export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
             amountFixed.isZero ? this.reset() : this.calcTolerance();
             return amountFixed;
           }),
-          filter(amount => !!this.context?.wallet && amount.bigInt > 0),
+          filter(amount => !!this.context?.wallet?.address && amount.bigInt > 0),
           switchMap(amount => this.getAllowance(amount.formattedValue)),
           switchMap(allowance => this.validateBalance(allowance.requestToSpend)))
         .subscribe());
@@ -111,7 +111,7 @@ export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
         .pipe(
           tap(block => this.latestBlock = block),
           tap(_ => this.calcDeadline(this.deadlineThreshold)),
-          filter(_ => !!this.context?.wallet && !!this.pool),
+          filter(_ => !!this.context?.wallet?.address && !!this.pool),
           switchMap(_ => this.getAllowance()))
         .subscribe());
   }
@@ -200,7 +200,7 @@ export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
   }
 
   private async validateBalance(amount: FixedDecimal): Promise<boolean> {
-    if (!this.context?.wallet || !this.pool) {
+    if (!this.context?.wallet?.address  || !this.pool) {
       return false;
     }
 

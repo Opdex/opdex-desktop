@@ -48,7 +48,7 @@ export class TokenSummaryCardComponent implements OnDestroy {
   }
 
   async distribute(): Promise<void> {
-    if (!this.context?.wallet || !this.token) return;
+    if (!this.context?.wallet?.address  || !this.token) return;
 
     const quote = await this._tokenService.distributionQuote();
 

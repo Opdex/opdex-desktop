@@ -55,7 +55,7 @@
     <opdex-tx-quote-submit-button
       [warn]="balanceError"
       label="Quote {{isWithdrawal ? 'Withdrawal' : 'Vote'}}"
-      [disabled]="!form.valid || !context?.wallet || balanceError === undefined || !proposal"
+      [disabled]="!form.valid || !context?.wallet?.address  || balanceError === undefined || !proposal"
       (onSubmit)="submit()">
     </opdex-tx-quote-submit-button>
 

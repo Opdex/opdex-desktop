@@ -83,7 +83,7 @@ export class TxStakeStopComponent extends TxBase implements OnDestroy {
             amountFixed.isZero ? this.reset() : this.setFiatValue(amountFixed);
             return amountFixed;
           }),
-          filter(amount => !!this.context?.wallet && amount.bigInt > 0),
+          filter(amount => !!this.context?.wallet?.address && amount.bigInt > 0),
           switchMap(_ => this.validateStakingBalance()))
         .subscribe());
   }
@@ -120,7 +120,7 @@ export class TxStakeStopComponent extends TxBase implements OnDestroy {
   }
 
   private async validateStakingBalance(): Promise<boolean> {
-    if (!this.amount.value || !this.context?.wallet || !this.pool?.stakingToken) {
+    if (!this.amount.value || !this.context?.wallet?.address  || !this.pool?.stakingToken) {
       return false;
     }
 

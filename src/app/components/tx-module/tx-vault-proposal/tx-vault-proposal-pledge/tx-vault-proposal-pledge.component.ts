@@ -111,7 +111,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
   }
 
   private async validateBalance(): Promise<boolean> {
-    if (!this.amount.value || !this.context?.wallet || !this.crs) return false;
+    if (!this.amount.value || !this.context?.wallet?.address  || !this.crs) return false;
 
     const amountNeeded = new FixedDecimal(this.amount.value, this.crs.decimals);
 

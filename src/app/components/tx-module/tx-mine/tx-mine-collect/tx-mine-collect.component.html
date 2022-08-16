@@ -11,7 +11,7 @@
 
   <opdex-tx-quote-submit-button
     [warn]="balanceError"
-    [disabled]="!context?.wallet || balanceError === undefined"
+    [disabled]="!context?.wallet?.address  || balanceError === undefined"
     (onSubmit)="submit()">
   </opdex-tx-quote-submit-button>
 

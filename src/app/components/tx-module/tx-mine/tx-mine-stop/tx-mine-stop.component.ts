@@ -78,7 +78,7 @@ export class TxMineStopComponent extends TxBase implements OnDestroy {
             amountFixed.isZero ? this.reset() : this.setFiatValue(amountFixed);
             return amountFixed;
           }),
-          filter(amount => !!this.context?.wallet && amount.bigInt > 0),
+          filter(amount => !!this.context?.wallet?.address && amount.bigInt > 0),
           switchMap(_ => this.validateMiningBalance()))
         .subscribe());
   }
@@ -115,7 +115,7 @@ export class TxMineStopComponent extends TxBase implements OnDestroy {
   }
 
   private async validateMiningBalance(): Promise<boolean> {
-    if (!this.amount.value || !this.context?.wallet || !this.pool) {
+    if (!this.amount.value || !this.context?.wallet?.address  || !this.pool) {
       return false;
     }
 

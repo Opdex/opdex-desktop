@@ -259,7 +259,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   }
 
   private async validateBalance(token: Token, amount: FixedDecimal): Promise<boolean> {
-    if (!this.context?.wallet || !this.pool) return false;
+    if (!this.context?.wallet?.address  || !this.pool) return false;
 
     return await this._validateBalance(token, amount);
   }

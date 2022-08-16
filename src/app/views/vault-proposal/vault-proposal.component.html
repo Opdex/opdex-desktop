@@ -63,7 +63,7 @@
           color="primary"
           class="small"
           (click)="quoteCompleteProposal(proposal.proposalId)"
-          *ngIf="context?.wallet && proposal.expiration < latestBlock && proposal.status !== 'Complete'">
+          *ngIf="context?.wallet?.address  && proposal.expiration < latestBlock && proposal.status !== 'Complete'">
           Finalize
         </button>
 
@@ -71,7 +71,7 @@
           color="primary"
           class="small"
           (click)="openTransactionView('pledge', false)"
-          *ngIf="context?.wallet && proposal.status === 'Pledge' && proposal.expiration >= latestBlock">
+          *ngIf="context?.wallet?.address  && proposal.status === 'Pledge' && proposal.expiration >= latestBlock">
           Pledge
         </button>
 
@@ -79,7 +79,7 @@
           color="primary"
           class="small"
           (click)="openTransactionView('vote', false)"
-          *ngIf="context?.wallet && proposal.status === 'Vote' && proposal.expiration >= latestBlock">
+          *ngIf="context?.wallet?.address  && proposal.status === 'Vote' && proposal.expiration >= latestBlock">
           Vote
         </button>
       </div>
@@ -146,7 +146,7 @@
   </div>
 </div>
 
-<div class="offset-section pt-5 pb-4" *ngIf="!!context?.wallet && (userPledge || userVote)">
+<div class="offset-section pt-5 pb-4" *ngIf="!!context?.wallet?.address  && (userPledge || userVote)">
   <div class="container">
     <div class="row">
       <div class="col-12">
