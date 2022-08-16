@@ -4,5 +4,6 @@ import { version } from '../../package.json';
 export const environment = {
   production: true,
   network: Network.Mainnet,
-  version: version
+  version: version,
+  minimumNodeVersion: '1.3.2'
 };

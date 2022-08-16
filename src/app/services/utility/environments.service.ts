@@ -30,6 +30,10 @@ export class EnvironmentsService {
     return new SemVer(environment.version);
   }
 
+  public get minNodeVersion(): SemVer {
+    return new SemVer(environment.minimumNodeVersion);
+  }
+
   constructor(private _electron: ElectronService) { }
 
   async setNetwork(): Promise<void> {

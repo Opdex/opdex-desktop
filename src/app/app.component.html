@@ -15,8 +15,12 @@
           </div>
 
           <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
-            <a class="notification-banner clickable primary flex-row-center-center p-2" [href]="updateUrl" target="_blank" *ngIf="!!updateUrl">
+            <a class="notification-banner clickable primary flex-row-center-center p-2" [href]="appUpdateUrl" target="_blank" *ngIf="!!appUpdateUrl">
               <mat-icon class="small mr-2">{{icons.update}}</mat-icon> Update Available
+            </a>
+
+            <a class="notification-banner clickable warning flex-row-center-center p-2" href="https://github.com/stratisproject/CirrusCore/releases" target="_blank" *ngIf="!!nodeUpdate && !appUpdateUrl">
+              <mat-icon class="small mr-2">{{icons.update}}</mat-icon> Node Update Required
             </a>
 
             <router-outlet #outlet="outlet"></router-outlet>

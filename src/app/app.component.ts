@@ -30,7 +30,8 @@ export class AppComponent implements OnInit {
   menuOpen = false;
   isPinned = true;
   hasIndexed = false;
-  updateUrl: string;
+  appUpdateUrl: string;
+  nodeUpdate: boolean;
 
   constructor(
     public overlayContainer: OverlayContainer,
@@ -70,6 +71,7 @@ export class AppComponent implements OnInit {
       });
 
     await this._checkAppUpdate();
+    await this._checkNodeVersion();
   }
 
   public handlePinnedToggle(event: boolean): void {
@@ -92,8 +94,14 @@ export class AppComponent implements OnInit {
   private async _checkAppUpdate(): Promise<void> {
     const latestVersion = await firstValueFrom(this._githubApi.getLatestVersion());
     if (latestVersion && this._env.version.compare(latestVersion.tag_name) === 1) {
-      this.updateUrl = latestVersion.html_url;
+      this.appUpdateUrl = latestVersion.html_url;
     }
+  }
+
+  private _checkNodeVersion(): void {
+    // Adjust version patch (ex: 1.3.2.0 to 1.3.2)
+    const currentVersion = this._nodeService.status.version.split('.').slice(0, 3).join('.');
+    this.nodeUpdate = this._env.minNodeVersion.compare(currentVersion) === 1;
   }
 
   private setTheme(theme: string): void {
