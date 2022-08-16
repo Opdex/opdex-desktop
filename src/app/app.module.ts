@@ -40,6 +40,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { TradeComponent } from './views/trade/trade.component';
 import { WalletComponent } from './views/wallet/wallet.component';
 import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
+import { StatusComponent } from './views/status/status.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.co
     TokenComponent,
     TradeComponent,
     WalletComponent,
-    VaultProposalComponent
+    VaultProposalComponent,
+    StatusComponent
   ],
   imports: [
     BrowserModule,

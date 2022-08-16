@@ -1,0 +1,14 @@
+@import 'src/scss/bootstrap-grid';
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+@media (min-width: map_get($grid-breakpoints, sm)) {
+  .button-group {
+    margin-top: 0px;
+    justify-content: end;
+  }
+}

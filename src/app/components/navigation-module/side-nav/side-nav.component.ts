@@ -1,3 +1,4 @@
+import { Network } from '@enums/networks';
 import { UserContext } from '@models/user-context';
 import { NodeService } from '@services/platform/node.service';
 import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
@@ -7,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Router } from '@angular/router';
 import { BugReportModalComponent } from '@components/modals-module/bug-report-modal/bug-report-modal.component';
+import { EnvironmentsService } from '@services/utility/environments.service';
 
 @Component({
   selector: 'opdex-side-nav',
@@ -20,7 +22,7 @@ export class SideNavComponent implements OnDestroy {
   isPinned: boolean = true;
   latestSyncedBlock$: Observable<number>;
   icons = Icons;
-  network: string;
+  network: Network;
   subscription = new Subscription();
   pendingTransactions: string[] = [];
   context: UserContext;
@@ -30,16 +32,11 @@ export class SideNavComponent implements OnDestroy {
     private _userContextService: UserContextService,
     private _indexService: NodeService,
     private _router: Router,
-    // private _transactionsService: TransactionsService,
-    // private _env: EnvironmentsService,
-    // private _authService: AuthService
+    private _env: EnvironmentsService
   ) {
     this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
-    // this.subscription.add(this._transactionsService.getBroadcastedTransactions$().subscribe(txs => this.pendingTransactions = txs));
     this.latestSyncedBlock$ = this._indexService.latestBlock$;
-
-    // const { network } = this._env;
-    // this.network = network;
+    this.network = this._env.network;
   }
 
   togglePin(): void {

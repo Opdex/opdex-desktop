@@ -64,38 +64,17 @@
           <span class="secondary">Wallet</span>
         </a>
       </li>
+      <li>
+        <a mat-button class="transparent" (click)="emitRouteChange('/status')" routerLink="/status" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Status' : null" matTooltipPosition="right">
+          <mat-icon>{{icons.status}}</mat-icon>
+          <span class="secondary">Status</span>
+        </a>
+      </li>
     </ul>
 
     <div class="space-between"></div>
 
     <div class="sidebar-nav secondary mb-2">
-      <div class="flex-row-center no-wrap"  *ngIf="pendingTransactions?.length > 0">
-        <button mat-button [matMenuTriggerFor]="qMenu" class="small d-inline pl-0 pr-0 transparent">
-          <mat-icon class="swap mr-2">{{icons.send}}</mat-icon>
-          <small>Pending Transactions</small>
-        </button>
-
-        <mat-menu #qMenu="matMenu" class="queue-panel pl-2 pr-2 pb-0 pt-0" style="min-height: auto">
-          <div class="flex-row-center mb-1" *ngIf="pendingTransactions.length > 0; else noTransactions">
-            <mat-icon class="tiny green mr-2">{{icons.checkOutline}}</mat-icon>
-            <small>Pending Transactions</small>
-          </div>
-
-          <ng-template #noTransactions>
-            <small>No Pending Transactions</small>
-          </ng-template>
-
-          <div class="queue-item flex-column" *ngFor="let tx of pendingTransactions; let i = index">
-            <small class="light pt-1 pb-1 overflow-ellipsis">{{tx}}</small>
-            <mat-divider style="position: relative;" *ngIf="i + 1 < pendingTransactions.length"></mat-divider>
-          </div>
-        </mat-menu>
-      </div>
-
-      <div class="flex-row-center no-wrap mb-1">
-        <opdex-theme-toggle></opdex-theme-toggle>
-      </div>
-
       <div class="flex-row-center">
         <opdex-currency-select></opdex-currency-select>
       </div>
@@ -107,25 +86,8 @@
         </button>
       </div>
 
-      <div class="flex-row-center no-wrap">
-        <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="openBugReport()">
-          <mat-icon class="mr-2">{{icons.bug}}</mat-icon>
-          <small>Report Issue</small>
-        </button>
-      </div>
-
-      <div class="flex-row-center no-wrap">
-        <a mat-button class="small d-inline pl-0 pr-0 transparent" href="https://docs.opdex.com/docs/knowledge-center-overview" target="_blank" rel="noopener noreferrer">
-          <mat-icon class="mr-2">{{icons.help}}</mat-icon>
-          <small>Help</small>
-        </a>
-      </div>
-
-      <div class="flex-row-center no-wrap">
-        <a mat-button class="small d-inline pl-0 pr-0 transparent" href="https://interflux.stratisplatform.com" target="_blank" rel="noopener noreferrer">
-          <mat-icon class="mr-2">{{icons.interflux}}</mat-icon>
-          <small>InterFlux</small>
-        </a>
+      <div class="flex-row-center no-wrap mt-1">
+        <opdex-theme-toggle></opdex-theme-toggle>
       </div>
 
       <div class="flex-row-center no-wrap" *ngIf="context?.wallet?.address">
@@ -135,30 +97,36 @@
         </button>
       </div>
 
-      <div class="pl-2">
-        <div class="button-group mt-3">
-          <a href="https://github.com/opdex" target="_blank" rel="noopener" matTooltip="Github">
+      <div class="pl-1">
+        <div class="button-group mt-3 flex-row-center">
+          <a href="https://github.com/opdex" target="_blank" rel="noopener noreferrer" matTooltip="Github">
             <img class="social-icon" src="assets/social/github-blue.svg" alt="Github Logo">
           </a>
 
-          <a href="https://twitter.com/OpdexProtocol" target="_blank" rel="noopener" matTooltip="Twitter">
+          <a href="https://twitter.com/OpdexProtocol" target="_blank" rel="noopener noreferrer" matTooltip="Twitter">
             <img class="social-icon" src="assets/social/twitter-blue.svg" alt="Twitter Logo">
           </a>
 
-          <a href="https://discord.gg/TnWVDTTrjf" target="_blank" rel="noreferrer" matTooltip="Discord">
+          <a href="https://discord.gg/TnWVDTTrjf" target="_blank" rel="noopener noreferrer" matTooltip="Discord">
             <img class="social-icon" src="assets/social/discord-blue.svg" alt="Discord Logo">
           </a>
 
-          <a href="https://reddit.com/r/opdex" target="_blank" rel="noreferrer" matTooltip="Reddit">
+          <a href="https://reddit.com/r/opdex" target="_blank" rel="noopener noreferrer" matTooltip="Reddit">
             <img class="social-icon" src="assets/social/reddit-blue.svg" alt="Reddit Logo">
           </a>
 
-          <a href="https://www.youtube.com/channel/UCFFfUIa-pwOXevO9HCWbaDg" target="_blank" rel="noreferrer" matTooltip="YouTube">
+          <a href="https://www.youtube.com/channel/UCFFfUIa-pwOXevO9HCWbaDg" target="_blank" rel="noopener noreferrer" matTooltip="YouTube">
             <img class="social-icon" src="assets/social/youtube-blue.svg" alt="YoutTube Logo">
+          </a>
+
+          <a matTooltip="InterFlux" href="https://interflux.stratisplatform.com" target="_blank" rel="noopener noreferrer">
+            <mat-icon color="primary" class="small">{{icons.interflux}}</mat-icon>
           </a>
         </div>
 
-        <a mat-button class="tiny body-content d-inline pl-0 pr-0 transparent" href="https://opdex.com/assets/opdex-platform-ui-terms-of-use.pdf" target="_blank" rel="noopener"><small>Terms of Use</small></a>
+        <a mat-button class="tiny body-content d-inline pl-0 pr-0 transparent" href="https://opdex.com/assets/opdex-platform-ui-terms-of-use.pdf" target="_blank" rel="noopener">
+          <small>Terms of Use</small>
+        </a>
       </div>
     </div>
 

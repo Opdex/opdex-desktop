@@ -1,3 +1,4 @@
+import { StatusComponent } from './views/status/status.component';
 import { WalletComponent } from './views/wallet/wallet.component';
 import { TradeComponent } from './views/trade/trade.component';
 import { MiningComponent } from './views/mining/mining.component';
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'mining', component: MiningComponent },
   { path: 'trade', component: TradeComponent },
   { path: 'wallet', component: WalletComponent },
+  { path: 'status', component: StatusComponent },
   { path: '**', redirectTo: '' }
 ];
 
