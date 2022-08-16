@@ -1,0 +1,14 @@
+<h3>Terms and Conditions</h3>
+
+<p>This is experimental. I understand that I am using the software as is, at my own risk. I agree that the software may contain issues and that I cannot hold developers or anybody responsible for issues this software may contain which or any side affects of said issues.
+  This software does not sign transactions or directly broadcast from users wallet. I understand that by using this software for transaction quotes, I accept all responsibility of broadcasting quoted transactions and all side affects of said transactions.</p>
+
+<ng-container *ngIf="context.termsAcceptance.acceptedDate">
+  <p class="light mb-0">Accepted {{context.termsAcceptance.acceptedDate | date:'short'}}</p>
+  <p class="light mb-0">Version: {{context.termsAcceptance.acceptedVersion}}</p>
+</ng-container>
+
+<div class="flex-row-center-center" *ngIf="data?.walletAddress || (context.wallet.address && !context.termsAcceptance.acceptedDate)">
+  <button mat-stroked-button (click)="close(false)" class="w-100 mr-2">Disagree</button>
+  <button mat-flat-button color="primary" (click)="close(true)" cdkFocusInitial class="w-100">I Agree</button>
+</div>

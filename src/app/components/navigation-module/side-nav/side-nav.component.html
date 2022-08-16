@@ -64,12 +64,6 @@
           <span class="secondary">Wallet</span>
         </a>
       </li>
-      <li>
-        <a mat-button class="transparent" (click)="emitRouteChange('/status')" routerLink="/status" routerLinkActive="active" [matTooltip]="!isPinned && !mobileMenuOpen ? 'Status' : null" matTooltipPosition="right">
-          <mat-icon>{{icons.status}}</mat-icon>
-          <span class="secondary">Status</span>
-        </a>
-      </li>
     </ul>
 
     <div class="space-between"></div>
@@ -84,6 +78,13 @@
           <mat-icon class="mr-2" [matTooltip]="network" #networkTooltip="matTooltip">languages</mat-icon>
           <small>#{{block | formatNumber:0}}</small>
         </button>
+      </div>
+
+      <div class="flex-row-center no-wrap">
+        <a mat-button class="body-content small d-inline pl-0 pr-0 transparent" (click)="emitRouteChange('/status')" routerLink="/status">
+          <mat-icon class="mr-2">{{icons.status}}</mat-icon>
+          <small>Status</small>
+        </a>
       </div>
 
       <div class="flex-row-center no-wrap mt-1">
@@ -124,9 +125,9 @@
           </a>
         </div>
 
-        <a mat-button class="tiny body-content d-inline pl-0 pr-0 transparent" href="https://opdex.com/assets/opdex-platform-ui-terms-of-use.pdf" target="_blank" rel="noopener">
+        <button mat-button class="mt-2 small d-inline pl-0 pr-0" (click)="openTerms()">
           <small>Terms of Use</small>
-        </a>
+        </button>
       </div>
     </div>
 

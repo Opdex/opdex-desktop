@@ -20,6 +20,7 @@ import { HelpModalComponent } from './help-modal/help-modal.component';
 import { CreateProposalModalComponent } from './create-proposal-modal/create-proposal-modal.component';
 import { CreatePoolModalComponent } from './create-pool-modal/create-pool-modal.component';
 import { ConfirmResyncModalComponent } from './confirm-resync-modal/confirm-resync-modal.component';
+import { TermsModalComponent } from './terms-modal/terms-modal.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { ConfirmResyncModalComponent } from './confirm-resync-modal/confirm-resy
     HelpModalComponent,
     CreatePoolModalComponent,
     CreateProposalModalComponent,
-    ConfirmResyncModalComponent
+    ConfirmResyncModalComponent,
+    TermsModalComponent
   ],
   imports: [
     CommonModule,

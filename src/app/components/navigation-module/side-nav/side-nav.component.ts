@@ -1,3 +1,4 @@
+import { TermsModalComponent } from '@components/modals-module/terms-modal/terms-modal.component';
 import { Network } from '@enums/networks';
 import { UserContext } from '@models/user-context';
 import { NodeService } from '@services/platform/node.service';
@@ -50,6 +51,10 @@ export class SideNavComponent implements OnDestroy {
 
   openBugReport(): void {
     this.dialog.open(BugReportModalComponent, { width: '500px' });
+  }
+
+  openTerms(): void {
+    this.dialog.open(TermsModalComponent, { width: '500px' });
   }
 
   logout(): void {
