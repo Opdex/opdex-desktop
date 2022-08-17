@@ -60,7 +60,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
         .subscribe());
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(block => this.latestBlock = block));
   }
 

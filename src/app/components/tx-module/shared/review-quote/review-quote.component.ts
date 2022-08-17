@@ -1,4 +1,4 @@
-import { NodeService } from '@services/platform/node.service';
+import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionsService } from '@services/platform/transactions.service';
 import { filter, switchMap, skip } from 'rxjs/operators';
 import { tap } from 'rxjs/operators';
@@ -43,7 +43,7 @@ export class ReviewQuoteComponent implements OnDestroy {
   public constructor(
     public _bottomSheetRef: MatBottomSheetRef<ReviewQuoteComponent>,
     private _transactionsService: TransactionsService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: TransactionQuote
   ) {
     this.quote = this.data;
@@ -77,7 +77,7 @@ export class ReviewQuoteComponent implements OnDestroy {
         .subscribe(_ => this._bottomSheetRef.dismiss(this.txHash)));
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           skip(1),
           tap(block => this.latestBlock = block),

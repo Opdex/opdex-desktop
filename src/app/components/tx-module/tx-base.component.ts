@@ -1,4 +1,4 @@
-
+import { IndexerService } from '@services/platform/indexer.service';
 import { WalletService } from '@services/platform/wallet.service';
 import { Injector } from '@angular/core';
 import { ReviewQuoteComponent } from './shared/review-quote/review-quote.component';
@@ -8,7 +8,6 @@ import { Subscription } from 'rxjs';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { AllowanceValidation } from '@models/allowance-validation';
 import { UserContext } from '@models/user-context';
-import { NodeService } from '@services/platform/node.service';
 import { ITransactionQuote } from '@interfaces/transaction-quote.interface';
 import { Token } from '@models/platform/token';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
@@ -21,7 +20,7 @@ export abstract class TxBase {
   private _userContext: UserContextService;
   private _bottomSheet: MatBottomSheet;
   private _walletService: WalletService;
-  protected _nodeService: NodeService;
+  protected _indexerService: IndexerService;
 
   constructor(
     protected _injector: Injector
@@ -29,7 +28,7 @@ export abstract class TxBase {
     this._userContext = this._injector.get(UserContextService);
     this._bottomSheet = this._injector.get(MatBottomSheet);
     this._walletService = this._injector.get(WalletService);
-    this._nodeService = this._injector.get(NodeService);
+    this._indexerService = this._injector.get(IndexerService);
     this.context$ = this._userContext.context$.subscribe(context => this.context = context);
   }
 

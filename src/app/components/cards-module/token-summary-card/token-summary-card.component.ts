@@ -1,7 +1,7 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TokenService } from '@services/platform/token.service';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { CurrencyService } from '@services/platform/currency.service';
-import { NodeService } from '@services/platform/node.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
@@ -27,14 +27,14 @@ export class TokenSummaryCardComponent implements OnDestroy {
   currency: ICurrency;
 
   constructor(
-    private _indexService: NodeService,
+    private _indexerService: IndexerService,
     private _userContextService: UserContextService,
     private _bottomSheet: MatBottomSheet,
     private _currency: CurrencyService,
     private _tokenService: TokenService
   ) {
     this.subscription.add(
-      this._indexService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(block => this.latestBlock = block));
 
     this.subscription.add(

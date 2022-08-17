@@ -1,7 +1,7 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { VaultService } from '@services/platform/vault.service';
 import { CreateProposalModalComponent } from '@components/modals-module/create-proposal-modal/create-proposal-modal.component';
 import { MatDialog } from '@angular/material/dialog';
-import { NodeService } from '@services/platform/node.service';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Icons } from 'src/app/enums/icons';
@@ -40,14 +40,14 @@ export class VaultCertificateCardComponent implements OnDestroy {
   }
 
   constructor(
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _userContextService: UserContextService,
     private _dialog: MatDialog,
     private _vaultService: VaultService,
     private _bottomSheet: MatBottomSheet,
   ) {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(block => this.latestBlock = block));
 
     this.subscription.add(

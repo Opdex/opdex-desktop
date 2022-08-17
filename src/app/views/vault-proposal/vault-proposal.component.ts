@@ -1,5 +1,5 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { WalletService } from '@services/platform/wallet.service';
-import { NodeService } from '@services/platform/node.service';
 import { Component, OnDestroy } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,7 +38,7 @@ export class VaultProposalComponent implements OnDestroy {
   constructor(
     private _vaultService: VaultService,
     private _tokensService: TokenService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _route: ActivatedRoute,
     private _userContextService: UserContextService,
     private _bottomSheet: MatBottomSheet,
@@ -59,7 +59,7 @@ export class VaultProposalComponent implements OnDestroy {
         .subscribe(context => this.context = context));
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
           switchMap(_ => this.getVault()),

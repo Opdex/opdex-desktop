@@ -1,5 +1,5 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionView } from '@enums/transaction-view';
-import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { Icons } from '@enums/icons';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
@@ -22,7 +22,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   constructor(
     private _route: ActivatedRoute,
     private _liquidityPoolService: LiquidityPoolService,
-    private _nodeServices: NodeService,
+    private _indexerService: IndexerService,
     private _router: Router
   ) { }
 
@@ -46,7 +46,7 @@ export class PoolComponent implements OnInit, OnDestroy {
     }
 
     this.subscription.add(
-      this._nodeServices.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
           switchMap(_ =>  this._liquidityPoolService.buildLiquidityPool(address)))

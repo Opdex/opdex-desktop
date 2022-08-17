@@ -1,7 +1,7 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TermsModalComponent } from '@components/modals-module/terms-modal/terms-modal.component';
 import { Network } from '@enums/networks';
 import { UserContext } from '@models/user-context';
-import { NodeService } from '@services/platform/node.service';
 import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Icons } from '@enums/icons';
@@ -31,12 +31,12 @@ export class SideNavComponent implements OnDestroy {
   constructor(
     public dialog: MatDialog,
     private _userContextService: UserContextService,
-    private _indexService: NodeService,
+    private _indexerService: IndexerService,
     private _router: Router,
     private _env: EnvironmentsService
   ) {
     this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
-    this.latestSyncedBlock$ = this._indexService.latestBlock$;
+    this.latestSyncedBlock$ = this._indexerService.latestBlock$;
     this.network = this._env.network;
   }
 

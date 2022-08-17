@@ -1,3 +1,4 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { tap } from 'rxjs/operators';
 import { WalletService } from '@services/platform/wallet.service';
 import { UserContextService } from '@services/utility/user-context.service';
@@ -7,7 +8,6 @@ import { switchMap } from 'rxjs/operators';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { UserContext } from '@models/user-context';
 import { Token } from '@models/platform/token';
-import { NodeService } from '@services/platform/node.service';
 
 @Component({
   selector: 'opdex-percentage-amount-buttons',
@@ -31,7 +31,7 @@ export class PercentageAmountButtonsComponent implements OnChanges {
 
   constructor(
     private _userContextService: UserContextService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _walletService: WalletService
   ) {
     this.contextSubscription.add(
@@ -69,7 +69,7 @@ export class PercentageAmountButtonsComponent implements OnChanges {
       }
 
       this.positionSubscription.add(
-        this._nodeService.latestBlock$
+        this._indexerService.latestBlock$
           .pipe(switchMap(_ => balance$))
           .subscribe(result => this.balance = FixedDecimal.FromBigInt(result, this.token.decimals)));
     }

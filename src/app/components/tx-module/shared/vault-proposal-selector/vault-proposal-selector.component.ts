@@ -1,8 +1,8 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { Component, OnChanges, OnDestroy, Input, Output, EventEmitter } from "@angular/core";
 import { FormGroup, FormControl, FormBuilder, Validators } from "@angular/forms";
 import { Icons } from "@enums/icons";
 import { VaultProposal } from "@models/platform/vault-proposal";
-import { NodeService } from "@services/platform/node.service";
 import { VaultService } from "@services/platform/vault.service";
 import { Subscription, tap, switchMap, debounceTime, distinctUntilChanged } from "rxjs";
 
@@ -31,14 +31,14 @@ export class VaultProposalSelectorComponent implements OnChanges, OnDestroy {
   constructor(
     private _fb: FormBuilder,
     private _vaultService: VaultService,
-    private _nodeService: NodeService
+    private _indexerService: IndexerService
   ) {
     this.form = this._fb.group({
       proposalId: [undefined, [Validators.required, Validators.min(1)]],
     });
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
           switchMap(_ => this._getProposal()))

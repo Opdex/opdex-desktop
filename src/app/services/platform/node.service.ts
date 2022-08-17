@@ -6,6 +6,8 @@ import { BehaviorSubject, filter, Observable } from 'rxjs';
 export class NodeService {
   private _block: number;
   private _status: INodeStatus;
+
+  // Block store block height
   private _block$ = new BehaviorSubject<number>(null);
   private _status$ = new BehaviorSubject<INodeStatus>(null);
 

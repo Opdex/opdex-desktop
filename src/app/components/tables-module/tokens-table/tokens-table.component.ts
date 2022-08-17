@@ -1,6 +1,6 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { CurrencyService } from '@services/platform/currency.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { NodeService } from '@services/platform/node.service';
 import { TokenService } from '@services/platform/token.service';
 import { Token } from '@models/platform/token';
 import { Component, Input, ViewChild, OnDestroy, OnInit } from '@angular/core';
@@ -37,7 +37,7 @@ export class TokensTableComponent implements OnInit, OnDestroy {
   constructor(
     private _router: Router,
     private _tokensService: TokenService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
   ) {
@@ -47,7 +47,7 @@ export class TokensTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this.getTokens$(this.skip, this.take)),
           switchMap(_ => this._currencyService.selectedCurrency$),

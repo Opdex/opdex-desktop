@@ -1,11 +1,10 @@
-import { switchMap } from 'rxjs';
+import { IndexerService } from '@services/platform/indexer.service';
+import { switchMap, Subscription } from 'rxjs';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { WalletService } from '@services/platform/wallet.service';
-import { NodeService } from '@services/platform/node.service';
 import { Icons } from '@enums/icons';
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 
 @Component({
@@ -28,7 +27,7 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
   skip = 0;
 
   constructor(
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _walletService: WalletService,
     private _userContextService: UserContextService
   ) { }
@@ -37,7 +36,7 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
     this.context = this._userContextService.userContext;
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(switchMap(_ => this._getTransactions()))
         .subscribe());
   }

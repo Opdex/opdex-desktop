@@ -1,14 +1,13 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TokenService } from '@services/platform/token.service';
 import { CurrencyService } from '@services/platform/currency.service';
 import { switchMap } from 'rxjs';
-import { NodeService } from '@services/platform/node.service';
 import { TransactionView } from '@enums/transaction-view';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 import { UserContext } from '@models/user-context';
 import { Subscription } from 'rxjs';
-import { EnvironmentsService } from '@services/utility/environments.service';
 import { WalletService } from '@services/platform/wallet.service';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -35,11 +34,10 @@ export class WalletComponent implements OnInit, OnDestroy {
 
   constructor(
     private _userContextService: UserContextService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _walletService: WalletService,
     private _currencyService: CurrencyService,
     private _tokenService: TokenService,
-    private _env: EnvironmentsService,
     private _router: Router
   ) { }
 
@@ -52,7 +50,7 @@ export class WalletComponent implements OnInit, OnDestroy {
         .subscribe());
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this._setCrsToken()),
           switchMap(_ => this._walletService.getBalance('CRS', this.context.wallet.address)),

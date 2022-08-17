@@ -107,7 +107,7 @@ export class TxProvideRemoveComponent extends TxBase implements OnDestroy {
         .subscribe());
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
           tap(_ => this.calcDeadline(this.deadlineThreshold)),

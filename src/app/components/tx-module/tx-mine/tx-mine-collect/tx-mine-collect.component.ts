@@ -24,7 +24,7 @@ export class TxMineCollectComponent extends TxBase implements OnDestroy {
     super(_injector);
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(switchMap(_ => this.validateMiningBalance()))
         .subscribe());
   }

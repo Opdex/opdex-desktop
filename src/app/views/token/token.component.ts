@@ -1,7 +1,7 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionView } from '@enums/transaction-view';
 import { TokenService } from '@services/platform/token.service';
 import { Subscription, tap, switchMap } from 'rxjs';
-import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -29,7 +29,7 @@ export class TokenComponent implements OnInit, OnDestroy {
   constructor(
     private _route: ActivatedRoute,
     private _liquidityPoolService: LiquidityPoolService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _tokenService: TokenService,
     private _router: Router
   ) { }
@@ -54,7 +54,7 @@ export class TokenComponent implements OnInit, OnDestroy {
     }
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(latestBlock => this.latestBlock = latestBlock),
           switchMap(_ => this._setPoolAndToken(address)))

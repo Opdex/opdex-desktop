@@ -1,9 +1,9 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
 import { UserContext } from '@models/user-context';
 import { UserContextService } from '@services/utility/user-context.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { MiningGovernance } from '@models/platform/mining-governance';
-import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { MiningGovernanceService } from '@services/platform/mining-governance.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -26,7 +26,7 @@ export class MiningComponent implements OnInit, OnDestroy {
 
   constructor(
     private _miningGovernanceService: MiningGovernanceService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _liquidityPoolService: LiquidityPoolService,
     private _userContextService: UserContextService,
     private _bottomSheet: MatBottomSheet,
@@ -38,7 +38,7 @@ export class MiningComponent implements OnInit, OnDestroy {
         .subscribe(context => this.context = context));
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(latestBlock => this._miningGovernanceService.buildMiningGovernance(latestBlock)),
           tap(gov => this.miningGovernance = gov),

@@ -37,7 +37,7 @@ export class StatusComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(latestBlock => this.latestBlock = latestBlock));
 
     this.subscription.add(

@@ -66,7 +66,7 @@ export class TxVaultProposalVoteComponent extends TxBase implements OnInit, OnCh
         .subscribe());
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(block => this.latestBlock = block));
   }
 

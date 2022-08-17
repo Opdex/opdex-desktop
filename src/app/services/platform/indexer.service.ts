@@ -7,7 +7,7 @@ import { OpdexDB } from '@services/database/db.service';
 import { Injectable } from "@angular/core";
 import { PoolRepositoryService } from "@services/database/pool-repository.service";
 import { TokenRepositoryService } from "@services/database/token-repository.service";
-import { BehaviorSubject, firstValueFrom } from "rxjs";
+import { BehaviorSubject, filter, firstValueFrom, Observable } from "rxjs";
 import { MarketService } from "./market.service";
 import { NodeService } from "./node.service";
 import { LiquidityPoolService } from './liquidity-pool.service';
@@ -17,6 +17,18 @@ import { MiningGovernanceService } from './mining-governance.service';
 export class IndexerService {
   indexing: boolean = false;
   hasIndexed = new BehaviorSubject(false);
+
+  // Latest indexed block
+  private _block: number;
+  private _block$ = new BehaviorSubject<number>(null);
+
+  public get latestBlock() {
+    return this._block;
+  }
+
+  public get latestBlock$(): Observable<number> {
+    return this._block$.asObservable().pipe(filter(block => !!block));
+  }
 
   constructor(
     private _nodeService: NodeService,
@@ -165,6 +177,8 @@ export class IndexerService {
       id: 1
     });
 
+    this._block = nodeStatus.blockStoreHeight;
+    this._block$.next(this._block);
     this.indexing = false;
     this.hasIndexed.next(true);
   }

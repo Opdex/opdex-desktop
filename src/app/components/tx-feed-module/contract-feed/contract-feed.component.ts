@@ -1,9 +1,9 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Icons } from '@enums/icons';
 import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
-import { NodeService } from '@services/platform/node.service';
 import { TransactionsService } from '@services/platform/transactions.service';
 import { Subscription, tap, switchMap, filter } from 'rxjs';
 
@@ -32,7 +32,7 @@ export class ContractFeedComponent {
 
   constructor(
     private _transactionsService: TransactionsService,
-    private _nodeService: NodeService) { }
+    private _indexerService: IndexerService) { }
 
   ngOnChanges(): void {
     if (this.contract) {
@@ -62,7 +62,7 @@ export class ContractFeedComponent {
           .subscribe());
 
       this.subscription.add(
-        this._nodeService.latestBlock$
+        this._indexerService.latestBlock$
           .pipe(
             tap(latestBlock => {
               this.latestBlock = latestBlock;

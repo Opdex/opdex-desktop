@@ -1,4 +1,4 @@
-import { NodeService } from '@services/platform/node.service';
+import { IndexerService } from '@services/platform/indexer.service';
 import { Component, EventEmitter, Input, Output, OnDestroy } from '@angular/core';
 import { skip, filter, switchMap } from 'rxjs/operators';
 import { Icons } from 'src/app/enums/icons';
@@ -21,10 +21,10 @@ export class LiquidityPoolSelectorComponent implements OnDestroy {
 
   constructor(
     private _liquidityPoolsService: LiquidityPoolService,
-    private _nodeService: NodeService
+    private _indexerService: IndexerService
   ) {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           skip(1),
           filter(_ => !!this.pool),

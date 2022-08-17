@@ -1,6 +1,6 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { CurrencyService } from '@services/platform/currency.service';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { NodeService } from '@services/platform/node.service';
 import { Component, ViewChild, OnDestroy, OnInit, Input } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
@@ -32,7 +32,7 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
 
   constructor(
     private _router: Router,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService
   ) {
@@ -42,7 +42,7 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this.getLiquidityPools$(this.skip, this.take)),
           switchMap(_ => this._currencyService.selectedCurrency$),

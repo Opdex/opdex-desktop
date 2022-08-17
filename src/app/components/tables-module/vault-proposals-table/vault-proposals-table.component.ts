@@ -1,6 +1,6 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { IPagination } from '@interfaces/database.interface';
 import { VaultService } from '@services/platform/vault.service';
-import { NodeService } from '@services/platform/node.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Vault } from '@models/platform/vault';
@@ -39,7 +39,7 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
 
   constructor(
     private _vaultService: VaultService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _userContext: UserContextService,
     private _bottomSheet: MatBottomSheet,
     private _router: Router
@@ -50,7 +50,7 @@ export class VaultProposalsTableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
           switchMap(_ => this._vaultService.getVault()),

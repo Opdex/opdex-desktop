@@ -71,7 +71,7 @@ export class TxStakeStartComponent extends TxBase implements OnDestroy {
         .subscribe());
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
       .pipe(
         filter(_ => !!this.context.isLoggedIn),
         switchMap(_ => this.getAllowance()),

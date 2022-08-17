@@ -1,3 +1,4 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { TokenService } from '@services/platform/token.service';
 import { WalletService } from '@services/platform/wallet.service';
 import { Subscription, switchMap, tap } from 'rxjs';
@@ -7,7 +8,6 @@ import { AllowanceValidation } from '@models/allowance-validation';
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { ReviewQuoteComponent } from '../review-quote/review-quote.component';
 import { take } from 'rxjs/operators';
-import { NodeService } from '@services/platform/node.service';
 
 @Component({
   selector: 'opdex-allowance-validation',
@@ -23,12 +23,12 @@ export class AllowanceValidationComponent implements OnChanges, OnDestroy {
 
   constructor(
     private _bottomSheet: MatBottomSheet,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _walletService: WalletService,
     private _tokenService: TokenService
   ) {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this._walletService.getAllowance(this.allowance.token.address, this.allowance.owner, this.allowance.spender)),
           tap(allowance => this.allowance.update(allowance)))

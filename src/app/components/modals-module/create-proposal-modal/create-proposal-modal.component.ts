@@ -1,9 +1,9 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { WalletService } from '@services/platform/wallet.service';
 import { UserContextService } from '@services/utility/user-context.service';
 import { UserContext } from '@models/user-context';
 import { VaultService } from '@services/platform/vault.service';
-import { NodeService } from '@services/platform/node.service';
 import { Component, OnDestroy, Inject } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 import { Icons } from '@enums/icons';
@@ -67,7 +67,7 @@ export class CreateProposalModalComponent implements OnDestroy {
 
   constructor(
     private _fb: FormBuilder,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _vaultService: VaultService,
     private _contextService: UserContextService,
     private _walletService: WalletService,
@@ -87,7 +87,7 @@ export class CreateProposalModalComponent implements OnDestroy {
         .subscribe(context => this.context = context));
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(switchMap(_ => this._validateBalance()))
         .subscribe());
 

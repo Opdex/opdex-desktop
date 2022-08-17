@@ -34,7 +34,7 @@ export class TxStakeCollectComponent extends TxBase implements OnDestroy {
     });
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(switchMap(_ => this.validateStakingBalance()))
         .subscribe());
   }

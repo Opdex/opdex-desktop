@@ -1,6 +1,5 @@
-import { filter, tap } from 'rxjs';
-import { switchMap } from 'rxjs';
-import { NodeService } from '@services/platform/node.service';
+import { IndexerService } from '@services/platform/indexer.service';
+import { switchMap, filter, tap } from 'rxjs';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
 import { Subscription } from 'rxjs';
@@ -23,7 +22,7 @@ export class TradeComponent implements OnInit, OnDestroy {
     private _route: ActivatedRoute,
     private _router: Router,
     private _liquidityPoolService: LiquidityPoolService,
-    private _nodeService: NodeService
+    private _indexerService: IndexerService
   ) {
     this.subscription.add(
       this._route.queryParams.subscribe(async ({view, pool, childView}) => {
@@ -36,7 +35,7 @@ export class TradeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           filter(_ => !!this.pool),
           switchMap(_ => this._liquidityPoolService.buildLiquidityPool(this.pool.address)),

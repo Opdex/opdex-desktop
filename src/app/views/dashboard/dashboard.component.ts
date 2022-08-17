@@ -1,8 +1,8 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { Router } from '@angular/router';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenService } from '@services/platform/token.service';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private _liquidityPoolService: LiquidityPoolService,
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _tokenService: TokenService,
     private _env: EnvironmentsService,
     private _router: Router
@@ -31,7 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this._tokenService.buildToken(this._env.contracts.odx)),
           tap(odx => this.odx = odx),

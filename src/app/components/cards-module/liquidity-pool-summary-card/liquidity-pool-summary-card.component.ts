@@ -1,6 +1,6 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { CurrencyService } from '@services/platform/currency.service';
-import { NodeService } from '@services/platform/node.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Subscription } from 'rxjs';
 import { Icons } from '@enums/icons';
@@ -34,11 +34,11 @@ export class LiquidityPoolSummaryCardComponent implements OnDestroy {
   }
 
   constructor(
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _currency: CurrencyService
   ) {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .subscribe(block => this.latestBlock = block));
 
     this.subscription.add(

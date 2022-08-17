@@ -1,11 +1,10 @@
+import { IndexerService } from '@services/platform/indexer.service';
 import { CreateProposalModalComponent } from '@components/modals-module/create-proposal-modal/create-proposal-modal.component';
 import { MatDialog } from '@angular/material/dialog';
-import { EnvironmentsService } from '@services/utility/environments.service';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Token } from '@models/platform/token';
 import { TokenService } from '@services/platform/token.service';
-import { NodeService } from '@services/platform/node.service';
 import { VaultService } from '@services/platform/vault.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, switchMap, tap } from 'rxjs';
@@ -49,11 +48,10 @@ export class VaultComponent implements OnInit, OnDestroy {
   nextCertificate: boolean;
 
   constructor(
-    private _nodeService: NodeService,
+    private _indexerService: IndexerService,
     private _vaultService: VaultService,
     private _tokenService: TokenService,
     private _userContextService: UserContextService,
-    private _env: EnvironmentsService,
     public dialog: MatDialog
   ) {
     this.statCards = this._getStatCards(null, null);
@@ -63,7 +61,7 @@ export class VaultComponent implements OnInit, OnDestroy {
     this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
 
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._indexerService.latestBlock$
         .pipe(
           tap(latestBlock => this.latestBlock = latestBlock),
           switchMap(_ => this._vaultService.getVault()),
