@@ -42,7 +42,7 @@
           <span class="secondary">Vault</span>
         </a>
       </li>
-      <li *ngIf="!context?.wallet?.address">
+      <li *ngIf="!context?.isLoggedIn">
         <a mat-button
           class="transparent"
           routerLink="/login"
@@ -52,7 +52,7 @@
           <span class="secondary">Connect</span>
         </a>
       </li>
-      <li *ngIf="context?.wallet?.address">
+      <li *ngIf="context?.isLoggedIn">
         <a mat-button
           class="transparent"
           (click)="emitRouteChange('/wallet')"
@@ -91,15 +91,19 @@
         <opdex-theme-toggle></opdex-theme-toggle>
       </div>
 
-      <div class="flex-row-center no-wrap" *ngIf="context?.wallet?.address">
+      <div class="flex-row-center no-wrap" *ngIf="context?.isLoggedIn">
         <button mat-button class="small d-inline pl-0 pr-0 transparent" (click)="logout()">
           <mat-icon class="mr-2">{{icons.exit}}</mat-icon>
           <small>Logout</small>
         </button>
       </div>
 
+      <button mat-button class="mt-1 small d-inline pl-0 pr-0" (click)="openTerms()">
+        <small>Terms of Use</small>
+      </button>
+
       <div class="pl-1">
-        <div class="button-group mt-3 flex-row-center">
+        <div class="button-group mt-2 flex-row-center">
           <a href="https://github.com/opdex" target="_blank" rel="noopener noreferrer" matTooltip="Github">
             <img class="social-icon" src="assets/social/github-blue.svg" alt="Github Logo">
           </a>
@@ -124,10 +128,6 @@
             <mat-icon color="primary" class="small">{{icons.interflux}}</mat-icon>
           </a>
         </div>
-
-        <button mat-button class="mt-2 small d-inline pl-0 pr-0" (click)="openTerms()">
-          <small>Terms of Use</small>
-        </button>
       </div>
     </div>
 

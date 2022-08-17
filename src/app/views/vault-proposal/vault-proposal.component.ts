@@ -86,7 +86,7 @@ export class VaultProposalComponent implements OnDestroy {
   }
 
   async getVote(): Promise<FixedDecimal> {
-    if (this.proposal.status === 'Pledge' || !!this.context?.wallet?.address === false) return null;
+    if (this.proposal.status === 'Pledge' || !this.context?.isLoggedIn) return null;
 
     try {
       const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet.address);
@@ -99,7 +99,7 @@ export class VaultProposalComponent implements OnDestroy {
   }
 
   async getPledge(): Promise<FixedDecimal> {
-    if (!!this.context?.wallet?.address === false) return null;
+    if (!this.context?.isLoggedIn) return null;
 
     try {
       const bigInt = await this._walletService.getVaultPledgePosition(this.proposal.proposalId, this.context.wallet.address);

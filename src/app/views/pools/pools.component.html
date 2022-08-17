@@ -17,7 +17,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <div class="flex-row-center-end" *ngIf="context?.wallet?.address">
+        <div class="flex-row-center-end" *ngIf="context?.isLoggedIn">
           <button color="primary" mat-stroked-button class="flex-row-center" (click)="createPool()">
             <span class="flex-row-center">
               Create Liquidity Pool

@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     const context = this._userContextService.userContext;
 
-    if (context.wallet.address && this._validateTermsAcceptedVersion(context.termsAcceptance)) {
+    if (context.isLoggedIn && this._validateTermsAcceptedVersion(context.termsAcceptance)) {
       this._loginRedirect();
     } else {
       this.walletList = await this._walletService.getWalletList();

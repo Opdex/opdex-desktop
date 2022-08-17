@@ -98,7 +98,7 @@
         <ng-container matColumnDef="actions" stickyEnd>
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let element">
-            <div class="flex-row-center-end" *ngIf="context?.wallet?.address">
+            <div class="flex-row-center-end" *ngIf="context?.isLoggedIn">
               <button class="small" mat-icon-button color="primary" [matMenuTriggerFor]="beforeMenu" (click)="$event.stopPropagation()">
                 <mat-icon>{{icons.more}}</mat-icon>
               </button>

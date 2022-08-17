@@ -80,7 +80,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
   }
 
   async submit(): Promise<void> {
-    if (!this.vaultAddress || !this.context.wallet.address) return;
+    if (!this.vaultAddress || !this.context.isLoggedIn) return;
 
     const amount = new FixedDecimal(this.amount.value, this.crs.decimals);
 
@@ -111,7 +111,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
   }
 
   private async validateBalance(): Promise<boolean> {
-    if (!this.amount.value || !this.context?.wallet?.address  || !this.crs) return false;
+    if (!this.amount.value || !this.context?.isLoggedIn || !this.crs) return false;
 
     const amountNeeded = new FixedDecimal(this.amount.value, this.crs.decimals);
 

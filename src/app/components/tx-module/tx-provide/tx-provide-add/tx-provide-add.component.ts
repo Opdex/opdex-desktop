@@ -113,7 +113,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
             if (amount !== '') this.amountSrc.setValue(amount, { emitEvent: false })
           }),
           tap(_ => this.calcTolerance()),
-          filter(_ => !!this.context.wallet.address),
+          filter(_ => !!this.context.isLoggedIn),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -134,7 +134,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
             if (quoteAmount !== '') this.amountCrs.setValue(quoteAmount, { emitEvent: false })
           }),
           tap(_ => this.calcTolerance()),
-          filter(_ => !!this.context.wallet.address),
+          filter(_ => !!this.context.isLoggedIn),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -144,7 +144,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
         .pipe(
           tap(block => this.latestBlock = block),
           tap(_ => this.calcDeadline(this.deadlineThreshold)),
-          filter(_ => !!this.context.wallet.address),
+          filter(_ => !!this.context.isLoggedIn),
           switchMap(_ => this.getAllowance()),
           switchMap(_ => this.validateBalances()))
         .subscribe());
@@ -259,7 +259,7 @@ export class TxProvideAddComponent extends TxBase implements OnDestroy {
   }
 
   private async validateBalance(token: Token, amount: FixedDecimal): Promise<boolean> {
-    if (!this.context?.wallet?.address  || !this.pool) return false;
+    if (!this.context?.isLoggedIn || !this.pool) return false;
 
     return await this._validateBalance(token, amount);
   }

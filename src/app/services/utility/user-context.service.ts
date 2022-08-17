@@ -77,9 +77,3 @@ export class UserContextService {
     return new UserContext(wallet, preferences, termsAcceptance);
   }
 }
-
-// Todo: undefined: user preferences
-// Todo: global: user preferences
-// Todo: accept terms => clear app storage => refresh
-// -- allows terms to be empty as long as session storage holds the users wallet address
-// -- validate accepted terms in this scenario on reload, when creating userContext

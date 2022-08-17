@@ -127,7 +127,7 @@
 
     <opdex-tx-quote-submit-button
       [warn]="(allowance && !allowance?.isApproved) || crsBalanceError || srcBalanceError"
-      [disabled]="!form.valid || !context?.wallet?.address  || allowance === undefined || crsBalanceError === undefined || srcBalanceError === undefined"
+      [disabled]="!form.valid || !context?.isLoggedIn || allowance === undefined || crsBalanceError === undefined || srcBalanceError === undefined"
       (onSubmit)="submit()">
     </opdex-tx-quote-submit-button>
 

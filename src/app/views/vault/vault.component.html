@@ -38,7 +38,7 @@
           <div class="flex-row-center-between mb-1">
             <h3 class="mb-0">Proposals</h3>
 
-            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.wallet?.address">
+            <button color="primary" mat-stroked-button class="flex-row-center" (click)="createProposal()" *ngIf="context?.isLoggedIn">
               <span class="flex-row-center">
                 Create Proposal
                 <mat-icon class="small ml-1">{{icons.add}}</mat-icon>

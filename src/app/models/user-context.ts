@@ -5,6 +5,10 @@ export class UserContext {
   private _preferences: UserContextPreferences;
   private _termsAcceptance: UserContextTermsAcceptance;
 
+  public get isLoggedIn(): boolean {
+    return !!this._wallet && !!this._wallet.address && !!this._wallet.name;
+  }
+
   public get wallet(): UserContextWallet {
     return this._wallet;
   }
@@ -35,8 +39,8 @@ export class UserContextWallet {
 }
 
 export class UserContextPreferences {
-  theme: string = 'light-mode';
+  theme: string;
   deadlineThreshold: number = 10;
   toleranceThreshold: number = 5;
-  currency: Currencies = Currencies.USD;
+  currency: Currencies;
 }

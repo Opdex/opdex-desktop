@@ -80,7 +80,7 @@ export class TxMineStartComponent extends TxBase implements OnDestroy {
           amountFixed.isZero ? this.reset() : this.setFiatValue(amountFixed);
           return amountFixed;
         }),
-        filter(amount => !!this.context?.wallet?.address && amount.bigInt > 0),
+        filter(amount => this.context?.isLoggedIn && amount.bigInt > 0),
         switchMap(amount => this.getAllowance$(amount.formattedValue)),
         switchMap(_ => this.validateBalance()))
       .subscribe());
@@ -88,7 +88,7 @@ export class TxMineStartComponent extends TxBase implements OnDestroy {
     this.subscription.add(
       this._nodeService.latestBlock$
       .pipe(
-        filter(_ => !!this.context.wallet.address),
+        filter(_ => this.context.isLoggedIn),
         switchMap(_ => this.getAllowance$()))
       .subscribe());
   }
@@ -110,7 +110,7 @@ export class TxMineStartComponent extends TxBase implements OnDestroy {
   }
 
   private async validateBalance(): Promise<boolean> {
-    if (!this.amount.value || !this.context?.wallet?.address  || !this.pool) {
+    if (!this.amount.value || !this.context?.isLoggedIn || !this.pool) {
       return false;
     }
 

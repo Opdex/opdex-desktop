@@ -307,7 +307,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.tokenInAmount.setValue(result.formattedValue, { emitEvent: false });
       this.calcTotals();
 
-      if (this.context.wallet.address === undefined) return null;
+      if (!this.context.isLoggedIn) return null;
       return await this.validateAllowance();
     } catch (error) {
       console.log(error)
@@ -335,7 +335,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.tokenOutAmount.setValue(result.formattedValue, { emitEvent: false });
       this.calcTotals();
 
-      if (this.context.wallet.address === undefined) return null;
+      if (!this.context.isLoggedIn) return null;
       return await this.validateAllowance();
     } catch (error) {
       console.log(error)
@@ -346,7 +346,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
   }
 
   private async validateAllowance(): Promise<boolean> {
-    if (!this.tokenIn || !this.tokenOut || this.tokenIn.address === 'CRS' || !this.context?.wallet?.address  || !this.tokenInAmount.value) {
+    if (!this.tokenIn || !this.tokenOut || this.tokenIn.address === 'CRS' || !this.context?.isLoggedIn || !this.tokenInAmount.value) {
       this.allowance = null;
       return false;
     }
@@ -356,7 +356,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
   }
 
   private async validateBalance(): Promise<boolean> {
-    if (!this.tokenIn || !this.tokenOut || !this.context?.wallet?.address  || !this.tokenInAmount.value) {
+    if (!this.tokenIn || !this.tokenOut || !this.context?.isLoggedIn || !this.tokenInAmount.value) {
       return false;
     }
 

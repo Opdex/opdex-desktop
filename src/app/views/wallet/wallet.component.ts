@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { TokenService } from '@services/platform/token.service';
 import { CurrencyService } from '@services/platform/currency.service';
 import { switchMap } from 'rxjs';
