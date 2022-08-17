@@ -1,3 +1,5 @@
+import { UserContext } from '@models/user-context';
+import { UserContextService } from '@services/utility/user-context.service';
 import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionView } from '@enums/transaction-view';
 import { Subscription, switchMap, tap } from 'rxjs';
@@ -15,6 +17,7 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
 export class PoolComponent implements OnInit, OnDestroy {
   pool: LiquidityPool;
   latestBlock: number;
+  context: UserContext;
   icons = Icons;
   subscription = new Subscription();
   routerSubscription = new Subscription();
@@ -23,7 +26,8 @@ export class PoolComponent implements OnInit, OnDestroy {
     private _route: ActivatedRoute,
     private _liquidityPoolService: LiquidityPoolService,
     private _indexerService: IndexerService,
-    private _router: Router
+    private _router: Router,
+    private _userContextService: UserContextService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -44,6 +48,10 @@ export class PoolComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe();
       this.subscription = new Subscription();
     }
+
+    this.subscription.add(
+      this._userContextService.context$
+        .subscribe(context => this.context = context));
 
     this.subscription.add(
       this._indexerService.latestBlock$

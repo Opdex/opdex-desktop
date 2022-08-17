@@ -1,0 +1,73 @@
+<opdex-card *ngIf="context?.isLoggedIn">
+  <h6>Wallet Positions</h6>
+  <ng-container *ngIf="positions; else loading">
+    <div class="flex-row-center-between">
+      <span class="flex-row-center">
+        <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
+        {{pool.crsToken.symbol}} Balance:
+      </span>
+      <opdex-number [value]="positions.crsBalance" [short]="true"></opdex-number>
+    </div>
+
+    <div class="flex-row-center-between">
+      <span class="flex-row-center">
+        <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
+        {{pool.srcToken.symbol}} Balance:
+      </span>
+      <opdex-number [value]="positions.srcBalance" [short]="true"></opdex-number>
+    </div>
+
+    <div class="flex-row-center-between">
+      <span class="flex-row-center">
+        <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
+        {{pool.lpToken.symbol}} Balance:
+      </span>
+      <opdex-number [value]="positions.lptBalance" [short]="true"></opdex-number>
+    </div>
+
+    <ng-container *ngIf="pool.miningPool">
+      <div class="flex-row-center-between">
+        <span class="flex-row-center">
+          <mat-icon class="tiny purple mr-1">{{icons.staking}}</mat-icon>
+          {{pool.stakingToken.symbol}} Staking:
+        </span>
+        <opdex-number [value]="positions.stakingPosition" [short]="true"></opdex-number>
+      </div>
+
+      <div class="flex-row-center-between">
+        <span class="flex-row-center">
+          <mat-icon class="tiny red mr-1">{{icons.mining}}</mat-icon>
+          {{pool.lpToken.symbol}} Mining:
+        </span>
+        <opdex-number [value]="positions.miningPosition" [short]="true"></opdex-number>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="flex-row-center-between mb-1">
+      <div class="skeleton-bg w-50"></div>
+      <div class="skeleton-bg w-25"></div>
+    </div>
+
+    <div class="flex-row-center-between mb-1">
+      <div class="skeleton-bg w-50"></div>
+      <div class="skeleton-bg w-25"></div>
+    </div>
+
+    <div class="flex-row-center-between mb-1">
+      <div class="skeleton-bg w-50"></div>
+      <div class="skeleton-bg w-25"></div>
+    </div>
+
+    <div class="flex-row-center-between mb-1">
+      <div class="skeleton-bg w-50"></div>
+      <div class="skeleton-bg w-25"></div>
+    </div>
+
+    <div class="flex-row-center-between mb-1">
+      <div class="skeleton-bg w-50"></div>
+      <div class="skeleton-bg w-25"></div>
+    </div>
+  </ng-template>
+</opdex-card>

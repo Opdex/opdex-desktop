@@ -44,6 +44,8 @@
         </opdex-liquidity-pool-token-card>
 
         <opdex-liquidity-pool-summary-card [pool]="pool"></opdex-liquidity-pool-summary-card>
+
+        <opdex-liquidity-pool-positions-card [pool]="pool" *ngIf="context?.isLoggedIn"></opdex-liquidity-pool-positions-card>
       </div>
 
       <div class="col-12 col-sm-6 col-xl-4">
