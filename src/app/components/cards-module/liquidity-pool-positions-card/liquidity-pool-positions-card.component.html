@@ -4,7 +4,7 @@
     <div class="flex-row-center-between">
       <span class="flex-row-center">
         <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
-        {{pool.crsToken.symbol}} Balance:
+        {{pool.crsToken.symbol}} Balance
       </span>
       <opdex-number [value]="positions.crsBalance" [short]="true"></opdex-number>
     </div>
@@ -12,7 +12,7 @@
     <div class="flex-row-center-between">
       <span class="flex-row-center">
         <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
-        {{pool.srcToken.symbol}} Balance:
+        {{pool.srcToken.symbol}} Balance
       </span>
       <opdex-number [value]="positions.srcBalance" [short]="true"></opdex-number>
     </div>
@@ -20,7 +20,7 @@
     <div class="flex-row-center-between">
       <span class="flex-row-center">
         <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
-        {{pool.lpToken.symbol}} Balance:
+        {{pool.lpToken.symbol}} Balance
       </span>
       <opdex-number [value]="positions.lptBalance" [short]="true"></opdex-number>
     </div>
@@ -29,7 +29,7 @@
       <div class="flex-row-center-between">
         <span class="flex-row-center">
           <mat-icon class="tiny purple mr-1">{{icons.staking}}</mat-icon>
-          {{pool.stakingToken.symbol}} Staking:
+          {{pool.stakingToken.symbol}} Staking
         </span>
         <opdex-number [value]="positions.stakingPosition" [short]="true"></opdex-number>
       </div>
@@ -37,7 +37,7 @@
       <div class="flex-row-center-between">
         <span class="flex-row-center">
           <mat-icon class="tiny red mr-1">{{icons.mining}}</mat-icon>
-          {{pool.lpToken.symbol}} Mining:
+          {{pool.lpToken.symbol}} Mining
         </span>
         <opdex-number [value]="positions.miningPosition" [short]="true"></opdex-number>
       </div>

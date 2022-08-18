@@ -1,3 +1,6 @@
+import { UserContext } from '@models/user-context';
+import { UserContextService } from '@services/utility/user-context.service';
+import { WalletService } from '@services/platform/wallet.service';
 import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionView } from '@enums/transaction-view';
 import { TokenService } from '@services/platform/token.service';
@@ -23,6 +26,8 @@ export class TokenComponent implements OnInit, OnDestroy {
   crsPerOlpt: FixedDecimal;
   srcPerOlpt: FixedDecimal;
   latestBlock: number;
+  context: UserContext;
+  userBalance: FixedDecimal;
   subscription = new Subscription();
   routerSubscription = new Subscription();
 
@@ -31,7 +36,9 @@ export class TokenComponent implements OnInit, OnDestroy {
     private _liquidityPoolService: LiquidityPoolService,
     private _indexerService: IndexerService,
     private _tokenService: TokenService,
-    private _router: Router
+    private _router: Router,
+    private _walletService: WalletService,
+    private _userContextService: UserContextService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -57,12 +64,30 @@ export class TokenComponent implements OnInit, OnDestroy {
       this._indexerService.latestBlock$
         .pipe(
           tap(latestBlock => this.latestBlock = latestBlock),
-          switchMap(_ => this._setPoolAndToken(address)))
+          switchMap(_ => this._setPoolAndToken(address)),
+          switchMap(_ => this._checkUserBalance()))
         .subscribe());
   }
 
   handleTxOption(option: TransactionView) {
     this._router.navigate(['/trade'], { queryParams: {view: option, pool: this.pool?.address}})
+  }
+
+  private async _checkUserBalance(): Promise<void> {
+    if (!this.token) return;
+
+    const context = this._userContextService.userContext;
+
+    if (!context.isLoggedIn) {
+      this.context = undefined;
+      this.userBalance = undefined;
+      return;
+    }
+
+    const balance = await this._walletService.getBalance(this.token.address, context.wallet.address);
+
+    this.context = context;
+    this.userBalance = FixedDecimal.FromBigInt(balance, this.token.decimals);
   }
 
   private async _setPoolAndToken(address: string): Promise<void> {

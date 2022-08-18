@@ -69,6 +69,18 @@
           [showPoolName]="true"
           *ngIf="!token?.isCrs && token?.address !== pool?.address">
         </opdex-liquidity-pool-summary-card>
+
+        <opdex-card *ngIf="context?.isLoggedIn">
+          <h6>Wallet Balance</h6>
+
+          <div class="flex-row-center-between">
+            <span class="flex-row-center">
+              <mat-icon class="tiny blue mr-1">{{icons.tokens}}</mat-icon>
+              {{token.symbol}}
+            </span>
+            <opdex-number [value]="userBalance" [short]="true"></opdex-number>
+          </div>
+        </opdex-card>
       </div>
 
       <div class="col-12 col-sm-6 col-xl-4" *ngIf="!token?.isCrs">
