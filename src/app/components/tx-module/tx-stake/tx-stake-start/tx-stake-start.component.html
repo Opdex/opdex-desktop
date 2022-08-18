@@ -1,0 +1,47 @@
+<div class="start-staking">
+  <form [formGroup]="form" name="start-staking-form" id="start-staking-form">
+    <opdex-input-control
+      [suffixDisabled]="true"
+      label="Start Staking"
+      [formControl]="amount"
+      [suffix]="pool.stakingToken?.symbol"
+      [numbersOnly]="true">
+      <opdex-number [value]="fiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      [contract]="pool.stakingToken?.address"
+      [token]="pool.stakingToken"
+      positionType="Balance"
+      [selected]="percentageSelected"
+      (onPercentageSelect)="handlePercentageSelect($event)"></opdex-percentage-amount-buttons>
+
+    <div class="mt-2 mb-2" *ngIf="allowance || balanceError">
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient Balance"
+        *ngIf="balanceError">
+      </opdex-tx-quote-error>
+
+      <opdex-allowance-validation
+        [allowance]="allowance">
+      </opdex-allowance-validation>
+    </div>
+
+    <div *ngIf="fiatValue" class="mt-3 p-2 border" style="border-radius: 4px;">
+      <div class="flex-row-center-between">
+        <small class="b-400">
+          <span class="success">+{{percentageOfSupply.formattedValue | shortNumber}}%</span> Total Staking Weight
+        </small>
+      </div>
+    </div>
+
+    <opdex-tx-quote-submit-button
+      [warn]="balanceError || (allowance && !allowance?.isApproved)"
+      [disabled]="!form.valid || !context?.isLoggedIn || balanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

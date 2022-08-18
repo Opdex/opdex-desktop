@@ -1,9 +1,16 @@
+import { UserContext } from '@models/user-context';
+import { UserContextService } from '@services/utility/user-context.service';
+import { WalletService } from '@services/platform/wallet.service';
+import { IndexerService } from '@services/platform/indexer.service';
+import { TransactionView } from '@enums/transaction-view';
+import { TokenService } from '@services/platform/token.service';
+import { Subscription, tap, switchMap } from 'rxjs';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Icons } from '@enums/icons';
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { Token } from '@models/platform/token';
 
 @Component({
@@ -11,25 +18,83 @@ import { Token } from '@models/platform/token';
   templateUrl: './token.component.html',
   styleUrls: ['./token.component.scss']
 })
-export class TokenComponent implements OnInit {
+export class TokenComponent implements OnInit, OnDestroy {
   token: Token;
   pool: LiquidityPool;
   icons = Icons;
   one = FixedDecimal.One(0);
   crsPerOlpt: FixedDecimal;
   srcPerOlpt: FixedDecimal;
+  latestBlock: number;
+  context: UserContext;
+  userBalance: FixedDecimal;
+  subscription = new Subscription();
+  routerSubscription = new Subscription();
 
   constructor(
     private _route: ActivatedRoute,
-    private _poolFactory: LiquidityPoolFactoryService) { }
+    private _liquidityPoolService: LiquidityPoolService,
+    private _indexerService: IndexerService,
+    private _tokenService: TokenService,
+    private _router: Router,
+    private _walletService: WalletService,
+    private _userContextService: UserContextService
+  ) { }
 
   async ngOnInit(): Promise<void> {
+    this.init();
+
+    this.routerSubscription.add(
+      this._router.events.subscribe((evt) => {
+        if (!(evt instanceof NavigationEnd)) return;
+        this.init();
+      })
+    );
+  }
+
+  async init(): Promise<void> {
     const address = this._route.snapshot.paramMap.get('address');
 
+    if (!this.subscription.closed) {
+      this.subscription.unsubscribe();
+      this.subscription = new Subscription();
+    }
+
+    this.subscription.add(
+      this._indexerService.latestBlock$
+        .pipe(
+          tap(latestBlock => this.latestBlock = latestBlock),
+          switchMap(_ => this._setPoolAndToken(address)),
+          switchMap(_ => this._checkUserBalance()))
+        .subscribe());
+  }
+
+  handleTxOption(option: TransactionView) {
+    this._router.navigate(['/trade'], { queryParams: {view: option, pool: this.pool?.address}})
+  }
+
+  private async _checkUserBalance(): Promise<void> {
+    if (!this.token) return;
+
+    const context = this._userContextService.userContext;
+
+    if (!context.isLoggedIn) {
+      this.context = undefined;
+      this.userBalance = undefined;
+      return;
+    }
+
+    const balance = await this._walletService.getBalance(this.token.address, context.wallet.address);
+
+    this.context = context;
+    this.userBalance = FixedDecimal.FromBigInt(balance, this.token.decimals);
+  }
+
+  private async _setPoolAndToken(address: string): Promise<void> {
     if (address !== 'CRS') {
       // SRC token first, fallback if not found to OLPT
-      this.pool = await this._poolFactory.buildLiquidityPoolBySrcToken(address) ||
-                  await this._poolFactory.buildLiquidityPool(address);
+      this.pool = await this._liquidityPoolService.buildLiquidityPoolBySrcToken(address) ||
+                  await this._liquidityPoolService.buildLiquidityPool(address);
 
       // Todo: If no pool is found, display an error
 
@@ -48,7 +113,12 @@ export class TokenComponent implements OnInit {
 
       this.token = address === this.pool.srcToken.address ? this.pool.srcToken : this.pool.lpToken;
     } else {
-      this.token = Token.CRS();
+      this.token = await this._tokenService.buildToken('CRS');
     }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
   }
 }

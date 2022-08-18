@@ -1,5 +1,5 @@
 <main>
-  <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}" *ngIf="nodeStatus && nodeStatus.state === 'Started'; else disconnected">
+  <div class="main-content-container" [ngClass]="{'sidebar-pinned': isPinned}" *ngIf="nodeStatus && nodeStatus.state === 'Started' && selectedCurrency; else disconnected">
     <ng-container *ngIf="hasIndexed; else indexing">
       <aside id="desktop-sidenav" [ngClass]="{'pinned': isPinned}">
         <opdex-side-nav (onPinnedToggle)="handlePinnedToggle($event)"></opdex-side-nav>
@@ -15,6 +15,14 @@
           </div>
 
           <div class="page-content-container" [@fadeAnimation]="prepareRoute(outlet)">
+            <a class="notification-banner clickable primary flex-row-center-center p-2" [href]="appUpdateUrl" target="_blank" *ngIf="!!appUpdateUrl">
+              <mat-icon class="small mr-2">{{icons.update}}</mat-icon> Update Available
+            </a>
+
+            <a class="notification-banner clickable warning flex-row-center-center p-2" href="https://github.com/stratisproject/CirrusCore/releases" target="_blank" *ngIf="!!nodeUpdate && !appUpdateUrl">
+              <mat-icon class="small mr-2">{{icons.update}}</mat-icon> Node Update Required
+            </a>
+
             <router-outlet #outlet="outlet"></router-outlet>
           </div>
 
@@ -27,7 +35,7 @@
   </div>
 
   <ng-template #disconnected>
-    <div class="container">
+    <div class="container standard-section">
       <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
           <opdex-card>
@@ -41,7 +49,7 @@
   </ng-template>
 
   <ng-template #indexing>
-    <div class="container">
+    <div class="container standard-section">
       <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
           <opdex-card>

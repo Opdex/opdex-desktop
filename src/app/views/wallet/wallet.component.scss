@@ -1,0 +1,12 @@
+.big-balance {
+  font-size: 1.3em;
+  font-weight: 400;
+  margin-bottom: 0px;
+  line-height: 1em;
+}
+
+.clickable {
+  &:hover {
+    cursor: pointer;
+  }
+}

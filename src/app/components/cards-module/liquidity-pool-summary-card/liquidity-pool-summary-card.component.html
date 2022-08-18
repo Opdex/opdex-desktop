@@ -12,19 +12,13 @@
         <p class="mb-0">Liquidity</p>
       </div>
 
-      <!-- <div class="flex-row-center">
-        <opdex-change-indicator
-          [value]="pool?.summary?.reserves?.dailyUsdChangePercent"
-          *ngIf="!!pool?.summary?.reserves?.dailyUsdChangePercent">
-        </opdex-change-indicator>
-
+      <div class="flex-row-center">
         <opdex-number
-          class="ml-2"
-          prefix="$"
-          [value]="pool?.summary?.reserves?.usd"
-          [short]="true">
+          [short]="true"
+          [prefix]="selectedCurrency?.htmlEntity"
+          [value]="liquidityFiat">
         </opdex-number>
-      </div> -->
+      </div>
     </div>
 
     <div class="flex-row-center-between">
@@ -79,11 +73,11 @@
           <p class="mb-0">Staking</p>
         </div>
 
-        <!-- <opdex-number
-          prefix="$"
-          [value]="pool?.summary?.staking?.usd"
-          [short]="true">
-        </opdex-number> -->
+        <opdex-number
+          [short]="true"
+          [prefix]="selectedCurrency?.htmlEntity"
+          [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
+        </opdex-number>
       </div>
 
       <div class="flex-row-center-between">
@@ -144,11 +138,11 @@
           <p class="mb-0">Mining</p>
         </div>
 
-        <!-- <opdex-number
-          prefix="$"
-          [value]="miningUsd"
-          [short]="true">
-        </opdex-number> -->
+        <opdex-number
+          [short]="true"
+          [prefix]="selectedCurrency?.htmlEntity"
+          [value]="pool.lpToken.pricing[selectedCurrency.abbreviation].multiply(pool.miningPool?.tokensMining)">
+        </opdex-number>
       </div>
 
       <div class="flex-row-center-between">
@@ -157,7 +151,7 @@
         <opdex-number
           [value]="pool?.miningPool?.tokensMining"
           [short]="true"
-          suffix="OLPT">
+          [suffix]="pool?.lpToken?.symbol">
         </opdex-number>
       </div>
 

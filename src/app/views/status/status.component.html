@@ -1,0 +1,51 @@
+<div class="header-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-sm-6">
+        <h1 class="mb-0">Status</h1>
+      </div>
+
+      <div class="col-12 col-sm-6">
+        <div class="button-group">
+          <button mat-stroked-button (click)="openBugReport()" class="mr-1">
+            <mat-icon class="small mr-1">{{icons.bug}}</mat-icon> Report Issue
+          </button>
+
+          <a mat-stroked-button href="https://docs.opdex.com/docs/knowledge-center-overview" target="_blank">
+            <mat-icon class="small mr-1">{{icons.help}}</mat-icon> Help
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="offset-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-4">
+        <opdex-card>
+          <h4>App Details</h4>
+          <p class="mb-0"><strong>Version:</strong> {{appVersion}}</p>
+          <p class="mb-0"><strong>Network:</strong> {{network}}</p>
+          <p class="mb-0"><strong>Block:</strong> {{latestBlock  | formatNumber:0}}</p>
+
+          <button mat-flat-button color="warn" class="mt-3" (click)="resync()">Resync App Data</button>
+        </opdex-card>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <opdex-card>
+          <h4>Node Details</h4>
+
+          <p class="mb-0"><strong>Version:</strong> {{nodeStatus.version}}</p>
+          <p class="mb-0"><strong>Network:</strong> {{nodeStatus.network}}</p>
+          <p class="mb-0"><strong>Block:</strong> {{nodeStatus.blockStoreHeight | formatNumber:0}}</p>
+          <p><strong>State:</strong> {{nodeStatus.state}}</p>
+
+          <small class="light">For more details, view your Cirrus Core wallet.</small>
+        </opdex-card>
+      </div>
+    </div>
+  </div>
+</div>

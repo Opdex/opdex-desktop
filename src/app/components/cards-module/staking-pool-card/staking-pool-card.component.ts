@@ -1,8 +1,11 @@
-import { Component, Input } from '@angular/core';
-// import { TransactionView } from '@sharedModels/transaction-view';
-// import { SidenavService } from '@sharedServices/utility/sidenav.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { CurrencyService } from '@services/platform/currency.service';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Icons } from '@enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
+import { ICurrency } from '@lookups/currencyDetails.lookup';
+import { TransactionView } from '@enums/transaction-view';
 ;
 
 @Component({
@@ -10,14 +13,29 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
   templateUrl: './staking-pool-card.component.html',
   styleUrls: ['./staking-pool-card.component.scss']
 })
-export class StakingPoolCardComponent {
+export class StakingPoolCardComponent implements OnInit, OnDestroy {
   @Input() pool: LiquidityPool;
+  selectedCurrency: ICurrency;
   icons = Icons;
-  // txView = TransactionView;
+  txView = TransactionView;
+  subscription = new Subscription();
 
-  // constructor(private _sidebar: SidenavService) { }
+  constructor(
+    private _currency: CurrencyService,
+    private _router: Router
+  ) { }
 
-  // transact(txView: TransactionView) {
-  //   this._sidebar.openSidenav(txView, {pool: this.pool});
-  // }
+  ngOnInit(): void {
+    this.subscription.add(
+      this._currency.selectedCurrency$
+        .subscribe(currency => this.selectedCurrency = currency));
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  transact(view: TransactionView) {
+    this._router.navigate(['/trade'], {queryParams: {pool: this.pool.address, view}})
+  }
 }

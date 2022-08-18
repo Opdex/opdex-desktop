@@ -1,8 +1,8 @@
 import { MiningPool } from './mining-pool';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IHydratedLiquidityPoolDetailsDto } from '@services/platform/liquidity-pool.service';
 import { Token } from './token';
+import { IHydratedLiquidityPoolDetailsDto } from '@interfaces/contract-properties.interface';
 
 export class LiquidityPool {
   address: string;
@@ -20,7 +20,7 @@ export class LiquidityPool {
   srcPerCrs: FixedDecimal;
   miningPool?: MiningPool;
 
-  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, miningPool: MiningPool, srcToken: Token, stakingToken: Token, crsToken: Token) {
+  constructor(entity: ILiquidityPoolEntity, hydrated: IHydratedLiquidityPoolDetailsDto, miningPool: MiningPool, srcToken: Token, stakingToken: Token, crsToken: Token, lpToken: Token) {
     this.address = entity.address;
     this.name = entity.name;
     this.miningPool = miningPool;
@@ -31,7 +31,7 @@ export class LiquidityPool {
     this.isNominated = entity.isNominated === 1;
     this.srcToken = srcToken;
     this.crsToken = crsToken;
-    this.lpToken = Token.OLPT(entity.address, hydrated.totalSupply);
+    this.lpToken = lpToken;
     this.stakingToken = stakingToken;
     this.crsPerSrc = this.reserveCrs.divide(this.reserveSrc);
     this.srcPerCrs = this.reserveSrc.divide(this.reserveCrs);

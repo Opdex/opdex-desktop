@@ -12,7 +12,7 @@ import { Icons } from 'src/app/enums/icons';
   styleUrls: ['./theme-toggle.component.scss']
 })
 export class ThemeToggleComponent implements OnDestroy {
-  wallet: UserContext;
+  context: UserContext;
   theme: string;
   icons = Icons;
   subscription = new Subscription();
@@ -25,7 +25,7 @@ export class ThemeToggleComponent implements OnDestroy {
     private _userContextService: UserContextService,
     private _theme: ThemeService,
   ) {
-    this.subscription.add(this._userContextService.context$.subscribe(context => this.wallet = context));
+    this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
     this.subscription.add(
       this._theme.getTheme()
         .subscribe(theme => {
@@ -43,13 +43,13 @@ export class ThemeToggleComponent implements OnDestroy {
   }
 
   private _setThemePreference(theme: string) {
-    if (this.wallet) {
-      let { wallet, preferences } = this.wallet;
+    if (this.context.isLoggedIn) {
+      let { wallet, preferences } = this.context;
       if (wallet) {
         if (!preferences) preferences = new UserContextPreferences();
 
         preferences.theme = theme;
-        this._userContextService.setUserPreferences(wallet, preferences);
+        this._userContextService.setUserPreferences(wallet.address, preferences);
       }
     }
   }

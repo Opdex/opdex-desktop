@@ -1,0 +1,8 @@
+<button mat-icon-button
+    [color]="color"
+    [ngClass]="size"
+    [matTooltip]="tooltip"
+    [cdkCopyToClipboard]="value"
+    (click)="copyHandler($event)">
+    <mat-icon [ngClass]="color">{{copied ? icons.check : icon}}</mat-icon>
+</button>

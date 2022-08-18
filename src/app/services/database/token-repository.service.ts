@@ -1,17 +1,34 @@
-import { ITokenEntity } from '@interfaces/database.interface';
-import { Injectable } from "@angular/core";
+import { IPagination, ITokenEntity } from '@interfaces/database.interface';
+import { Injectable, Injector } from "@angular/core";
 import { OpdexDB } from "./db.service";
+import { CacheService } from '@services/utility/cache.service';
+import { from, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
-export class TokenRepositoryService {
-  constructor(private _db: OpdexDB) { }
-
-  async getTokenByAddress(address: string) {
-    return await this._db.token.get({ address });
+export class TokenRepositoryService extends CacheService {
+  constructor(
+    protected _injector: Injector,
+    private _db: OpdexDB
+  ) {
+    super(_injector);
   }
 
-  async getTokens() {
-    return await this._db.token.toArray();
+  getTokenByAddress(address: string): Observable<ITokenEntity> {
+    return this.getItem<ITokenEntity>(address, from(this._db.token.get({ address })), 10);
+  }
+
+  async searchTokens(keyword: string): Promise<ITokenEntity[]> {
+    return await this._db.token
+      .where('address').equals(keyword)
+      .or('symbol').startsWithIgnoreCase(keyword)
+      .or('name').startsWithIgnoreCase(keyword)
+      .toArray();
+  }
+
+  async getTokens(skip: number = 0, take: number = 10): Promise<IPagination<ITokenEntity>> {
+    const count = await this._db.token.count();
+    const results = await this._db.token.offset(skip).limit(take).toArray();
+    return { skip, take, results, count };
   }
 
   async persistTokens(tokens: ITokenEntity[]) {

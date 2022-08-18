@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import * as path from 'path'
 import * as url from 'url'
 
@@ -26,6 +26,12 @@ require('electron-context-menu')({
 
 app.whenReady().then(() => {
   createWindow();
+
+  // Open browser links in new window
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
 
   app.on('activate', () => {
     // Open a window if none are open (macOS)

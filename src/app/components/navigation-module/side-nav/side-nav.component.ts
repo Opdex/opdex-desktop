@@ -1,5 +1,7 @@
+import { IndexerService } from '@services/platform/indexer.service';
+import { TermsModalComponent } from '@components/modals-module/terms-modal/terms-modal.component';
+import { Network } from '@enums/networks';
 import { UserContext } from '@models/user-context';
-import { NodeService } from '@services/platform/node.service';
 import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Icons } from '@enums/icons';
@@ -7,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserContextService } from '@services/utility/user-context.service';
 import { Router } from '@angular/router';
 import { BugReportModalComponent } from '@components/modals-module/bug-report-modal/bug-report-modal.component';
+import { EnvironmentsService } from '@services/utility/environments.service';
 
 @Component({
   selector: 'opdex-side-nav',
@@ -20,7 +23,7 @@ export class SideNavComponent implements OnDestroy {
   isPinned: boolean = true;
   latestSyncedBlock$: Observable<number>;
   icons = Icons;
-  network: string;
+  network: Network;
   subscription = new Subscription();
   pendingTransactions: string[] = [];
   context: UserContext;
@@ -28,22 +31,13 @@ export class SideNavComponent implements OnDestroy {
   constructor(
     public dialog: MatDialog,
     private _userContextService: UserContextService,
-    private _indexService: NodeService,
+    private _indexerService: IndexerService,
     private _router: Router,
-    // private _transactionsService: TransactionsService,
-    // private _env: EnvironmentsService,
-    // private _authService: AuthService
+    private _env: EnvironmentsService
   ) {
     this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
-    // this.subscription.add(this._transactionsService.getBroadcastedTransactions$().subscribe(txs => this.pendingTransactions = txs));
-    this.latestSyncedBlock$ = this._indexService.latestBlock$;
-
-    // const { network } = this._env;
-    // this.network = network;
-  }
-
-  login(): void {
-    // this._authService.prepareLogin();
+    this.latestSyncedBlock$ = this._indexerService.latestBlock$;
+    this.network = this._env.network;
   }
 
   togglePin(): void {
@@ -57,6 +51,10 @@ export class SideNavComponent implements OnDestroy {
 
   openBugReport(): void {
     this.dialog.open(BugReportModalComponent, { width: '500px' });
+  }
+
+  openTerms(): void {
+    this.dialog.open(TermsModalComponent, { width: '500px' });
   }
 
   logout(): void {

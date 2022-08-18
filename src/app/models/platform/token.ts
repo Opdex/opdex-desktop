@@ -1,7 +1,8 @@
+import { toChecksumAddress } from 'ethereum-checksum-address';
 import { Icons } from '@enums/icons';
+import { IHydratedTokenDetailsDto } from '@interfaces/contract-properties.interface';
 import { ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
-import { IHydratedTokenDetailsDto } from '@services/platform/token.service';
 
 export class Token {
   address: string;
@@ -18,7 +19,16 @@ export class Token {
     return this.address === 'CRS';
   }
 
-  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any) {
+  get isStaking(): boolean {
+    return !!this.distribution;
+  }
+
+  public get trackBy(): string {
+    const { pricing, address } = this;
+    return `${address}-${pricing.usd}`;
+  }
+
+  constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any, trusted?: boolean) {
     this.address = entity.address;
     this.name = entity.name;
     this.symbol = entity.symbol;
@@ -31,11 +41,12 @@ export class Token {
       this.wrappedToken = new WrappedToken({
         chain: entity.nativeChain,
         address: entity.nativeChainAddress,
-        // Todo: should validate the ethereum address via checksum (we do but don't mark success)
-        validated: true,
-        // Validate supported tokens via Cirrus FN API
-        trusted: true
-      } as IWrappedToken);
+        trusted
+      });
+    }
+
+    if (hydrated.nextDistributionBlock) {
+      this.distribution = new TokenDistribution(hydrated.nextDistributionBlock);
     }
   }
 
@@ -45,35 +56,19 @@ export class Token {
       symbol: 'CRS',
       address: 'CRS',
       decimals: 8,
-      nativeChain: 'Cirrus'
+      nativeChain: 'Cirrus',
+      createdBlock: 1
     }, {
       totalSupply: BigInt('10000000000000000')
-    })
-  }
-
-  static OLPT(address: string, totalSupply: BigInt): Token {
-    return new Token({
-      name: 'Liquidity Pool Token',
-      symbol: 'OLPT',
-      address,
-      decimals: 8,
-      nativeChain: 'Cirrus'
-    }, {
-      totalSupply
     })
   }
 }
 
 export class WrappedToken {
-  private _custodian: string;
   private _chain: string;
   private _address: string;
-  private _validated: boolean;
-  private _trusted: boolean;
-
-  public get custodian(): string {
-    return this._custodian;
-  }
+  private _validated: boolean = false;
+  private _trusted: boolean = false;
 
   public get chain(): string {
     return this._chain;
@@ -107,43 +102,33 @@ export class WrappedToken {
   }
 
   constructor(wrapped: IWrappedToken) {
-    this._custodian = wrapped.custodian;
     this._chain = wrapped.chain;
-    this._address = wrapped.address;
-    this._validated = wrapped.validated;
     this._trusted = wrapped.trusted;
+    this._setAddress(wrapped.address);
+  }
+
+  private _setAddress(address: string): void {
+    try {
+      this._address = toChecksumAddress(address);
+      this._validated = true;
+    } catch {
+      this._address = address;
+    }
   }
 }
 
 export class TokenDistribution {
-  private _vault: string;
-  private _miningGovernance: string;
   private _nextDistributionBlock: number;
-  private _history: TokenDistributionHistory[];
-
-  public get vault(): string {
-    return this._vault;
-  }
-
-  public get miningGovernance(): string {
-    return this._miningGovernance;
-  }
 
   public get nextDistributionBlock(): number {
     return this._nextDistributionBlock;
   }
-
-  public get history(): TokenDistributionHistory[] {
-    return this._history || [];
+  public get distributionPeriodBlockDuration(): number {
+    return 1971000; // Cirrus blocks per year
   }
 
-  constructor(distribution: ITokenDistribution) {
-    if (!!distribution === false) return;
-
-    this._vault = distribution.vault;
-    this._miningGovernance = distribution.miningGovernance;
-    this._nextDistributionBlock = distribution.nextDistributionBlock;
-    this._history = distribution.history.map(history => new TokenDistributionHistory(history));
+  constructor(nextDistributionBlock: number) {
+    this._nextDistributionBlock = nextDistributionBlock;
   }
 
   isReady(latestBlock: number): boolean {
@@ -151,35 +136,9 @@ export class TokenDistribution {
   }
 }
 
-export class TokenDistributionHistory {
-  private _vault: FixedDecimal;
-  private _miningGovernance: FixedDecimal;
-  private _block: number;
-
-  public get vault(): FixedDecimal {
-    return this._vault;
-  }
-
-  public get miningGovernance(): FixedDecimal {
-    return this._miningGovernance;
-  }
-
-  public get block(): number {
-    return this._block;
-  }
-
-  constructor(history: ITokenDistributionHistory) {
-    this._vault = new FixedDecimal(history.vault, history.vault.split('.')[0].length);
-    this._miningGovernance = new FixedDecimal(history.miningGovernance, history.miningGovernance.split('.')[0].length);
-    this._block = history.block;
-  }
-}
-
 export interface IWrappedToken {
-  custodian: string;
   chain: string;
   address: string;
-  validated: boolean;
   trusted: boolean;
 }
 

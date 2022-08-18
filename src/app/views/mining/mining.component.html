@@ -44,13 +44,13 @@
               </ng-container>
             </div>
 
-            <!-- <opdex-tx-quote-submit-button
+            <opdex-tx-quote-submit-button
               label="Distribute Rewards"
-              [disabled]="submitting || !context.wallet"
+              [disabled]="!context.wallet"
               (onSubmit)="quoteDistribution()"
               size="small"
               *ngIf="miningGovernance.periodRemainingBlocks === 0">
-            </opdex-tx-quote-submit-button> -->
+            </opdex-tx-quote-submit-button>
           </ng-container>
 
           <ng-template #loadingFirstSkeleton>
@@ -108,7 +108,7 @@
 
 <div class="standard-section">
   <div class="container">
-    <div class="row mb-4">
+    <div class="row mb-4" *ngIf="miningPools?.length">
       <div class="col-12">
         <h3>Mining Pools</h3>
 

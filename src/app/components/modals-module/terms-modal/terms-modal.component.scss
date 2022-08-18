@@ -1,0 +1,14 @@
+.terms {
+  max-height: 250px;
+  overflow-y: scroll;
+  background: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  margin-bottom: 0;
+
+  &.dark-mode {
+    background: #221b2b;
+    border: 1px solid #5c4896;
+  }
+}

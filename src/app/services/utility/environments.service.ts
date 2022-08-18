@@ -1,3 +1,4 @@
+import { SemVer } from 'semver';
 import { ElectronService } from './electron-service';
 import { IEnvironment, IEnvironmentContracts } from '@interfaces/environment.interface';
 import { Injectable } from '@angular/core';
@@ -17,8 +18,20 @@ export class EnvironmentsService {
     return this._env.network;
   }
 
+  public get startHeight(): number {
+    return this._env.startHeight;
+  }
+
   public get contracts(): IEnvironmentContracts {
     return this._env.contracts;
+  }
+
+  public get version(): SemVer {
+    return new SemVer(environment.version);
+  }
+
+  public get minNodeVersion(): SemVer {
+    return new SemVer(environment.minimumNodeVersion);
   }
 
   constructor(private _electron: ElectronService) { }

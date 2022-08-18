@@ -1,0 +1,18 @@
+<section id="trade" class="header-section tx-bg pb-3 flex-row">
+  <div class="container justify-content-center">
+    <div class="flex-row justify-content-center">
+      <div class="w-100" style="max-width: 400px;">
+        <div class="mb-3">
+          <opdex-tx-buttons (onSelectOption)="handleTxOption($event)"></opdex-tx-buttons>
+        </div>
+
+        <div [ngSwitch]="view">
+          <opdex-tx-swap *ngSwitchCase="1" [data]="{pool}"></opdex-tx-swap>
+          <opdex-tx-provide *ngSwitchCase="2" [data]="{pool, childView}" (onPoolSelection)="handlePoolSelection($event)"></opdex-tx-provide>
+          <opdex-tx-stake *ngSwitchCase="3" [data]="{pool, childView}" (onPoolSelection)="handlePoolSelection($event)"></opdex-tx-stake>
+          <opdex-tx-mine *ngSwitchCase="4" [data]="{pool, childView}" (onPoolSelection)="handlePoolSelection($event)"></opdex-tx-mine>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

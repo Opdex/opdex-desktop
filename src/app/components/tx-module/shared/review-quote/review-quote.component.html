@@ -1,0 +1,124 @@
+<div class="review-tx-quote" *ngIf="quoteRequest && quoteReceipt">
+  <button mat-icon-button class="close-button tiny" (click)="close()"><mat-icon>{{icons.close}}</mat-icon></button>
+
+  <ng-container *ngIf="!txHash; else success">
+    <h4 class="{{quoteReceipt.success ? 'mb-1' : 'mb-3'}}">Transaction Quote</h4>
+
+    <ng-container *ngIf="quoteReceipt.success">
+      <opdex-tx-receipt
+        [tx]="quoteReceipt"
+        [quote]="quoteRequest"
+        [showBottomDivider]="false"
+        [showTimeAgo]="false"
+        [collapsed]="false">
+      </opdex-tx-receipt>
+
+      <mat-divider></mat-divider>
+    </ng-container>
+
+    <div class="mt-2" *ngIf="quote?.error">
+      <p class="mb-2 b-400 flex-row-center error" style="font-size: 1.1em">
+        <mat-icon color="warn" class="small mr-2">{{icons.error}}</mat-icon>
+        Errors
+      </p>
+
+      <p>{{quote.error.friendly || quote.error.raw}}</p>
+
+      <div class="flex-row-center-between mb-3" *ngIf="!showQrAnyways">
+        <button mat-stroked-button
+          style="flex-basis: 30%"
+          (click)="close()">
+          Cancel
+        </button>
+
+        <button mat-flat-button
+          color="warn"
+          (click)="showQrAnyways = true;
+                   showMethodDetails = true;
+                   showParameterDetails = true;"
+          class="ml-3"
+          style="flex-grow: 1;">
+          Continue Anyways
+        </button>
+      </div>
+
+      <mat-divider></mat-divider>
+    </div>
+
+    <div *ngIf="quoteRequest" class="mt-2">
+      <div class="flex-row-center-between mb-2">
+        <div class="flex-row-center">
+          <opdex-help-button class="mr-2" [info]="methodDetailsHelp"></opdex-help-button>
+          <h6 class="mb-0 d-inline">Method Details</h6>
+        </div>
+
+        <div class="flex-row-center-center">
+          <button mat-icon-button color="primary" class="small" (click)="toggleMethodDetails()">
+            <mat-icon>{{showMethodDetails ? icons.remove : icons.add}}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div [@collapse]="!showMethodDetails">
+        <div class="mb-2">
+          <small class="light d-block">Contract Method</small>
+          <small class="d-block overflow-ellipsis">{{quoteRequest?.method}}</small>
+        </div>
+
+        <div class="mb-2">
+          <small class="light d-block">Contract Address</small>
+          <small class="d-block overflow-ellipsis">{{quoteReceipt?.to}}</small>
+        </div>
+      </div>
+
+      <ng-container *ngIf="quoteRequest.parameters?.length">
+        <mat-divider></mat-divider>
+
+        <div class="flex-row-center-between mt-2 mb-2">
+          <div class="flex-row-center">
+            <opdex-help-button class="mr-2" [info]="methodParametersHelp"></opdex-help-button>
+            <h6 class="mb-0 d-inline">Method Parameters</h6>
+          </div>
+
+          <div class="flex-row-center-center">
+            <button mat-icon-button color="primary" class="small" (click)="toggleParameterDetails()">
+              <mat-icon>{{showParameterDetails ? icons.remove : icons.add}}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div [@collapse]="!showParameterDetails">
+          <div class="mb-2" *ngFor="let param of quoteRequest.parameters">
+            <small class="light d-block">{{param.label}}</small>
+            <small class="d-block overflow-ellipsis">{{param.value | contractParameter}}</small>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="mt-4" *ngIf="quoteReceipt.success || showQrAnyways;">
+      <p class="error b-400 text-center" *ngIf="showQrAnyways">This transaction is highly likely to fail.</p>
+
+      <small class="d-block light text-center mb-3">Scan or copy the QR code with a Stratis wallet to quote and complete the transaction.</small>
+
+      <opdex-qr-code [data]="quoteRequest" class="d-block mb-3"></opdex-qr-code>
+    </div>
+  </ng-container>
+
+  <ng-template #success>
+    <div class="flex-column justify-content-center align-items-center" style="min-height: 400px;">
+      <span class="check-animation active">
+        <span class="check-container">
+          <mat-icon>{{icons.check}}</mat-icon>
+        </span>
+      </span>
+
+      <small class="text-center light mt-5 w-100 overflow-ellipsis">
+        {{txHash}}
+      </small>
+    </div>
+  </ng-template>
+</div>
+

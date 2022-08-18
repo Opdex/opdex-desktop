@@ -1,3 +1,7 @@
+import { ControlsModule } from '@components/controls-module/controls.module';
+import { TransactionModule } from './components/tx-module/tx.module';
+import { TablesModule } from './components/tables-module/tables.module';
+import { TxFeedModule } from './components/tx-feed-module/tx-feed.module';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { NavigationModule } from './components/navigation-module/navigation.module';
 import { SharedModule } from '@components/shared-module/shared.module';
@@ -32,6 +36,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { TradeComponent } from './views/trade/trade.component';
+import { WalletComponent } from './views/wallet/wallet.component';
+import { VaultProposalComponent } from './views/vault-proposal/vault-proposal.component';
+import { StatusComponent } from './views/status/status.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +52,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MiningComponent,
     VaultComponent,
     PoolComponent,
-    TokenComponent
+    TokenComponent,
+    TradeComponent,
+    WalletComponent,
+    VaultProposalComponent,
+    StatusComponent
   ],
   imports: [
     BrowserModule,
@@ -62,7 +75,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     CardsModule,
     SharedModule,
     NavigationModule,
-    ModalsModule
+    ModalsModule,
+    TxFeedModule,
+    MatSelectModule,
+    TablesModule,
+    TransactionModule,
+    ControlsModule
   ],
   providers: [
     {

@@ -3,6 +3,7 @@ import { Network } from '@enums/networks';
 export interface IEnvironment {
   network: Network;
   cirrusApi: string;
+  startHeight: number;
   contracts: IEnvironmentContracts;
 }
 

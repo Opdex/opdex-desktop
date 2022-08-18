@@ -1,47 +1,55 @@
 <div class="header-section">
   <div class="container">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-md-6 col-lg-8">
         <div class="flex-row-center">
           <opdex-token-icons [tokens]="[pool?.crsToken, pool?.srcToken]"></opdex-token-icons>
           <h1 class="mb-0 ml-2">{{pool?.name}}</h1>
         </div>
 
         <opdex-copy-address [address]="pool?.address"></opdex-copy-address>
-      </div>
 
-      <div class="col-12 mt-2 mb-3">
-        <div class="flex-row-center">
+        <div class="flex-row-center mt-2 mb-3">
           <div class="badge blue mr-2">{{pool?.transactionFee?.bigInt > 0 ? pool.transactionFee.formattedValue : 0}}% Fee</div>
           <div class="badge purple mr-2" *ngIf="pool?.isNominated"><mat-icon class="mr-1">{{icons.staking}}</mat-icon> Nominated</div>
           <div class="badge red" *ngIf="pool?.miningPool?.miningPeriodEndBlock > latestBlock"><mat-icon class="mr-1">{{icons.mining}}</mat-icon> Mining</div>
         </div>
       </div>
 
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <opdex-liquidity-pool-token-card
-          [token]="pool?.srcToken"
-          [swapToken]="pool?.crsToken"
-          [swapRate]="pool?.crsPerSrc">
-        </opdex-liquidity-pool-token-card>
-      </div>
-
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <opdex-liquidity-pool-token-card
-          [token]="pool?.crsToken"
-          [swapToken]="pool?.srcToken"
-          [swapRate]="pool?.srcPerCrs">
-        </opdex-liquidity-pool-token-card>
+      <div class="col-12 col-md-6 col-lg-4">
+        <opdex-tx-buttons
+          (onSelectOption)="handleTxOption($event)"
+          [hideStaking]="!pool?.miningPool"
+          [hideMining]="!pool?.miningPool">
+        </opdex-tx-buttons>
       </div>
     </div>
   </div>
 </div>
 
-<div class="offset-section">
+<div class="offset-section tx-bg light">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+      <div class="col-12 col-sm-6 col-xl-4">
+        <opdex-liquidity-pool-token-card
+          [token]="pool?.srcToken"
+          [swapToken]="pool?.crsToken"
+          [swapRate]="pool?.crsPerSrc">
+        </opdex-liquidity-pool-token-card>
+
+        <opdex-liquidity-pool-token-card
+          [token]="pool?.crsToken"
+          [swapToken]="pool?.srcToken"
+          [swapRate]="pool?.srcPerCrs">
+        </opdex-liquidity-pool-token-card>
+
         <opdex-liquidity-pool-summary-card [pool]="pool"></opdex-liquidity-pool-summary-card>
+
+        <opdex-liquidity-pool-positions-card [pool]="pool" *ngIf="context?.isLoggedIn"></opdex-liquidity-pool-positions-card>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <opdex-contract-feed [contract]="pool?.address"></opdex-contract-feed>
       </div>
     </div>
   </div>

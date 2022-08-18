@@ -12,6 +12,7 @@ export interface ILiquidityPoolEntity {
   transactionFee: number;
   isNominated: number;
   miningPeriodEndBlock: number;
+  createdBlock: number;
 }
 
 export interface ITokenEntity {
@@ -22,4 +23,33 @@ export interface ITokenEntity {
   decimals: number;
   nativeChain?: string;
   nativeChainAddress?: string;
+  createdBlock: number;
+}
+
+export interface IVaultProposalEntity {
+  id?: number;
+  proposalId: number;
+  createdBlock: number;
+  type: number;
+  approved: number;
+  description: string;
+  wallet: string;
+  creator: string;
+}
+
+export interface IVaultCertificateEntity {
+  id?: number;
+  owner: string;
+  amount: BigInt;
+  redeemed: number; // 0 false - 1 true
+  revoked: number; // 0 false - 1 true
+  createdBlock: number;
+  vestedBlock: number;
+}
+
+export interface IPagination<T> {
+  skip: number;
+  take: number;
+  count: number;
+  results: T[];
 }

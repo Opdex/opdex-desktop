@@ -1,22 +1,46 @@
-import { NodeService } from '@services/platform/node.service';
-import { ILiquidityPoolEntity } from '@interfaces/database.interface';
+import { CacheService } from '@services/utility/cache.service';
+import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
 import { OpdexDB } from './db.service';
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core";
+import { from, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
-export class PoolRepositoryService {
-  constructor(private _db: OpdexDB, private _nodeService: NodeService) { }
-
-  async getPoolByAddress(address: string): Promise<ILiquidityPoolEntity> {
-    return await this._db.liquidityPool.get({ address });
+export class PoolRepositoryService extends CacheService {
+  constructor(
+    private _db: OpdexDB,
+    protected _injector: Injector) {
+      super(_injector);
   }
 
-  async getPoolBySrcAddress(address: string): Promise<ILiquidityPoolEntity> {
-    return await this._db.liquidityPool.get({srcToken: address});
+  async searchLiquidityPools(keyword: string): Promise<ILiquidityPoolEntity[]> {
+    return await this._db.liquidityPool
+      .where('address').equals(keyword)
+      .or('name').startsWithIgnoreCase(keyword)
+      .toArray();
   }
 
-  async getPools(skip: number = 0, take: number = 10): Promise<ILiquidityPoolEntity[]> {
-    return await this._db.liquidityPool.offset(skip).limit(take).toArray();
+  getPoolByAddress(address: string): Observable<ILiquidityPoolEntity> {
+    const key = `poolByAddress-${address}`;
+    const observable = from(this._db.liquidityPool.get({ address }));
+    return this.getItem<ILiquidityPoolEntity>(key, observable, 1);
+  }
+
+  getPoolBySrcAddress(address: string): Observable<ILiquidityPoolEntity> {
+    const key = `poolBySrcToken-${address}`;
+    const observable = from(this._db.liquidityPool.get({srcToken: address}));
+    return this.getItem<ILiquidityPoolEntity>(key, observable, 1);
+  }
+
+  getPoolByMiningPoolAddress(address: string) : Observable<ILiquidityPoolEntity> {
+    const key = `poolByMiningPool-${address}`;
+    const observable = from(this._db.liquidityPool.get({miningPool: address}));
+    return this.getItem<ILiquidityPoolEntity>(key, observable, 1);
+  }
+
+  async getPools(skip: number = 0, take: number = 10): Promise<IPagination<ILiquidityPoolEntity>> {
+    const count = await this._db.liquidityPool.count();
+    const results = await this._db.liquidityPool.offset(skip).limit(take).toArray();
+    return { skip, take, results, count };
   }
 
   async getPoolsByMiningPoolAddress(miningPools: string[]): Promise<ILiquidityPoolEntity[]> {

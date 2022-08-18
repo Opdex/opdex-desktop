@@ -23,6 +23,14 @@
       }
     }
   }
+
+  .mat-button-toggle-group-appearance-standard {
+    border: 1px solid #2d2b40;
+
+    .mat-button-toggle {
+      background : $dark-primary;
+    }
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

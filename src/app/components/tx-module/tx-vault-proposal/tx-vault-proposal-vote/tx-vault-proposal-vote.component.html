@@ -1,0 +1,64 @@
+<div class="vault-proposal-vote">
+  <form [formGroup]="form" name="vault-proposal-vote-form" id="vault-proposal-vote-form">
+    <opdex-input-control
+      [prefixIcon]="isWithdrawal ? icons.remove : icons.add"
+      [prefixIconDisabled]="true"
+      [suffixDisabled]="true"
+      [label]="isWithdrawal ? 'Withdraw' : 'Vote'"
+      [formControl]="amount"
+      [numbersOnly]="true"
+      suffix="CRS">
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      contract="{{ isWithdrawal ? vaultAddress : 'CRS'}}"
+      [token]="crs"
+      [positionType]="positionType"
+      [selected]="percentageSelected"
+      (onPercentageSelect)="handlePercentageSelect($event)"
+      [proposalId]="proposal.proposalId"
+      [disable]="amount.disabled"
+      *ngIf="crs">
+    </opdex-percentage-amount-buttons>
+
+    <small class="error" *ngIf="amount.disabled">{{votingDisabled}}</small>
+
+    <mat-slide-toggle
+      class="d-block mt-3"
+      color="primary"
+      [checked]="isWithdrawal"
+      (change)="handleAddRemoveStatus($event)">
+      <span [ngClass]="{'light': !isWithdrawal}">Withdraw Vote</span>
+    </mat-slide-toggle>
+
+    <mat-slide-toggle
+      *ngIf="!isWithdrawal"
+      class="d-block mt-3"
+      color="primary"
+      formControlName="inFavor">
+      <span [ngClass]="{'light': !inFavor.value}">In Favor</span>
+    </mat-slide-toggle>
+
+    <opdex-card [info]="true" class="d-block mt-3" *ngIf="isWithdrawal && proposal.status === 'Vote' && proposal.expiration >= latestBlock">
+      <small>
+        Withdrawing when an active proposal is in vote status will deduct the withdrawn amount from the proposals' votes.
+      </small>
+    </opdex-card>
+
+    <div class="mt-2" *ngIf="balanceError">
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient Balance">
+      </opdex-tx-quote-error>
+    </div>
+
+    <opdex-tx-quote-submit-button
+      [warn]="balanceError"
+      label="Quote {{isWithdrawal ? 'Withdrawal' : 'Vote'}}"
+      [disabled]="!form.valid || !context?.isLoggedIn || balanceError === undefined || !proposal"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

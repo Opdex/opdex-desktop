@@ -1,11 +1,15 @@
-import { LiquidityPoolFactoryService } from '@services/factory/liquidity-pool-factory.service';
+import { IndexerService } from '@services/platform/indexer.service';
+import { ReviewQuoteComponent } from '@components/tx-module/shared/review-quote/review-quote.component';
+import { UserContext } from '@models/user-context';
+import { UserContextService } from '@services/utility/user-context.service';
+import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
 import { MiningGovernance } from '@models/platform/mining-governance';
-import { NodeService } from '@services/platform/node.service';
 import { Subscription, switchMap, tap } from 'rxjs';
-import { MiningGovernanceFactoryService } from '@services/factory/mining-governance-factory.service';
+import { MiningGovernanceService } from '@services/platform/mining-governance.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Icons } from '@enums/icons';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'opdex-mining',
@@ -13,6 +17,7 @@ import { LiquidityPool } from '@models/platform/liquidity-pool';
   styleUrls: ['./mining.component.scss']
 })
 export class MiningComponent implements OnInit, OnDestroy {
+  context: UserContext;
   miningGovernance: MiningGovernance;
   nominatedPools: LiquidityPool[];
   miningPools: LiquidityPool[];
@@ -20,22 +25,36 @@ export class MiningComponent implements OnInit, OnDestroy {
   icons = Icons;
 
   constructor(
-    private _miningGovernanceFactory: MiningGovernanceFactoryService,
-    private _nodeService: NodeService,
-    private _liquidityPoolFactory: LiquidityPoolFactoryService
+    private _miningGovernanceService: MiningGovernanceService,
+    private _indexerService: IndexerService,
+    private _liquidityPoolService: LiquidityPoolService,
+    private _userContextService: UserContextService,
+    private _bottomSheet: MatBottomSheet,
   ) { }
 
   ngOnInit(): void {
     this.subscription.add(
-      this._nodeService.latestBlock$
+      this._userContextService.context$
+        .subscribe(context => this.context = context));
+
+    this.subscription.add(
+      this._indexerService.latestBlock$
         .pipe(
-          switchMap(latestBlock => this._miningGovernanceFactory.buildMiningGovernance(latestBlock)),
+          switchMap(latestBlock => this._miningGovernanceService.buildMiningGovernance(latestBlock)),
           tap(gov => this.miningGovernance = gov),
-          switchMap(_ => this._liquidityPoolFactory.buildNominatedLiquidityPools()),
+          switchMap(_ => this._liquidityPoolService.buildNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
-          switchMap(_ => this._liquidityPoolFactory.buildActiveMiningPools()),
+          switchMap(_ => this._liquidityPoolService.buildActiveMiningPools()),
           tap(pools => this.miningPools = pools))
         .subscribe());
+  }
+
+  async quoteDistribution(): Promise<void> {
+    if (!this.context?.wallet) return;
+
+    const quote = await this._miningGovernanceService.rewardMiningPools();
+
+    this._bottomSheet.open(ReviewQuoteComponent, { data: quote });
   }
 
   poolsTrackBy(index: number, pool: LiquidityPool): string {

@@ -1,0 +1,107 @@
+<div class="transaction-receipt row-hoverable" *ngIf="tx" (click)="toggleCollapse()">
+  <div class="tx-container">
+    <div class="flex-row-center w-100 mb-1">
+      <div class="icon-container">
+        <mat-icon
+          *ngIf="tx.success"
+          class="small"
+          [ngClass]="(tx.transactionType?.iconColor || 'orange')">
+          {{tx.transactionType?.icon || icons.warning}}
+        </mat-icon>
+
+        <mat-icon *ngIf="!tx.success" class="small red">
+          {{icons.error}}
+        </mat-icon>
+      </div>
+
+      <div class="flex-row-center-between w-100">
+        <small class="b-400">
+          <span *ngIf="tx?.transactionSummary === 'Unknown' &&
+                      (quote?.method === 'CollectStakingRewards' || quote?.method === 'CollectMiningRewards');
+                      else unknown">Collect Rewards</span>
+          <ng-template #unknown>{{tx?.transactionSummary}}</ng-template>
+        </small>
+
+        <div class="flex-row-center">
+          <!-- <small *ngIf="showTimeAgo">{{tx?.block?.medianTime | timeago}}</small> -->
+          <small *ngIf="showTimeAgo">#{{tx?.block?.height | formatNumber:0}}</small>
+
+          <a mat-button
+            color="primary"
+            class="tiny p-0 ml-2"
+            style="font-size: .8em; line-height: .8em; min-width: 0;"
+            href="https://explorer.coinvault.io/{{chain}}/explorer/transaction/{{tx.hash}}"
+            target="_blank"
+            *ngIf="!!tx.hash"
+            matTooltip="View in Explorer">
+            <mat-icon class="tiny">{{icons.exit}}</mat-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-100 icon-container-offset" *ngIf="tx.transactionType; else invalid">
+      <ng-container [ngSwitch]="tx.transactionType.title">
+        <opdex-swap-transaction-summary [transaction]="tx" *ngSwitchCase="'Swap'"></opdex-swap-transaction-summary>
+        <opdex-provide-transaction-summary [transaction]="tx" *ngSwitchCase="'Provide'"></opdex-provide-transaction-summary>
+        <opdex-mine-transaction-summary [transaction]="tx" *ngSwitchCase="'Mine'"></opdex-mine-transaction-summary>
+        <opdex-stake-transaction-summary [transaction]="tx" *ngSwitchCase="'Stake'"></opdex-stake-transaction-summary>
+        <opdex-enable-mining-transaction-summary [transaction]="tx" *ngSwitchCase="'Enable Mining'"></opdex-enable-mining-transaction-summary>
+        <opdex-create-pool-transaction-summary [transaction]="tx" *ngSwitchCase="'Create Pool'"></opdex-create-pool-transaction-summary>
+        <opdex-distribute-transaction-summary [transaction]="tx" *ngSwitchCase="'Distribute'"></opdex-distribute-transaction-summary>
+        <opdex-allowance-transaction-summary [transaction]="tx" *ngSwitchCase="'Allowance'"></opdex-allowance-transaction-summary>
+        <opdex-vault-proposal-transaction-summary [transaction]="tx" *ngSwitchCase="'Vault Proposal'"></opdex-vault-proposal-transaction-summary>
+        <opdex-vault-certificate-transaction-summary [transaction]="tx" *ngSwitchCase="'Vault Certificate'"></opdex-vault-certificate-transaction-summary>
+      </ng-container>
+    </div>
+
+    <ng-template #invalid>
+      <div class="icon-container-offset flex-row-center">
+        <ng-container *ngIf="quote?.method !== 'CollectStakingRewards' && quote?.method !== 'CollectMiningRewards'; else noRewards">
+          <span *ngIf="tx.success">Unable to read transaction summary, no Opdex transaction events found.</span>
+          <!-- <span *ngIf="!tx.success">{{tx.error.friendly}}</span> -->
+          <span *ngIf="!tx.success">{{tx.error}}</span>
+        </ng-container>
+
+        <ng-template #noRewards>
+          No rewards to collect.
+        </ng-template>
+      </div>
+    </ng-template>
+
+    <div class="collapsed" [@collapse]="collapsed">
+      <div class="flex-row-center icon-container-offset pt-3 flex-wrap">
+        <div class="flex-row-center mr-3" *ngIf="tx.hash?.length > 0">
+          <opdex-copy-button
+            [tooltip]="tx.hash"
+            [value]="tx.hash"
+            [icon]="icons.receipt"
+            size="tiny"
+            color="primary"
+            [stopPropagation]="true"></opdex-copy-button>
+
+          <span class="ml-2"><small>{{tx.hash | shortAddress:3}}</small></span>
+        </div>
+
+        <div class="flex-row-center mr-3">
+          <opdex-copy-button
+            [tooltip]="tx.from"
+            [value]="tx.from"
+            [icon]="icons.owner"
+            size="tiny"
+            color="swap"
+            [stopPropagation]="true">
+          </opdex-copy-button>
+
+            <span class="ml-2"><small>{{tx.from | shortAddress:3}}</small></span>
+        </div>
+
+        <div class="flex-row-center">
+          <mat-icon class="tiny mr-2 mine">{{icons.gas}}</mat-icon> <small>{{tx.gasUsed | formatNumber:0}}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider *ngIf="showBottomDivider" style="position: relative;"></mat-divider>
+</div>

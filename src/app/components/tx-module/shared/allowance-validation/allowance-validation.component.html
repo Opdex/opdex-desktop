@@ -1,0 +1,19 @@
+<ng-container *ngIf="allowance">
+  <div class="flex-row-center-between" *ngIf="!allowance.isApproved">
+    <div class="flex-row-center">
+      <mat-icon class="tiny orange mr-1" *ngIf="!waiting">{{icons.warning}}</mat-icon>
+      <mat-spinner *ngIf="waiting" class="tiny mr-2"></mat-spinner>
+      <p class="quote-error light" *ngIf="!waiting">Insufficient Allowance</p>
+      <p class="quote-error light" *ngIf="waiting">Awaiting Approval</p>
+    </div>
+
+    <a color="primary" class="tiny" href="javascript:void(0)" *ngIf="!waiting" (click)="approveAllowance()" type="button"><small>Approve</small></a>
+  </div>
+
+  <div class="flex-row-center-between" *ngIf="allowance.isApproved">
+    <div class="message flex-row-center">
+      <mat-icon class="tiny green mr-1">{{icons.checkOutline}}</mat-icon>
+      <p class="quote-error light">Allowance</p>
+    </div>
+  </div>
+</ng-container>

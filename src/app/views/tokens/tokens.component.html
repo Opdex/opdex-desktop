@@ -1,35 +1,27 @@
 <div class="header-section">
   <div class="container">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-md-8 col-lg-9">
         <h1 class="mb-0">Tokens</h1>
+      </div>
+
+      <div class="col-12 col-md-4 col-lg-3">
+        <div class="d-md-none mt-3"></div>
+        <opdex-tx-buttons
+          (onSelectOption)="handleTxOption($event)"
+          [hideMining]="true"
+          [hideStaking]="true">
+        </opdex-tx-buttons>
       </div>
     </div>
   </div>
 </div>
 
-<div class="offset-section">
+<div class="standard-section">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3" *ngFor="let token of tokens">
-        <opdex-card routerLink="/tokens/{{token.address}}">
-          <div class="flex-row-center-between">
-            <div class="flex-row-center">
-              <opdex-token-icon [token]="token"></opdex-token-icon>
-
-              <div class="flex-col-center ml-2 mb-2">
-                <small class="mb-0">{{token.name}}</small>
-                <h4 class="mb-0">{{token.symbol}}</h4>
-              </div>
-            </div>
-
-            <div class="flex-row-center">
-              <opdex-number [prefix]="currency.htmlEntity" [value]="token.pricing[currency.abbreviation]" [short]="true"></opdex-number>
-            </div>
-          </div>
-
-          <opdex-copy-address [address]="token.address"></opdex-copy-address>
-        </opdex-card>
+      <div class="col-12">
+        <opdex-tokens-table [take]="15"></opdex-tokens-table>
       </div>
     </div>
   </div>

@@ -1,3 +1,6 @@
+import { SharedPipesModule } from '@pipes/shared-pipes.module';
+import { VaultProposalCardComponent } from './vault-proposal-card/vault-proposal-card.component';
+import { VaultCertificateCardComponent } from './vault-certificate-card/vault-certificate-card.component';
 import { MarketTokenCardComponent } from './market-token-card/market-token-card.component';
 import { StakingPoolCardComponent } from './staking-pool-card/staking-pool-card.component';
 import { SharedModule } from '@components/shared-module/shared.module';
@@ -21,6 +24,7 @@ import { LiquidityPoolSummaryCardComponent } from './liquidity-pool-summary-card
 import { LiquidityPoolTokenCardComponent } from './liquidity-pool-token-card/liquidity-pool-token-card.component';
 import { MiningPoolCardComponent } from './mining-pool-card/mining-pool-card.component';
 import { TokenSummaryCardComponent } from './token-summary-card/token-summary-card.component';
+import { LiquidityPoolPositionsCardComponent } from './liquidity-pool-positions-card/liquidity-pool-positions-card.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +34,10 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     StakingPoolCardComponent,
     MiningPoolCardComponent,
     MarketTokenCardComponent,
-    TokenSummaryCardComponent
+    TokenSummaryCardComponent,
+    VaultCertificateCardComponent,
+    VaultProposalCardComponent,
+    LiquidityPoolPositionsCardComponent
   ],
   imports: [
     CommonModule,
@@ -43,7 +50,8 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     MatProgressBarModule,
     MatDividerModule,
     MatBottomSheetModule,
-    SharedModule
+    SharedModule,
+    SharedPipesModule
   ],
   exports: [
     CardComponent,
@@ -52,7 +60,10 @@ import { TokenSummaryCardComponent } from './token-summary-card/token-summary-ca
     StakingPoolCardComponent,
     MarketTokenCardComponent,
     MiningPoolCardComponent,
-    TokenSummaryCardComponent
+    TokenSummaryCardComponent,
+    VaultCertificateCardComponent,
+    VaultProposalCardComponent,
+    LiquidityPoolPositionsCardComponent
   ]
 })
 export class CardsModule { }

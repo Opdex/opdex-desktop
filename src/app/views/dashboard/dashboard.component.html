@@ -1,10 +1,17 @@
 <div class="header-section">
   <div class="container">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-md-6 col-lg-8">
         <h1>Dashboard</h1>
       </div>
 
+      <div class="col-12 col-md-6 col-lg-4">
+        <opdex-tx-buttons (onSelectOption)="handleTxOption($event)"></opdex-tx-buttons>
+        <div class="dm-lg-none mb-3"></div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
         <opdex-market-token-card [token]="crs"></opdex-market-token-card>
       </div>
@@ -15,9 +22,9 @@
   </div>
 </div>
 
-<div class="standard-section">
+<div class="offset-section">
   <div class="container">
-    <div class="row mb-4">
+    <div class="row mb-4" *ngIf="miningPools?.length">
       <div class="col-12">
         <h3>Mining Pools</h3>
 
@@ -43,22 +50,20 @@
   </div>
 </div>
 
-
-<div class="offset-section">
+<div class="standard-section">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-4" *ngFor="let pool of pools">
-        <opdex-card routerLink="/pools/{{pool.address}}">
-          <h3>{{pool.name}}</h3>
-          <small>{{pool.address}}</small>
-          <p>{{pool.reserveCrs.formattedValue}} CRS Reserves</p>
-          <p>{{pool.reserveSrc.formattedValue}} {{pool.srcToken.symbol}} Reserves</p>
-          <p>{{pool.totalStaked.formattedValue}} ODX Staked</p>
-          <p>1 CRS = {{pool.srcPerCrs.formattedValue}} {{pool.srcToken.symbol}}</p>
-          <p>1 {{pool.srcToken.symbol}} = {{pool.crsPerSrc.formattedValue}} CRS</p>
-        </opdex-card>
+      <div class="col-12">
+        <h3>Liquidity Pools</h3>
+        <opdex-pools-table [take]="5"></opdex-pools-table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <h3>Tokens</h3>
+        <opdex-tokens-table [take]="5"></opdex-tokens-table>
       </div>
     </div>
   </div>
 </div>
-

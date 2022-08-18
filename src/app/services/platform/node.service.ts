@@ -1,16 +1,15 @@
 import { INodeStatus } from '@interfaces/full-node.interface';
-import { CirrusApiService } from '@services/api/cirrus-api.service';
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, filter, Observable, tap, of, catchError } from 'rxjs';
+import { BehaviorSubject, filter, Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class NodeService {
   private _block: number;
   private _status: INodeStatus;
+
+  // Block store block height
   private _block$ = new BehaviorSubject<number>(null);
   private _status$ = new BehaviorSubject<INodeStatus>(null);
-
-  constructor(private _cirrus: CirrusApiService) { }
 
   public get latestBlock() {
     return this._block;
@@ -28,19 +27,13 @@ export class NodeService {
     return this._status$.asObservable().pipe(filter(status => !!status));
   }
 
-  refreshStatus$(): Observable<INodeStatus> {
-    return this._cirrus.getNodeStatus()
-      .pipe(
-        catchError(_ => of(undefined)),
-        tap((status: INodeStatus) => {
-          this._status = status;
-          this._status$.next(status);
+  public setStatus(status: INodeStatus) {
+    this._status = status;
+    this._status$.next(status);
 
-          if (!this._block || this._block < status.consensusHeight) {
-            this._block = status.consensusHeight;
-            this._block$.next(this._block);
-          }
-        })
-      );
+    if (!!status && (!this._block || this._block < status.consensusHeight)) {
+      this._block = status.consensusHeight;
+      this._block$.next(this._block);
+    }
   }
 }

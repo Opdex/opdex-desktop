@@ -1,0 +1,47 @@
+<div class="start-mining">
+  <form [formGroup]="form" name="start-mining-form" id="start-mining-form">
+    <opdex-input-control
+      [suffixDisabled]="true"
+      label="Start Mining"
+      [formControl]="amount"
+      [suffix]="pool.lpToken.symbol"
+      [numbersOnly]="true">
+      <opdex-number [value]="fiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      [contract]="pool.address"
+      [token]="pool.lpToken"
+      positionType="Balance"
+      [selected]="percentageSelected"
+      (onPercentageSelect)="handlePercentageSelect($event)"></opdex-percentage-amount-buttons>
+
+    <div class="mt-2" *ngIf="balanceError || allowance">
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient Balance"
+        *ngIf="balanceError">
+      </opdex-tx-quote-error>
+
+      <opdex-allowance-validation
+        [allowance]="allowance">
+      </opdex-allowance-validation>
+    </div>
+
+    <div *ngIf="fiatValue" class="mt-3 p-2 border" style="border-radius: 4px;">
+      <div class="flex-row-center-between">
+        <small class="b-400">
+          <span class="success">+{{percentageOfSupply.formattedValue | shortNumber}}%</span> Total Mining Weight
+        </small>
+      </div>
+    </div>
+
+    <opdex-tx-quote-submit-button
+      [warn]="balanceError || (allowance && !allowance?.isApproved)"
+      [disabled]="!form.valid || !context?.isLoggedIn || balanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

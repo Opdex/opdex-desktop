@@ -9,24 +9,24 @@
         </a>
       </div>
 
-      <!-- <button mat-icon-button color="primary" [ngClass]="iconSizes.small" [matMenuTriggerFor]="beforeMenu">
+      <button mat-icon-button color="primary" class="small" [matMenuTriggerFor]="beforeMenu">
         <mat-icon>{{icons.more}}</mat-icon>
       </button>
 
       <mat-menu #beforeMenu="matMenu" xPosition="before" class="w-100">
-        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.swap)">
+        <button mat-menu-item class="small" (click)="transact(txView.swap)">
           <mat-icon class="swap">{{icons.swap}}</mat-icon> Swap
         </button>
-        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.provide)">
+        <button mat-menu-item class="small" (click)="transact(txView.provide)">
           <mat-icon class="provide">{{icons.provide}}</mat-icon> Provide
         </button>
-        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.stake)" *ngIf="pool.summary.staking">
+        <button mat-menu-item class="small" (click)="transact(txView.stake)" *ngIf="pool.miningPool">
           <mat-icon class="stake">{{icons.staking}}</mat-icon> Stake
         </button>
-        <button mat-menu-item [ngClass]="iconSizes.small" (click)="transact(txView.mine)" *ngIf="pool.miningPool?.isActive">
+        <button mat-menu-item class="small" (click)="transact(txView.mine)" *ngIf="pool.miningPool?.isActive">
           <mat-icon class="mine">{{icons.mining}}</mat-icon> Mine
         </button>
-      </mat-menu> -->
+      </mat-menu>
     </div>
 
     <div class="flex-row-center-between">
@@ -35,19 +35,17 @@
         <p class="mb-0">Staking</p>
       </div>
 
-      <!-- <opdex-number [short]="true" prefix="$" [value]="pool.summary.staking.usd"></opdex-number> -->
+      <opdex-number
+        [short]="true"
+        [prefix]="selectedCurrency?.htmlEntity"
+        [value]="pool.stakingToken.pricing[selectedCurrency.abbreviation].multiply(pool.totalStaked)">
+      </opdex-number>
     </div>
 
     <div class="flex-row-center-between">
       <p class="mb-0 sub-heading">Weight</p>
 
       <div class="flex-row-center">
-        <!-- <opdex-change-indicator
-          class="mr-2"
-          [value]="pool.summary.staking.dailyWeightChangePercent"
-          *ngIf="!!pool.summary.staking.dailyWeightChangePercent">
-        </opdex-change-indicator> -->
-
         <opdex-number [short]="true" [suffix]="pool.stakingToken?.symbol" [value]="pool.totalStaked"></opdex-number>
       </div>
     </div>

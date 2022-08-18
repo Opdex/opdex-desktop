@@ -1,0 +1,35 @@
+<ng-container *ngIf="token && !error">
+  <div class="flex-row-center mb-2">
+    <button mat-icon-button color="primary" class="tiny mr-2" routerLink="/mining-governance">
+      <mat-icon class="red">{{icons.mining}}</mat-icon>
+    </button>
+
+    <opdex-number
+      class="mr-2"
+      prefix="+"
+      [value]="miningGovernanceAmount"
+      [short]="true"
+      [stopPropagation]="true">
+    </opdex-number>
+
+    <a class="ml-1 no-decoration" routerLink="/tokens/{{token.address}}">{{token.symbol}}</a>
+  </div>
+
+  <div class="flex-row-center">
+    <button mat-icon-button color="primary" class="tiny mr-2" routerLink="/vault">
+      <mat-icon class="swap">{{icons.vault}}</mat-icon>
+    </button>
+
+    <opdex-number
+      class="mr-2"
+      prefix="+"
+      [value]="vaultAmount"
+      [short]="true"
+      [stopPropagation]="true">
+    </opdex-number>
+
+    <a class="ml-1 no-decoration" routerLink="/tokens/{{token.address}}">{{token.symbol}}</a>
+  </div>
+</ng-container>
+
+<div *ngIf="error">{{error}}</div>

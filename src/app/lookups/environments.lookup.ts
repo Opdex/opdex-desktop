@@ -5,6 +5,7 @@ export const Environments: IEnvironment[] = [
   {
     network: Network.Mainnet,
     cirrusApi: 'http://localhost:37223',
+    startHeight: 3750000,
     contracts: {
       deployer: 'CUG9qFQbzQKyDYos9UywG2aodJ6S45wqA6',
       router: 'CeNa4b95h9YqDc1UZ2YCqmeqXXKqeDdAYW',
@@ -16,6 +17,7 @@ export const Environments: IEnvironment[] = [
   }, {
     network: Network.Testnet,
     cirrusApi: 'http://localhost:38223',
+    startHeight: 2950000,
     contracts: {
       deployer: 'tJi67WDN6uoSRWgqTWr3Gmobc5xQ3AEfnC',
       router: 'tAFxpxRdcV9foADqD6gK3c8sY5MeANzFp5',

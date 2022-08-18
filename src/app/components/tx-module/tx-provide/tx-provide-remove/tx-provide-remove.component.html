@@ -1,0 +1,106 @@
+<div class="remove-liquidity">
+  <form [formGroup]="form" name="remove-liquidity-form" id="remove-liquidity-form">
+    <opdex-input-control
+      [suffixDisabled]="true"
+      label="Remove Liquidity"
+      [formControl]="liquidity"
+      [suffix]="pool.lpToken.symbol"
+      [numbersOnly]="true">
+      <opdex-number [value]="lptInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      [contract]="pool.address"
+      [token]="pool.lpToken"
+      positionType="Balance"
+      [selected]="percentageSelected"
+      (onPercentageSelect)="handlePercentageSelect($event)"></opdex-percentage-amount-buttons>
+
+    <div class="mt-2 mb-2" *ngIf="allowance || balanceError">
+      <opdex-allowance-validation
+        [allowance]="allowance">
+      </opdex-allowance-validation>
+
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient Balance"
+        *ngIf="balanceError">
+      </opdex-tx-quote-error>
+    </div>
+
+    <div *ngIf="!!crsOut && !!srcOut" class="mt-3 p-2 border" style="border-radius: 4px;">
+      <div class="flex-row-center-between">
+        <small class="b-400">
+          <span class="error">-{{percentageOfSupply.formattedValue | shortNumber}}%</span> Total Liquidity
+        </small>
+
+        <button mat-icon-button class="tiny" (click)="toggleShowTransactionDetails()">
+          <mat-icon>{{showTransactionDetails ? icons.arrowDown : icons.arrowRight}}</mat-icon>
+        </button>
+      </div>
+
+      <div [@collapse]="!showTransactionDetails">
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Estimated Output</small>
+          <small>
+            <opdex-number [value]="crsOut" [precision]="4" [suffix]="pool.crsToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Minimum ({{toleranceThreshold}}% slippage)</small>
+          <small>
+            <opdex-number [value]="crsOutMin" [precision]="4" [suffix]="pool.crsToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Estimated Output</small>
+          <small>
+            <opdex-number [value]="srcOut" [precision]="4" [suffix]="pool.srcToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Minimum ({{toleranceThreshold}}% slippage)</small>
+          <small>
+            <opdex-number [value]="srcOutMin" [precision]="4" [suffix]="pool.srcToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Block Deadline ({{deadlineThreshold}} minutes)</small>
+          <small class="text-right">{{deadlineBlock | formatNumber:0}}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tolerance and Deadline -->
+    <div class="flex-row-center-end">
+      <button mat-icon-button
+        color="primary"
+        class="small"
+        (click)="toggleShowMore(!showMore)"
+        type="button">
+        <mat-icon>{{showMore ? icons.remove : icons.add}}</mat-icon>
+      </button>
+    </div>
+
+    <div [@collapse]="!showMore">
+      <opdex-tolerance [value]="toleranceThreshold" (onToleranceChange)="calcTolerance($event)"></opdex-tolerance>
+
+      <div class="mt-2">
+        <opdex-deadline [value]="deadlineThreshold" (onDeadlineChange)="calcDeadline($event)"></opdex-deadline>
+      </div>
+    </div>
+    <!-- End Tolerance and Deadline -->
+
+    <opdex-tx-quote-submit-button
+      [warn]="allowance && !allowance?.isApproved"
+      [disabled]="!form.valid || !context?.isLoggedIn || balanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

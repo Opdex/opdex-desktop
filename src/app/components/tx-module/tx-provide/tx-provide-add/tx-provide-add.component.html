@@ -1,0 +1,136 @@
+<div class="add-liquidity">
+  <form [formGroup]="form" name="add-liquidity-form" id="add-liquidity-form">
+    <div class="mb-4">
+      <opdex-input-control
+        [suffixDisabled]="true"
+        label="Provide {{pool.crsToken.symbol}}"
+        [formControl]="amountCrs"
+        [suffix]="pool.crsToken.symbol"
+        [numbersOnly]="true">
+        <opdex-number [value]="crsInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+      </opdex-input-control>
+
+      <opdex-percentage-amount-buttons
+        [contract]="pool.crsToken.address"
+        [token]="pool.crsToken"
+        positionType="Balance"
+        [selected]="crsPercentageSelected"
+        (onPercentageSelect)="handlePercentageSelect('crs', $event)">
+      </opdex-percentage-amount-buttons>
+
+      <div class="mt-2 mb-2" *ngIf="crsBalanceError || (amountCrs.errors && amountCrs.errors['invalidAmountEquivalent'])">
+        <opdex-tx-quote-error
+          [warn]="true"
+          message="Insufficient {{pool.crsToken.symbol}} Balance"
+          *ngIf="crsBalanceError">
+        </opdex-tx-quote-error>
+
+        <opdex-tx-quote-error *ngIf="amountCrs.errors && amountCrs.errors['invalidAmountEquivalent']"
+          [warn]="false"
+          message="Error retrieving equivalent {{pool.srcToken.symbol}} amount">
+        </opdex-tx-quote-error>
+      </div>
+    </div>
+
+    <opdex-input-control
+      [suffixDisabled]="true"
+      label="Provide {{pool.srcToken.symbol}}"
+      [formControl]="amountSrc"
+      [suffix]="pool.srcToken.symbol"
+      [numbersOnly]="true">
+      <opdex-number [value]="srcInFiatValue" [prefix]="selectedCurrency?.htmlEntity" [precision]="2"></opdex-number>
+    </opdex-input-control>
+
+    <opdex-percentage-amount-buttons
+      [contract]="pool.srcToken.address"
+      [token]="pool.srcToken"
+      positionType="Balance"
+      [selected]="srcPercentageSelected"
+      (onPercentageSelect)="handlePercentageSelect('src', $event)">
+    </opdex-percentage-amount-buttons>
+
+    <div class="mt-2 mb-2" *ngIf="allowance || srcBalanceError || (amountSrc.errors && amountSrc.errors['invalidAmountEquivalent'])">
+      <opdex-allowance-validation
+        [allowance]="allowance">
+      </opdex-allowance-validation>
+
+      <opdex-tx-quote-error
+        [warn]="true"
+        message="Insufficient {{pool.srcToken.symbol}} Balance"
+        *ngIf="srcBalanceError">
+      </opdex-tx-quote-error>
+
+      <opdex-tx-quote-error *ngIf="amountSrc.errors && amountSrc.errors['invalidAmountEquivalent']"
+        [warn]="false"
+        message="Error retrieving equivalent {{pool.crsToken.symbol}} amount">
+      </opdex-tx-quote-error>
+    </div>
+
+    <div *ngIf="!!srcInMin && !!crsInMin" class="mt-3 p-2 border" style="border-radius: 4px;">
+      <div class="flex-row-center-between">
+        <small class="b-400">
+          <span class="success">+{{percentageOfSupply.formattedValue | shortNumber}}%</span> Total Liquidity
+        </small>
+
+        <button mat-icon-button class="tiny" (click)="toggleShowTransactionDetails()">
+          <mat-icon>{{showTransactionDetails ? icons.arrowDown : icons.arrowRight}}</mat-icon>
+        </button>
+      </div>
+
+      <div [@collapse]="!showTransactionDetails">
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Minimum ({{toleranceThreshold}}% slippage)</small>
+          <small>
+            <opdex-number [value]="crsInMin" [precision]="4" [suffix]="pool.crsToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Minimum ({{toleranceThreshold}}% slippage)</small>
+          <small>
+            <opdex-number [value]="srcInMin" [precision]="4" [suffix]="pool.srcToken.symbol"></opdex-number>
+          </small>
+        </div>
+
+        <div class="flex-row-center-between">
+          <small class="b-400 light mr-1">Block Deadline ({{deadlineThreshold}} minutes)</small>
+          <small class="text-right">{{deadlineBlock | formatNumber:0}}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tolerance and Deadline -->
+    <div class="flex-row-center-end">
+      <button
+        mat-icon-button color="primary"
+        class="small"
+        (click)="toggleShowMore(!showMore)"
+        type="button">
+        <mat-icon>{{showMore ? icons.remove : icons.add}}</mat-icon>
+      </button>
+    </div>
+
+    <div [@collapse]="!showMore">
+      <opdex-tolerance
+        [value]="toleranceThreshold"
+        (onToleranceChange)="calcTolerance($event)">
+      </opdex-tolerance>
+
+      <div class="mt-2">
+        <opdex-deadline
+          [value]="deadlineThreshold"
+          (onDeadlineChange)="calcDeadline($event)">
+        </opdex-deadline>
+      </div>
+    </div>
+    <!-- End Tolerance and Deadline -->
+
+    <opdex-tx-quote-submit-button
+      [warn]="(allowance && !allowance?.isApproved) || crsBalanceError || srcBalanceError"
+      [disabled]="!form.valid || !context?.isLoggedIn || allowance === undefined || crsBalanceError === undefined || srcBalanceError === undefined"
+      (onSubmit)="submit()">
+    </opdex-tx-quote-submit-button>
+
+    <opdex-tx-quote-errors [quoteErrors]="quoteErrors"></opdex-tx-quote-errors>
+  </form>
+</div>

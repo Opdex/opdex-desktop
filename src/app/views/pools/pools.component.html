@@ -1,22 +1,32 @@
 <div class="header-section">
   <div class="container">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-md-6 col-lg-8">
         <h1 class="mb-0">Liquidity Pools</h1>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="d-md-none mt-3"></div>
+        <opdex-tx-buttons (onSelectOption)="handleTxOption($event)"></opdex-tx-buttons>
       </div>
     </div>
   </div>
 </div>
 
-<div class="offset-section">
+<div class="standard-section">
   <div class="container">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-3" *ngFor="let pool of pools">
-        <opdex-liquidity-pool-summary-card
-          [pool]="pool"
-          [showPoolName]="true"
-          routerLink="/pools/{{pool.address}}">
-        </opdex-liquidity-pool-summary-card>
+      <div class="col-12">
+        <div class="flex-row-center-end" *ngIf="context?.isLoggedIn">
+          <button color="primary" mat-stroked-button class="flex-row-center" (click)="createPool()">
+            <span class="flex-row-center">
+              Create Liquidity Pool
+              <mat-icon class="small ml-1">{{icons.add}}</mat-icon>
+            </span>
+          </button>
+        </div>
+
+        <opdex-pools-table></opdex-pools-table>
       </div>
     </div>
   </div>
