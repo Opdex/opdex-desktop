@@ -31,7 +31,7 @@ export class NodeService {
     this._status = status;
     this._status$.next(status);
 
-    if (!this._block || this._block < status.consensusHeight) {
+    if (!!status && (!this._block || this._block < status.consensusHeight)) {
       this._block = status.consensusHeight;
       this._block$.next(this._block);
     }

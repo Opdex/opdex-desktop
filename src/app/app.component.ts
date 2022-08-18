@@ -6,7 +6,7 @@ import { CoinGeckoApiService } from './services/api/coin-gecko-api.service';
 import { INodeStatus } from './interfaces/full-node.interface';
 import { NodeService } from './services/platform/node.service';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { timer, switchMap, tap, filter, firstValueFrom } from 'rxjs';
+import { timer, switchMap, tap, filter, firstValueFrom, catchError, of } from 'rxjs';
 import { CurrencyService } from '@services/platform/currency.service';
 import { RouterOutlet } from '@angular/router';
 import { Icons } from '@enums/icons';
@@ -99,8 +99,11 @@ export class AppComponent implements OnInit {
   }
 
   private _checkNodeVersion(): void {
+    const { status } = this._nodeService;
+    if (!status) return;
+
     // Adjust version patch (ex: 1.3.2.0 to 1.3.2)
-    const currentVersion = this._nodeService.status.version.split('.').slice(0, 3).join('.');
+    const currentVersion = status.version.split('.').slice(0, 3).join('.');
     this.nodeUpdate = this._env.minNodeVersion.compare(currentVersion) === 1;
   }
 
@@ -122,7 +125,7 @@ export class AppComponent implements OnInit {
   }
 
   private async _refreshNodeStatus(): Promise<INodeStatus> {
-    const status = await firstValueFrom(this._cirrusApi.getNodeStatus());
+    const status = await firstValueFrom(this._cirrusApi.getNodeStatus().pipe(catchError(_ => of(undefined))));
     this._nodeService.setStatus(status);
     return status;
   }

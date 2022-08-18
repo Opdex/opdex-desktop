@@ -1,3 +1,6 @@
+import { UserContext } from '@models/user-context';
+import { UserContextService } from '@services/utility/user-context.service';
+import { WalletService } from '@services/platform/wallet.service';
 import { IndexerService } from '@services/platform/indexer.service';
 import { TransactionsService } from '@services/platform/transactions.service';
 import { filter, switchMap, skip } from 'rxjs/operators';
@@ -26,9 +29,10 @@ export class ReviewQuoteComponent implements OnDestroy {
   quoteReceipt: TransactionReceipt;
   showMethodDetails = true;
   showParameterDetails = true;
-  latestBlock: number;
+  initialQuoteBlock: number;
   icons = Icons;
   showQrAnyways: boolean;
+  context: UserContext;
 
   methodParametersHelp = {
     title: 'What are method parameters?',
@@ -44,33 +48,14 @@ export class ReviewQuoteComponent implements OnDestroy {
     public _bottomSheetRef: MatBottomSheetRef<ReviewQuoteComponent>,
     private _transactionsService: TransactionsService,
     private _indexerService: IndexerService,
+    private _walletService: WalletService,
+    private _userContextService: UserContextService,
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: TransactionQuote
   ) {
+    this.subscription.add(this._userContextService.context$.subscribe(context => this.context = context));
     this.quote = this.data;
-    // this._transactionsService.setQuoteDrawerStatus(true);
-
     this.quoteRequest = this.data.txHandoff;
     this.setQuoteReceipt(this.data);
-
-    // this.subscription.add(
-    //   this._transactionsService.getBroadcastedTransaction$()
-    //     .subscribe(txHash => this.txHash = txHash));
-
-    // this.subscription.add(
-    //   this._transactionsService.getMinedTransaction$()
-    //     .subscribe(receipt => {
-    //       if (this.txHash) return;
-
-    //       const fromAddressMatches = receipt.from === this.quoteRequest.sender;
-    //       const toAddressMatches = receipt.to === this.quoteRequest.to;
-    //       let matchingEvents = true;
-
-    //       for (var i = 0; i < receipt.events?.length || 0; i++) {
-    //         matchingEvents = receipt.events[i].eventType === this.quote.events[i]?.eventType;
-    //       }
-
-    //       if (fromAddressMatches && toAddressMatches && matchingEvents) this.txHash = receipt.hash;
-    //     }));
 
     this.subscription.add(
       this._bottomSheetRef.backdropClick()
@@ -80,17 +65,42 @@ export class ReviewQuoteComponent implements OnDestroy {
       this._indexerService.latestBlock$
         .pipe(
           skip(1),
-          tap(block => this.latestBlock = block),
+          tap(block => {
+            if(!this.initialQuoteBlock) this.initialQuoteBlock = block
+          }),
           filter(_ => !!this.txHash === false),
           switchMap(_ => this._transactionsService.replayQuote(this.quote)),
           tap(q => this.quoteRequest = q.txHandoff),
-          tap(q => this.setQuoteReceipt(q)))
-        .subscribe(rsp => this.quote = rsp)
+          tap(q => this.setQuoteReceipt(q)),
+          switchMap(_ => this._checkForBroadcastReceipt()))
+        .subscribe()
     )
+  }
+
+  private async _checkForBroadcastReceipt(): Promise<void> {
+    if (!this.context || this.txHash) return;
+
+    const latestTxSummaries = await this._walletService.getWalletHistory(this.context, 0, 1);
+
+    if (latestTxSummaries.length === 1) {
+      const receipt = latestTxSummaries[0];
+      const fromAddressMatches = receipt.from === this.quoteRequest.sender;
+      const toAddressMatches = receipt.to === this.quoteRequest.to;
+      let matchingEvents = true;
+
+      for (var i = 0; i < receipt.events?.length || 0; i++) {
+        matchingEvents = receipt.block.height > this.initialQuoteBlock &&
+                         receipt.events[i].log.event === this.quote.events[i]?.eventType &&
+                         receipt.events[i].address === this.quote.events[i]?.contract;
+      }
+
+      if (fromAddressMatches && toAddressMatches && matchingEvents) this.txHash = receipt.hash;
+    }
   }
 
   private setQuoteReceipt(quote: TransactionQuote): void {
     this.quoteReceipt = quote.receipt;
+    this.quote = quote;
 
     if (!this.quoteReceipt.success && !this.showQrAnyways) {
       this.showParameterDetails = false;
@@ -116,6 +126,5 @@ export class ReviewQuoteComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    // this._transactionsService.setQuoteDrawerStatus(false);
   }
 }
