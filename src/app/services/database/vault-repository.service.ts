@@ -27,7 +27,11 @@ export class VaultRepositoryService {
     return await this._db.certificate.get({owner});
   }
 
-  async getCertificateByVestedBlock(vestedBlock: number): Promise<IVaultCertificateEntity> {
+  async getCertificateByProposalId(proposalId: number): Promise<IVaultCertificateEntity> {
+    return await this._db.certificate.get({proposalId});
+  }
+
+  private async _getCertificateByVestedBlock(vestedBlock: number): Promise<IVaultCertificateEntity> {
     return await this._db.certificate.get({vestedBlock});
   }
 
@@ -56,7 +60,6 @@ export class VaultRepositoryService {
     }));
   }
 
-  // Todo: Link to proposalId
   async persistCertificates(certificates: IVaultCertificateEntity[]): Promise<void> {
     const certificateIds = certificates.map(certificate => certificate.id);
 
@@ -74,13 +77,13 @@ export class VaultRepositoryService {
   }
 
   async setCertificateRedemption(vestedBlock: number): Promise<void> {
-    const entity = await this.getCertificateByVestedBlock(vestedBlock);
+    const entity = await this._getCertificateByVestedBlock(vestedBlock);
     entity.redeemed = 1;
     await this._db.certificate.put(entity);
   }
 
   async setCertificateRevocation(vestedBlock: number, newAmount: BigInt): Promise<void> {
-    const entity = await this.getCertificateByVestedBlock(vestedBlock);
+    const entity = await this._getCertificateByVestedBlock(vestedBlock);
     entity.revoked = 1;
     entity.amount = newAmount;
     await this._db.certificate.put(entity);

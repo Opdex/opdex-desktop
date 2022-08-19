@@ -1,6 +1,6 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenService } from '@services/platform/token.service';
-import { VaultService } from '@services/platform/vault.service';
+import { CompletedVaultProposalTransaction, VaultService } from '@services/platform/vault.service';
 import { VaultRepositoryService } from '@services/database/vault-repository.service';
 import { ILiquidityPoolEntity } from '@interfaces/database.interface';
 import { OpdexDB } from '@services/database/db.service';
@@ -60,25 +60,47 @@ export class IndexerService {
     const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight
     const nodeStatus = this._nodeService.status;
 
-    const [pools, rewardedMiningPools, nominations, createdProposals, createdCertificates, completedProposals, redeemedCertificates, revokedCertificates] = await Promise.all([
+    // Todo: Combine completedVaultProposals, revokedCertificates and createdCertificates since they all log in one transaction
+    const [poolReceipts, rewardedMiningPoolReceipts, nominations, createdProposals, completedProposals, redeemedCertificates] = await Promise.all([
       firstValueFrom(this._marketService.getMarketPools(lastUpdateBlock)),
       firstValueFrom(this._miningGovernanceService.getRewardedPoolReceipts$(lastUpdateBlock)),
       firstValueFrom(this._miningGovernanceService.getRawNominatedPools$()),
       firstValueFrom(this._vaultService.getCreatedVaultProposalReceipts(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCreatedVaultCertificateReceipts(lastUpdateBlock)),
       firstValueFrom(this._vaultService.getCompletedVaultProposalReceipts(lastUpdateBlock)),
       firstValueFrom(this._vaultService.getRedeemedVaultCertificateReceipts(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRevokedVaultCertificateReceipts(lastUpdateBlock)),
     ]);
 
-    const poolsDetails = await Promise.all(pools.map(async pool => {
-      const poolDetails = await firstValueFrom(this._liquidityPoolService.getRawStaticPoolProperties(pool.pool));
-      const tokenDetails = await firstValueFrom(this._tokenService.getRawStaticTokenProperties(pool.token));
+    await this._indexPoolsAndTokens(poolReceipts, nodeStatus.coinTicker);
+    await this._indexRewardedMiningPools(rewardedMiningPoolReceipts);
+    await this._indexNominatedLiquidityPools(nominations);
+    await this._indexCreatedVaultProposals(createdProposals);
+    await this._indexCompletedVaultProposals(completedProposals);
+    await this._indexRedeemedVaultCertificates(redeemedCertificates);
+
+    await this._db.indexer.put({
+      lastUpdateBlock: nodeStatus.blockStoreHeight,
+      id: 1
+    });
+
+    this._block = nodeStatus.blockStoreHeight;
+    this._block$.next(this._block);
+    this.indexing = false;
+    this.hasIndexed.next(true);
+  }
+
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
+  private async _indexPoolsAndTokens(poolReceipts: any[], crsTicker: string): Promise<void> {
+    const poolsDetails = await Promise.all(poolReceipts.map(async receipt => {
+      const poolDetails = await firstValueFrom(this._liquidityPoolService.getRawStaticPoolProperties(receipt.pool));
+      const tokenDetails = await firstValueFrom(this._tokenService.getRawStaticTokenProperties(receipt.token));
 
       const poolResponse = {
         pool: poolDetails,
         token: tokenDetails,
-        createdBlock: pool.createdBlock
+        createdBlock: receipt.createdBlock
       };
 
       return poolResponse;
@@ -88,7 +110,7 @@ export class IndexerService {
       await this._poolsRepository.persistPools(poolsDetails.map(({pool, token, createdBlock}) => {
         return {
           address: pool.address,
-          name: `${token.symbol}-${nodeStatus.coinTicker}`,
+          name: `${token.symbol}-${crsTicker}`,
           srcToken: token.address,
           miningPool: pool.miningPool,
           transactionFee: pool.transactionFee,
@@ -103,17 +125,18 @@ export class IndexerService {
           address: token.address,
           name: token.name,
           symbol: token.symbol,
-          decimals: parseInt(token.decimals),
+          decimals: token.decimals,
           nativeChain: token.nativeChain || 'Cirrus',
           nativeChainAddress: token.nativeChainAddress,
           createdBlock
         }
       }));
     }
+  }
 
-    // Persist active mining pools
-    if (rewardedMiningPools.length) {
-      const miningPoolEndBlocks = await firstValueFrom(this._liquidityPoolService.getMiningPeriodEndBlocks(rewardedMiningPools.map(pool => pool.miningPool)));
+  private async _indexRewardedMiningPools(rewardReceipts: any[]): Promise<void> {
+    if (rewardReceipts.length) {
+      const miningPoolEndBlocks = await firstValueFrom(this._liquidityPoolService.getMiningPeriodEndBlocks(rewardReceipts.map(pool => pool.miningPool)));
       const miningPoolEntities = await this._poolsRepository.getPoolsByMiningPoolAddress(miningPoolEndBlocks.map(pool => pool.miningPool));
 
       await this._poolsRepository.persistPools(miningPoolEntities.map((entity: ILiquidityPoolEntity) => {
@@ -123,11 +146,16 @@ export class IndexerService {
         }
       }));
     }
+  }
 
-    // Persist nominations
-    await this._poolsRepository.setNominations(nominations.map(({stakingPool}) => stakingPool));
+  private async _indexNominatedLiquidityPools(nominations: any[]): Promise<void> {
+    if (nominations.length) {
+      const nominatedPools = nominations.map(({stakingPool}) => stakingPool);
+      await this._poolsRepository.setNominations(nominatedPools);
+    }
+  }
 
-    // Persist created vault proposals
+  private async _indexCreatedVaultProposals(createdProposals: any[]): Promise<void> {
     if (createdProposals.length) {
       await this._vaultRepository.persistProposals(createdProposals.map(proposal => {
         return {
@@ -141,45 +169,58 @@ export class IndexerService {
         }
       }))
     }
+  }
 
-    // persist created certificates
-    if (createdCertificates.length) {
-      await this._vaultRepository.persistCertificates(createdCertificates.map(certificate => {
-        return {
-          owner: certificate.owner,
-          amount: certificate.amount,
-          redeemed: 0, // false by default
-          revoked: 0, // false by default
-          vestedBlock: certificate.vestedBlock,
-          createdBlock: certificate.blockHeight
-        }
-      }))
+  private async _indexCompletedVaultProposals(transactions: CompletedVaultProposalTransaction[]): Promise<void> {
+    if (transactions.length) {
+      // Persist created proposals
+      await this._vaultRepository.setCompletedProposals(transactions.map(tx => tx.completionLog));
+
+      // Find revoked certs
+      const revokedCertificateLogs = transactions
+        .filter(tx => !!tx.certRevocationLog)
+        .map(tx => tx.certRevocationLog);
+
+      // Persist revoked certs
+      if (revokedCertificateLogs.length) {
+        await Promise.all(revokedCertificateLogs.map(cert => {
+          return this._vaultRepository.setCertificateRevocation(cert.vestedBlock, cert.newAmount)
+        }))
+      }
+
+      // Find created certificates
+      const createdCertificateLogs: any[] = transactions
+        .filter(tx => !!tx.certCreationLog)
+        .map(tx => {
+          return {
+            blockHeight: tx.blockHeight,
+            proposalId: tx.completionLog.proposalId,
+            log: tx.certCreationLog
+          }
+        });
+
+      // persist created certificates
+      if (createdCertificateLogs.length) {
+        await this._vaultRepository.persistCertificates(createdCertificateLogs.map(certificate => {
+          return {
+            owner: certificate.log.owner,
+            amount: certificate.log.amount,
+            redeemed: 0, // false by default
+            revoked: 0, // false by default,
+            proposalId: certificate.proposalId,
+            vestedBlock: certificate.log.vestedBlock,
+            createdBlock: certificate.blockHeight
+          }
+        }))
+      }
     }
+  }
 
-    if (completedProposals.length) {
-      await this._vaultRepository.setCompletedProposals(completedProposals)
-    }
-
+  private async _indexRedeemedVaultCertificates(redeemedCertificates: any[]): Promise<void> {
     if (redeemedCertificates.length) {
       await Promise.all(redeemedCertificates.map(cert => {
         return this._vaultRepository.setCertificateRedemption(cert.vestedBlock)
       }))
     }
-
-    if (revokedCertificates.length) {
-      await Promise.all(revokedCertificates.map(cert => {
-        return this._vaultRepository.setCertificateRevocation(cert.vestedBlock, cert.newAmount)
-      }))
-    }
-
-    await this._db.indexer.put({
-      lastUpdateBlock: nodeStatus.blockStoreHeight,
-      id: 1
-    });
-
-    this._block = nodeStatus.blockStoreHeight;
-    this._block$.next(this._block);
-    this.indexing = false;
-    this.hasIndexed.next(true);
   }
 }

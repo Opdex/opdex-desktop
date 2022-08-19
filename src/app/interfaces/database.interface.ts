@@ -43,6 +43,7 @@ export interface IVaultCertificateEntity {
   amount: BigInt;
   redeemed: number; // 0 false - 1 true
   revoked: number; // 0 false - 1 true
+  proposalId: number;
   createdBlock: number;
   vestedBlock: number;
 }

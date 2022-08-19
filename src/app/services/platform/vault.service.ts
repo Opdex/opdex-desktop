@@ -1,3 +1,4 @@
+import { ICompleteVaultProposalLog, IRevokeVaultCertificateLog, ICreateVaultCertificateLog } from '@interfaces/contract-logs.interface';
 import { UserContextService } from '@services/utility/user-context.service';
 import { VaultMethods } from '@enums/contracts/methods/vault-methods';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -17,6 +18,14 @@ import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
 import { TransactionQuote } from '@models/platform/transaction-quote';
 import { IHydratedVault, IHydratedProposal } from '@interfaces/contract-properties.interface';
+
+export type CompletedVaultProposalTransaction = {
+  from: string;
+  blockHeight: number;
+  completionLog: ICompleteVaultProposalLog;
+  certRevocationLog?: IRevokeVaultCertificateLog;
+  certCreationLog?: ICreateVaultCertificateLog;
+}
 
 @Injectable({providedIn: 'root'})
 export class VaultService {
@@ -48,6 +57,11 @@ export class VaultService {
     return { skip: result.skip, take: result.take, results: proposals, count: result.count };
   }
 
+  async getCertificateByProposalId(proposalId: number): Promise<VaultCertificate> {
+    const result = await this._vaultRepository.getCertificateByProposalId(proposalId);
+    return new VaultCertificate(result);
+  }
+
   async getCertificates(skip: number, take: number): Promise<IPagination<VaultCertificate>> {
     const result = await this._vaultRepository.getCertificates(skip, take);
     const certificates = result.results.map(entity => new VaultCertificate(entity));
@@ -64,28 +78,32 @@ export class VaultService {
     return this._searchReceipt$(request, logType);
   }
 
-  public getCompletedVaultProposalReceipts(fromBlock: number): Observable<any[]> {
-    const logType = TransactionLogTypes.CompleteVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  public getCreatedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
-    const logType = TransactionLogTypes.CreateVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  public getRevokedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
-    const logType = TransactionLogTypes.RevokeVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
   public getRedeemedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
     const logType = TransactionLogTypes.RedeemVaultCertificateLog;
     const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
     return this._searchReceipt$(request, logType);
+  }
+
+  public getCompletedVaultProposalReceipts(fromBlock: number): Observable<CompletedVaultProposalTransaction[]> {
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, TransactionLogTypes.CompleteVaultProposalLog);
+
+    return this._cirrusApi.searchContractReceipts(request)
+      .pipe(
+        map(response => {
+          const txs: CompletedVaultProposalTransaction[] = [];
+
+          response.forEach(tx => {
+            txs.push({
+              from: tx.from,
+              blockHeight: tx.blockNumber,
+              completionLog: tx.logs.find(log => log.log.event === TransactionLogTypes.CompleteVaultProposalLog).log.data,
+              certRevocationLog: tx.logs.find(log => log.log.event === TransactionLogTypes.RevokeVaultCertificateLog)?.log?.data,
+              certCreationLog: tx.logs.find(log => log.log.event === TransactionLogTypes.CreateVaultCertificateLog)?.log?.data,
+            });
+          });
+
+          return txs;
+      }));
   }
 
   ////////////////////////////////////////
