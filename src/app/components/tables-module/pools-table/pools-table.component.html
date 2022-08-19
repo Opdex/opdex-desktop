@@ -18,6 +18,7 @@
             <opdex-number
               [short]="true"
               [prefix]="selectedCurrency?.htmlEntity"
+              [preventCopy]="true"
               [value]="element.crsToken.pricing[selectedCurrency?.abbreviation].multiply(element.reserveCrs).add(element.srcToken.pricing[selectedCurrency?.abbreviation].multiply(element.reserveSrc))">
             </opdex-number>
           </div>
@@ -29,7 +30,7 @@
         <td mat-cell *matCellDef="let element">
           <ng-container *ngIf="element.stakingToken?.address !== element.srcToken?.address; else stakingDisabled">
             <div class="no-wrap flex-row-center">
-              <opdex-number [precision]="0" [short]="true" [suffix]="element.stakingToken?.symbol" [value]="element.totalStaked" [stopPropagation]="true"></opdex-number>
+              <opdex-number [precision]="0" [short]="true" [suffix]="element.stakingToken?.symbol" [value]="element.totalStaked" [preventCopy]="true"></opdex-number>
             </div>
           </ng-container>
           <ng-template #stakingDisabled>
@@ -45,7 +46,8 @@
             <opdex-number
               [value]="element.miningPool?.tokensMining"
               [short]="true"
-              [suffix]="element.lpToken?.symbol">
+              [suffix]="element.lpToken?.symbol"
+              [preventCopy]="true">
             </opdex-number>
           </ng-container>
 
