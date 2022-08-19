@@ -71,7 +71,7 @@ export class TxVaultProposalVoteComponent extends TxBase implements OnInit, OnCh
   }
 
   async ngOnInit(): Promise<void> {
-    this.crs = await this._tokenService.buildToken('CRS');
+    this.crs = await this._tokenService.getToken('CRS');
   }
 
   ngOnChanges() {

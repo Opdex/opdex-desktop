@@ -32,7 +32,7 @@ export class WalletService {
     return txs.map(tx => new TransactionReceipt(tx));
   }
 
-  async getAllowance(token: string, wallet: string, spender: string): Promise<BigInt> {
+  public async getAllowance(token: string, wallet: string, spender: string): Promise<BigInt> {
     const request = new LocalCallRequest(token, 'Allowance', wallet, [
       new Parameter(ParameterType.Address, wallet),
       new Parameter(ParameterType.Address, spender)
@@ -42,21 +42,16 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  async getBalance(token: string, wallet: string): Promise<BigInt> {
+  public async getBalance(token: string, wallet: string): Promise<BigInt> {
     if (token === 'CRS') {
       const response = await firstValueFrom(this._cirrus.getAddressBalance(wallet));
       return BigInt(response);
     } else {
-      const request = new LocalCallRequest(token, 'GetBalance', wallet, [
-        new Parameter(ParameterType.Address, wallet)
-      ]);
-
-      const response = await firstValueFrom(this._cirrus.localCall(request));
-      return BigInt(response.errorMessage ? '0' : response.return);
+      return await this._getBalance(token, wallet);
     }
   }
 
-  async getStakingPosition(liquidityPool: string, wallet: string): Promise<BigInt> {
+  public async getStakingPosition(liquidityPool: string, wallet: string): Promise<BigInt> {
     const request = new LocalCallRequest(liquidityPool, 'GetStakedBalance', wallet, [
       new Parameter(ParameterType.Address, wallet)
     ]);
@@ -65,17 +60,11 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  // Todo: Same as "getBalance()" maybe should just use that...
-  async getMiningPosition(miningPool: string, wallet: string): Promise<BigInt> {
-    const request = new LocalCallRequest(miningPool, 'GetBalance', wallet, [
-      new Parameter(ParameterType.Address, wallet)
-    ]);
-
-    const response = await firstValueFrom(this._cirrus.localCall(request));
-    return BigInt(response.errorMessage ? '0' : response.return);
+  public async getMiningPosition(miningPool: string, wallet: string): Promise<BigInt> {
+    return await this._getBalance(miningPool, wallet);
   }
 
-  async getVaultPledgePosition(proposalId: number, wallet: string): Promise<BigInt> {
+  public async getVaultPledgePosition(proposalId: number, wallet: string): Promise<BigInt> {
     const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalPledge', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
@@ -85,7 +74,7 @@ export class WalletService {
     return BigInt(response.errorMessage ? '0' : response.return);
   }
 
-  async getVaultVotePosition(proposalId: number, wallet: string): Promise<{balance: BigInt, inFavor: boolean}> {
+  public async getVaultVotePosition(proposalId: number, wallet: string): Promise<{balance: BigInt, inFavor: boolean}> {
     const request = new LocalCallRequest(this._env.contracts.vault, 'GetProposalVote', wallet, [
       new Parameter(ParameterType.ULong, proposalId),
       new Parameter(ParameterType.Address, wallet),
@@ -96,5 +85,18 @@ export class WalletService {
       balance: BigInt(response.errorMessage ? '0' : response.return.amount),
       inFavor: response.errorMessage ? false : response.return.inFavor
     };
+  }
+
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
+  private async _getBalance(address: string, wallet: string): Promise<BigInt> {
+    const request = new LocalCallRequest(address, 'GetBalance', wallet, [
+      new Parameter(ParameterType.Address, wallet)
+    ]);
+
+    const response = await firstValueFrom(this._cirrus.localCall(request));
+    return BigInt(response.errorMessage ? '0' : response.return);
   }
 }

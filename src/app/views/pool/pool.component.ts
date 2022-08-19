@@ -57,7 +57,7 @@ export class PoolComponent implements OnInit, OnDestroy {
       this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
-          switchMap(_ =>  this._liquidityPoolService.buildLiquidityPool(address)))
+          switchMap(_ =>  this._liquidityPoolService.getLiquidityPool(address)))
         .subscribe(pool => this.pool = pool));
   }
 

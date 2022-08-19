@@ -44,10 +44,10 @@ export class CreatePoolTransactionSummaryComponent implements OnChanges {
       const log = <ICreateLiquidityPoolLog>createEvents[0].log.data;
 
       if (this.isQuote) {
-        this.src = await this._tokenService.buildToken(log.token);
-        this.crs = await this._tokenService.buildToken('CRS');
+        this.src = await this._tokenService.getToken(log.token);
+        this.crs = await this._tokenService.getToken('CRS');
       } else {
-        this.pool = await this._liquidityPoolService.buildLiquidityPool(log.pool);
+        this.pool = await this._liquidityPoolService.getLiquidityPool(log.pool);
       }
     } catch {
       this.error = 'Oops, something is wrong.';

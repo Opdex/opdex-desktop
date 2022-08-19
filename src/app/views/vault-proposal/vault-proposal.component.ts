@@ -77,7 +77,7 @@ export class VaultProposalComponent implements OnDestroy {
 
   async getVault(): Promise<Vault> {
     const vault = await this._vaultService.getVault();
-    const token = await this._tokensService.buildToken(vault.token);
+    const token = await this._tokensService.getToken(vault.token);
 
     this.vault = vault;
     this.token = token;

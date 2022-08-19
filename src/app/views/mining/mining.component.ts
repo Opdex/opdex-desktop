@@ -40,11 +40,11 @@ export class MiningComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexerService.latestBlock$
         .pipe(
-          switchMap(latestBlock => this._miningGovernanceService.buildMiningGovernance(latestBlock)),
+          switchMap(latestBlock => this._miningGovernanceService.getMiningGovernance(latestBlock)),
           tap(gov => this.miningGovernance = gov),
-          switchMap(_ => this._liquidityPoolService.buildNominatedLiquidityPools()),
+          switchMap(_ => this._liquidityPoolService.getNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
-          switchMap(_ => this._liquidityPoolService.buildActiveMiningPools()),
+          switchMap(_ => this._liquidityPoolService.getActiveMiningPools()),
           tap(pools => this.miningPools = pools))
         .subscribe());
   }
@@ -52,7 +52,7 @@ export class MiningComponent implements OnInit, OnDestroy {
   async quoteDistribution(): Promise<void> {
     if (!this.context?.wallet) return;
 
-    const quote = await this._miningGovernanceService.rewardMiningPools();
+    const quote = await this._miningGovernanceService.rewardMiningPoolsQuote();
 
     this._bottomSheet.open(ReviewQuoteComponent, { data: quote });
   }

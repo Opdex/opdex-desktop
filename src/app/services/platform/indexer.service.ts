@@ -62,18 +62,18 @@ export class IndexerService {
 
     const [pools, rewardedMiningPools, nominations, createdProposals, createdCertificates, completedProposals, redeemedCertificates, revokedCertificates] = await Promise.all([
       firstValueFrom(this._marketService.getMarketPools(lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getRewardedPools(lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getNominatedPools()),
-      firstValueFrom(this._vaultService.getCreatedVaultProposals(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCreatedVaultCertificates(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCompletedVaultProposals(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRedeemedVaultCertificates(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRevokedVaultCertificates(lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceService.getRewardedPoolReceipts$(lastUpdateBlock)),
+      firstValueFrom(this._miningGovernanceService.getRawNominatedPools$()),
+      firstValueFrom(this._vaultService.getCreatedVaultProposalReceipts(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCreatedVaultCertificateReceipts(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getCompletedVaultProposalReceipts(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRedeemedVaultCertificateReceipts(lastUpdateBlock)),
+      firstValueFrom(this._vaultService.getRevokedVaultCertificateReceipts(lastUpdateBlock)),
     ]);
 
     const poolsDetails = await Promise.all(pools.map(async pool => {
-      const poolDetails = await firstValueFrom(this._liquidityPoolService.getStaticPool(pool.pool));
-      const tokenDetails = await firstValueFrom(this._tokenService.getToken(pool.token));
+      const poolDetails = await firstValueFrom(this._liquidityPoolService.getRawStaticPoolProperties(pool.pool));
+      const tokenDetails = await firstValueFrom(this._tokenService.getRawStaticTokenProperties(pool.token));
 
       const poolResponse = {
         pool: poolDetails,

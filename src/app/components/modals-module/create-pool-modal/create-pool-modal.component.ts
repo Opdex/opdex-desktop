@@ -52,10 +52,10 @@ export class CreatePoolModalComponent implements OnInit, OnDestroy {
     this.validationError = undefined;
 
     try {
-      const token = await this._tokenService.buildToken(this.tokenControl.value);
+      const token = await this._tokenService.getToken(this.tokenControl.value);
       // Check that the token provided is not OLPT and that the SRC token doesn't already have a pool
-      const pool = await this._liquidityPoolService.buildLiquidityPool(this.tokenControl.value) ||
-                                await this._liquidityPoolService.buildLiquidityPoolBySrcToken(this.tokenControl.value);
+      const pool = await this._liquidityPoolService.getLiquidityPool(this.tokenControl.value) ||
+                                await this._liquidityPoolService.getLiquidityPoolBySrcToken(this.tokenControl.value);
 
       this.validatedToken = token;
       this.validatedTokenPool = pool;

@@ -34,7 +34,7 @@ export class VaultCertificateTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    this.vaultToken = await this._tokenService.buildToken(this._envService.contracts.odx);
+    this.vaultToken = await this._tokenService.getToken(this._envService.contracts.odx);
     this.amount = FixedDecimal.FromBigInt(log.amount, this.vaultToken.decimals);
   }
 }

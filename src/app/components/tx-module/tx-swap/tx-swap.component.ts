@@ -379,7 +379,7 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
     if (!!this.tokenOut && this.tokenOut.address !== 'CRS') tokens.push(this.tokenOut.address);
 
     const pools = await Promise.all(tokens.map(token =>
-      this._liquidityPoolService.buildLiquidityPoolBySrcToken(token)));
+      this._liquidityPoolService.getLiquidityPoolBySrcToken(token)));
 
     this.poolIn = pools.find(pool => pool.crsToken.address === this.tokenIn.address || pool.srcToken.address === this.tokenIn.address);
     this.poolOut = pools.find(pool => pool.crsToken.address === this.tokenOut.address || pool.srcToken.address === this.tokenOut.address);

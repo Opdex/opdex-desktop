@@ -33,13 +33,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexerService.latestBlock$
         .pipe(
-          switchMap(_ => this._tokenService.buildToken(this._env.contracts.odx)),
+          switchMap(_ => this._tokenService.getToken(this._env.contracts.odx)),
           tap(odx => this.odx = odx),
-          switchMap(_ => this._tokenService.buildToken('CRS')),
+          switchMap(_ => this._tokenService.getToken('CRS')),
           tap(crs => this.crs = crs),
-          switchMap(_ => this._liquidityPoolService.buildNominatedLiquidityPools()),
+          switchMap(_ => this._liquidityPoolService.getNominatedLiquidityPools()),
           tap(pools => this.nominatedPools = pools),
-          switchMap(_ => this._liquidityPoolService.buildActiveMiningPools()),
+          switchMap(_ => this._liquidityPoolService.getActiveMiningPools()),
           tap(pools => this.miningPools = pools))
         .subscribe());
   }

@@ -27,7 +27,7 @@ export class TradeComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._route.queryParams.subscribe(async ({view, pool, childView}) => {
         if (view) this.view = view;
-        if (pool) this.pool = await this._liquidityPoolService.buildLiquidityPool(pool);
+        if (pool) this.pool = await this._liquidityPoolService.getLiquidityPool(pool);
         if (childView) this.childView = childView;
       })
     );
@@ -38,7 +38,7 @@ export class TradeComponent implements OnInit, OnDestroy {
       this._indexerService.latestBlock$
         .pipe(
           filter(_ => !!this.pool),
-          switchMap(_ => this._liquidityPoolService.buildLiquidityPool(this.pool.address)),
+          switchMap(_ => this._liquidityPoolService.getLiquidityPool(this.pool.address)),
           tap(pool => this.pool = pool))
         .subscribe());
   }

@@ -32,7 +32,7 @@ export class VaultService {
   }
 
   async getVault(): Promise<Vault> {
-    const hydrated = await firstValueFrom(this.getHydratedVault());
+    const hydrated = await firstValueFrom(this._getRawHydratedVault$());
     return new Vault(this._vault, hydrated);
   }
 
@@ -53,6 +53,44 @@ export class VaultService {
     const certificates = result.results.map(entity => new VaultCertificate(entity));
     return { skip: result.skip, take: result.take, results: certificates, count: result.count };
   }
+
+  ////////////////////////////////////////
+  //          RECEIPT METHODS           //
+  ////////////////////////////////////////
+
+  public getCreatedVaultProposalReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.CreateVaultProposalLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getCompletedVaultProposalReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.CompleteVaultProposalLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getCreatedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.CreateVaultCertificateLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getRevokedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.RevokeVaultCertificateLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getRedeemedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.RedeemVaultCertificateLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  ////////////////////////////////////////
+  //          QUOTE METHODS             //
+  ////////////////////////////////////////
 
   public async pledgeQuote(proposalId: number, amount: FixedDecimal): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
@@ -183,12 +221,32 @@ export class VaultService {
     return new TransactionQuote(request, response);
   }
 
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
   private async _buildProposal(entity: IVaultProposalEntity): Promise<VaultProposal> {
-    const hydrated = await firstValueFrom(this.getHydratedProposal(entity.proposalId));
+    const hydrated = await firstValueFrom(this._getRawHydratedProposal$(entity.proposalId));
     return new VaultProposal(this._vault, this._env.contracts.odx, entity, hydrated);
   }
 
-  getHydratedVault(): Observable<IHydratedVault> {
+  private _searchReceipt$(request: ReceiptSearchRequest, logType: TransactionLogTypes): Observable<any[]> {
+    return this._cirrusApi.searchContractReceipts(request)
+      .pipe(
+        map(response => {
+          const logs = [];
+
+          response.forEach(tx => {
+            tx.logs
+              .filter(log => log.log.event === logType)
+              .forEach(log => logs.push({...log.log.data, blockHeight: tx.blockNumber, from: tx.from,}));
+          });
+
+          return logs;
+      }));
+  }
+
+  private _getRawHydratedVault$(): Observable<IHydratedVault> {
     const vault = this._vault;
     const balanceRequest = new LocalCallRequest(this._env.contracts.odx, 'GetBalance', this._vault, [new Parameter(ParameterType.Address, this._vault)]);
 
@@ -217,55 +275,9 @@ export class VaultService {
         }));
   }
 
-  getHydratedProposal(proposalId: number): Observable<IHydratedProposal> {
+  private _getRawHydratedProposal$(proposalId: number): Observable<IHydratedProposal> {
     const vault = this._vault;
     const request = new LocalCallRequest(vault, VaultMethods.GetProposal, vault, [new Parameter(ParameterType.ULong, proposalId)])
     return this._cirrusApi.localCall(request).pipe(map(response => response.return));
-  }
-
-  getCreatedVaultProposals(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CreateVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getCompletedVaultProposals(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CompleteVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getCreatedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CreateVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getRevokedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.RevokeVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getRedeemedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.RedeemVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  private _searchReceipt$(request: ReceiptSearchRequest, logType: TransactionLogTypes): Observable<any> {
-    return this._cirrusApi.searchContractReceipts(request)
-      .pipe(
-        map(response => {
-          const logs = [];
-
-          response.forEach(tx => {
-            tx.logs
-              .filter(log => log.log.event === logType)
-              .forEach(log => logs.push({...log.log.data, blockHeight: tx.blockNumber, from: tx.from,}));
-          });
-
-          return logs;
-      }));
   }
 }

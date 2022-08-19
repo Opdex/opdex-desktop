@@ -34,36 +34,79 @@ export class LiquidityPoolService {
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
   }
 
-  public async buildLiquidityPool(address: string): Promise<LiquidityPool> {
+  public async getLiquidityPool(address: string): Promise<LiquidityPool> {
     const entity = await firstValueFrom(this._poolRepository.getPoolByAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 
-  public async buildLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
+  public async getLiquidityPoolBySrcToken(address: string): Promise<LiquidityPool> {
     const entity = await firstValueFrom(this._poolRepository.getPoolBySrcAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 
-  public async buildLiquidityPoolByMiningPoolAddress(address: string): Promise<LiquidityPool> {
+  public async getLiquidityPoolByMiningPoolAddress(address: string): Promise<LiquidityPool> {
     const entity = await firstValueFrom(this._poolRepository.getPoolByMiningPoolAddress(address));
     return await this._buildLiquidityPool(entity);
   }
 
-  public async buildLiquidityPools(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
+  public async getLiquidityPools(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
     const result = await this._poolRepository.getPools(skip, take);
     const pools = await Promise.all(result.results.map(entity => this._buildLiquidityPool(entity)));
     return { skip: result.skip, take: result.take, results: pools, count: result.count };
   }
 
-  public async buildActiveMiningPools(): Promise<LiquidityPool[]> {
+  public async getActiveMiningPools(): Promise<LiquidityPool[]> {
     const entities = await this._poolRepository.getActiveMiningPools();
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
   }
 
-  public async buildNominatedLiquidityPools(): Promise<LiquidityPool[]> {
+  public async getNominatedLiquidityPools(): Promise<LiquidityPool[]> {
     const entities = await this._poolRepository.getNominatedPools();
     return await Promise.all(entities.map(entity => this._buildLiquidityPool(entity)));
   }
+
+  public getRawStaticPoolProperties(address: string): Observable<IBaseLiquidityPoolDetailsDto> {
+    const properties = [
+      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.Token, ParameterType.Address),
+      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.TransactionFee, ParameterType.UInt),
+      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.MiningPool, ParameterType.Address),
+    ];
+
+    return zip(properties)
+      .pipe(
+        map(([token, transactionFee, miningPool]) => {
+          return {
+            address,
+            token,
+            transactionFee: parseFloat(transactionFee),
+            miningPool
+          };
+        })
+      );
+  }
+
+  public getMiningPeriodEndBlocks(miningPools: string[]): Observable<{ miningPeriodEndBlock: number, miningPool: string}[]> {
+    const uniquePools = miningPools
+      .filter((value, index, self) => self.lastIndexOf(value) === index)
+
+    const properties = uniquePools
+      .map(miningPool => this._cirrusApi.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong))
+
+    return zip(properties)
+      .pipe(
+        map(endBlocks => {
+          return endBlocks.map((block, index) => {
+            return {
+              miningPeriodEndBlock: parseFloat(block),
+              miningPool: uniquePools[index]
+            }
+          })
+        }));
+  }
+
+  ////////////////////////////////////////
+  //          QUOTE METHODS             //
+  ////////////////////////////////////////
 
   public async addLiquidityQuote(token: string, amountCrs: FixedDecimal, amountSrc: FixedDecimal, amountCrsMin: FixedDecimal, amountSrcMin: FixedDecimal, deadline: number): Promise<TransactionQuote> {
     const { wallet } = this._context.userContext;
@@ -175,6 +218,10 @@ export class LiquidityPoolService {
     return await this._submitQuote(request);
   }
 
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
   private async _submitQuote(request: LocalCallRequest): Promise<TransactionQuote> {
     const response = await firstValueFrom(this._cirrusApi.localCall(request));
     return new TransactionQuote(request, response);
@@ -183,45 +230,23 @@ export class LiquidityPoolService {
   private async _buildLiquidityPool(entity: ILiquidityPoolEntity): Promise<LiquidityPool> {
     if (!entity) return undefined;
 
-    const hydrated = await firstValueFrom(this._getHydratedPool(entity.address, entity.miningPool));
+    const hydrated = await firstValueFrom(this._getRawHydratedPool$(entity.address, entity.miningPool));
 
     let miningPool = null;
     if (entity.srcToken !== this._env.contracts.odx) {
-      const miningPoolDto = await firstValueFrom(this.getHydratedMiningPool(entity.miningPool));
+      const miningPoolDto = await firstValueFrom(this._getRawHydratedMiningPool$(entity.miningPool));
       miningPool = new MiningPool(miningPoolDto);
     }
 
-    const srcToken = await this._tokenService.buildToken(entity.srcToken);
-    const stakingToken = await this._tokenService.buildToken(this._env.contracts.odx);
-    const crsToken = await this._tokenService.buildToken('CRS');
-    const lpToken = await this._tokenService.buildToken(entity.address);
+    const srcToken = await this._tokenService.getToken(entity.srcToken);
+    const stakingToken = await this._tokenService.getToken(this._env.contracts.odx);
+    const crsToken = await this._tokenService.getToken('CRS');
+    const lpToken = await this._tokenService.getToken(entity.address);
 
     return new LiquidityPool(entity, hydrated, miningPool, srcToken, stakingToken, crsToken, lpToken);
   }
 
-  // API
-
-  getStaticPool(address: string): Observable<IBaseLiquidityPoolDetailsDto> {
-    const properties = [
-      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.Token, ParameterType.Address),
-      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.TransactionFee, ParameterType.UInt),
-      this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.MiningPool, ParameterType.Address),
-    ];
-
-    return zip(properties)
-      .pipe(
-        map(([token, transactionFee, miningPool]) => {
-          return {
-            address,
-            token,
-            transactionFee: parseFloat(transactionFee),
-            miningPool
-          };
-        })
-      );
-  }
-
-  private _getHydratedPool(address: string, miningPool: string): Observable<IHydratedLiquidityPoolDetailsDto> {
+  private _getRawHydratedPool$(address: string, miningPool: string): Observable<IHydratedLiquidityPoolDetailsDto> {
     const properties = [
       this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))),
       this._cirrusApi.getContractStorageItem(address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))),
@@ -244,13 +269,7 @@ export class LiquidityPoolService {
         }));
   }
 
-  // Todo: Get Volume
-  // -- Get all swaps within 5400 blocks
-  // -- Add all CRS, Add all SRC
-  // -- Calculate current CRS/SRC pricing
-  // -- Calc volume by ($SRC * SrcTokenVolume) + ($CRS * CrsTokenVolume)
-
-  getHydratedMiningPool(miningPool: string): Observable<IMiningPoolDetailsDto> {
+  private _getRawHydratedMiningPool$(miningPool: string): Observable<IMiningPoolDetailsDto> {
     const properties = [
       this._cirrusApi.getContractStorageItem(miningPool, MiningPoolStateKeys.StakingToken, ParameterType.Address).pipe(catchError(_ => of(''))),
       this._cirrusApi.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong).pipe(catchError(_ => of('0'))),
@@ -268,25 +287,6 @@ export class LiquidityPoolService {
             totalSupply: BigInt(totalSupply),
             address: miningPool
           };
-        }));
-  }
-
-  getMiningPeriodEndBlocks(miningPools: string[]): Observable<{ miningPeriodEndBlock: number, miningPool: string}[]> {
-    const uniquePools = miningPools
-      .filter((value, index, self) => self.lastIndexOf(value) === index)
-
-    const properties = uniquePools
-      .map(miningPool => this._cirrusApi.getContractStorageItem(miningPool, MiningPoolStateKeys.MiningPeriodEndBlock, ParameterType.ULong))
-
-    return zip(properties)
-      .pipe(
-        map(endBlocks => {
-          return endBlocks.map((block, index) => {
-            return {
-              miningPeriodEndBlock: parseFloat(block),
-              miningPool: uniquePools[index]
-            }
-          })
         }));
   }
 }

@@ -35,7 +35,7 @@ export class DistributeTransactionSummaryComponent implements OnChanges {
     }
 
     const event = events[0];
-    const token = await this._tokenService.buildToken(event.address);
+    const token = await this._tokenService.getToken(event.address);
     const log = <IDistributionLog>event.log.data;
 
     this.token = token;

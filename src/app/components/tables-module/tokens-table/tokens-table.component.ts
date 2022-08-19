@@ -56,7 +56,7 @@ export class TokensTableComponent implements OnInit, OnDestroy {
   }
 
   private async getTokens$(skip: number, take: number): Promise<IPagination<Token>> {
-    const result = await this._tokensService.buildTokens(skip, take);
+    const result = await this._tokensService.getTokens(skip, take);
     this.dataSource.data = [...result.results];
     this.previous = this.skip > 0 && result.count > this.skip;
     this.next = result.count > this.take + this.skip;
@@ -64,12 +64,12 @@ export class TokensTableComponent implements OnInit, OnDestroy {
   }
 
   async provide(tokenAddress: string): Promise<void> {
-    const pool = await this._liquidityPoolsService.buildLiquidityPoolBySrcToken(tokenAddress);
+    const pool = await this._liquidityPoolsService.getLiquidityPoolBySrcToken(tokenAddress);
     this._tradeRoute(pool, TransactionView.provide);
   }
 
   async swap(tokenAddress: string): Promise<void> {
-    const pool = await this._liquidityPoolsService.buildLiquidityPoolBySrcToken(tokenAddress);
+    const pool = await this._liquidityPoolsService.getLiquidityPoolBySrcToken(tokenAddress);
     this._tradeRoute(pool, TransactionView.swap);
   }
 

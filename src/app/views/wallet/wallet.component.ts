@@ -91,7 +91,7 @@ export class WalletComponent implements OnInit, OnDestroy {
   }
 
   private async _setCrsToken(): Promise<void> {
-    this.crs = await this._tokenService.buildToken('CRS');
+    this.crs = await this._tokenService.getToken('CRS');
   }
 
   handleTxOption(view: TransactionView) {

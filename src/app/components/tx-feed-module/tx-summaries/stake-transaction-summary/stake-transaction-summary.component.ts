@@ -53,7 +53,7 @@ export class StakeTransactionSummaryComponent implements OnChanges {
     this.isAddition = startEvent !== undefined;
     this.isCollection = collectEvent !== undefined;
     this.collectionLiquidatedRewards = this.isCollection && burnEvent !== undefined;
-    this.pool = await this._liquidityPoolService.buildLiquidityPool(startEvent?.address || stopEvent?.address || collectEvent?.address);
+    this.pool = await this._liquidityPoolService.getLiquidityPool(startEvent?.address || stopEvent?.address || collectEvent?.address);
 
     let stakingAmount: BigInt;
 
