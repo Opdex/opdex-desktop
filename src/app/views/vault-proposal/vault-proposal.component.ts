@@ -62,53 +62,11 @@ export class VaultProposalComponent implements OnDestroy {
       this._indexerService.latestBlock$
         .pipe(
           tap(block => this.latestBlock = block),
-          switchMap(_ => this.getVault()),
-          switchMap(_ => this.getProposal(proposalId)),
-          switchMap(_ => this.getVote()),
-          switchMap(_ => this.getPledge()))
+          switchMap(_ => this._getVault()),
+          switchMap(_ => this._getProposal(proposalId)),
+          switchMap(_ => this._getVote()),
+          switchMap(_ => this._getPledge()))
         .subscribe());
-  }
-
-  async getProposal(proposalId: number): Promise<void> {
-    this.proposal = await this._vaultService.getProposal(proposalId);
-    if (!this.txView && this.proposal.status !== 'Complete') this.txView = this.proposal.status;
-    this.setPledgePercentage();
-  }
-
-  async getVault(): Promise<Vault> {
-    const vault = await this._vaultService.getVault();
-    const token = await this._tokensService.getToken(vault.token);
-
-    this.vault = vault;
-    this.token = token;
-
-    return vault;
-  }
-
-  async getVote(): Promise<FixedDecimal> {
-    if (this.proposal.status === 'Pledge' || !this.context?.isLoggedIn) return null;
-
-    try {
-      const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet.address);
-      const fixed = FixedDecimal.FromBigInt(response.balance, 8); // CRS 8 decimals
-      this.userVote = {balance: fixed, inFavor: response.inFavor};
-      return fixed;
-    } catch {
-      return null;
-    }
-  }
-
-  async getPledge(): Promise<FixedDecimal> {
-    if (!this.context?.isLoggedIn) return null;
-
-    try {
-      const bigInt = await this._walletService.getVaultPledgePosition(this.proposal.proposalId, this.context.wallet.address);
-      const fixed = FixedDecimal.FromBigInt(bigInt, 8); // CRS 8 decimals
-      this.userPledge = fixed;
-      return fixed;
-    } catch {
-      return null;
-    }
   }
 
   async quoteCompleteProposal(proposalId: number): Promise<void> {
@@ -127,17 +85,6 @@ export class VaultProposalComponent implements OnDestroy {
         queryParams: { txView: view, withdraw },
         queryParamsHandling: 'merge'
       });
-  }
-
-  proposalsTrackBy(index: number, proposal: VaultProposal) {
-    return `${index}-${proposal?.trackBy}`;
-  }
-
-  private setPledgePercentage(): void {
-    const minimum = this.vault.totalPledgeMinimum;
-    const pledge = this.proposal.pledgeAmount;
-
-    this.pledgePercentage = pledge.divide(minimum).multiply(FixedDecimal.OneHundred(0));
   }
 
   getExpirationPercentage(proposal: VaultProposal) {
@@ -163,6 +110,53 @@ export class VaultProposalComponent implements OnDestroy {
 
   statCardTrackBy(index: number, statCard: StatCardInfo) {
     return `${index}-${statCard?.title}-${statCard?.value?.formattedValue}`;
+  }
+
+  private async _getProposal(proposalId: number): Promise<void> {
+    this.proposal = await this._vaultService.getProposal(proposalId);
+    if (!this.txView && this.proposal.status !== 'Complete') this.txView = this.proposal.status;
+    if (!this.withdraw && this.proposal.status === 'Complete') this.withdraw = true;
+
+    const minimum = this.vault.totalPledgeMinimum;
+    const pledge = this.proposal.pledgeAmount;
+
+    this.pledgePercentage = pledge.divide(minimum).multiply(FixedDecimal.OneHundred(0));
+  }
+
+  private async _getVault(): Promise<Vault> {
+    const vault = await this._vaultService.getVault();
+    const token = await this._tokensService.getToken(vault.token);
+
+    this.vault = vault;
+    this.token = token;
+
+    return vault;
+  }
+
+  private async _getVote(): Promise<FixedDecimal> {
+    if (this.proposal.status === 'Pledge' || !this.context?.isLoggedIn) return null;
+
+    try {
+      const response = await this._walletService.getVaultVotePosition(this.proposal.proposalId, this.context.wallet.address);
+      const fixed = FixedDecimal.FromBigInt(response.balance, 8); // CRS 8 decimals
+      this.userVote = {balance: fixed, inFavor: response.inFavor};
+      return fixed;
+    } catch {
+      return null;
+    }
+  }
+
+  private async _getPledge(): Promise<FixedDecimal> {
+    if (!this.context?.isLoggedIn) return null;
+
+    try {
+      const bigInt = await this._walletService.getVaultPledgePosition(this.proposal.proposalId, this.context.wallet.address);
+      const fixed = FixedDecimal.FromBigInt(bigInt, 8); // CRS 8 decimals
+      this.userPledge = fixed;
+      return fixed;
+    } catch {
+      return null;
+    }
   }
 
   ngOnDestroy() {

@@ -10,7 +10,7 @@ import { Vault } from '@models/platform/vault';
 import { catchError, firstValueFrom, map, Observable, of, zip } from 'rxjs';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { VaultProposal } from '@models/platform/vault-proposal';
-import { IPagination, IVaultProposalEntity } from '@interfaces/database.interface';
+import { IPagination, IVaultProposalEntity, IVaultCertificateEntity } from '@interfaces/database.interface';
 import { VaultStateKeys } from '@enums/contracts/state-keys/vault-state-keys';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { ParameterType } from '@enums/parameter-type';
@@ -245,7 +245,19 @@ export class VaultService {
 
   private async _buildProposal(entity: IVaultProposalEntity): Promise<VaultProposal> {
     const hydrated = await firstValueFrom(this._getRawHydratedProposal$(entity.proposalId));
-    return new VaultProposal(this._vault, this._env.contracts.odx, entity, hydrated);
+
+    let certificate: IVaultCertificateEntity;
+
+    if (VaultProposal.getType(entity.type) === 'Create') {
+      certificate = await this._vaultRepository.getCertificateByProposalId(entity.proposalId);
+    } else if (VaultProposal.getType(entity.type) === 'Revoke') {
+      // Latest cert by holder in descending order
+      certificate = await (await this._vaultRepository
+          .getCertificatesByOwner(entity.wallet))
+          .sort((a, b) => b.vestedBlock - a.vestedBlock)[0];
+    }
+
+    return new VaultProposal(this._vault, this._env.contracts.odx, entity, hydrated, certificate);
   }
 
   private _searchReceipt$(request: ReceiptSearchRequest, logType: TransactionLogTypes): Observable<any[]> {
