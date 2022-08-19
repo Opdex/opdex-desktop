@@ -25,7 +25,7 @@ export class OpdexDB extends Dexie {
       liquidityPool: '++id, &address, name, srcToken, miningPool, transactionFee, isNominated, miningPeriodEndBlock, createdBlock',
       token: '++id, &address, symbol, name, decimals, nativeChain, nativeChainAddress, createdBlock',
       proposal: '++id, &proposalId, type, description, creator, wallet, approved, createdBlock',
-      certificate: '++id, owner, amount, redeemed, revoked, vestedBlock, createdBlock'
+      certificate: '++id, owner, amount, redeemed, revoked, &proposalId, vestedBlock, createdBlock'
     });
   }
 }

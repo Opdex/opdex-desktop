@@ -41,7 +41,7 @@ export class MineTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    this.pool = await this._liquidityPoolService.buildLiquidityPoolByMiningPoolAddress(startEvent?.address || stopEvent?.address || collectEvent?.address)
+    this.pool = await this._liquidityPoolService.getLiquidityPoolByMiningPoolAddress(startEvent?.address || stopEvent?.address || collectEvent?.address)
 
     const collectAmount = collectEvent === undefined ? BigInt('0') : (<ICollectMiningRewardsLog>collectEvent.log.data).amount;
     this.collectAmount = FixedDecimal.FromBigInt(collectAmount, this.pool.stakingToken?.decimals);

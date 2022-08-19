@@ -146,11 +146,24 @@
   </div>
 </div>
 
-<div class="offset-section pt-5 pb-4" *ngIf="context?.isLoggedIn && (userPledge || userVote)">
+<div class="offset-section" *ngIf="proposal?.certificate">
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h3>Current Positions</h3>
+        <h4>Assigned Certificate</h4>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <opdex-vault-certificate-card *ngIf="proposal.certificate" [cert]="proposal.certificate"></opdex-vault-certificate-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="standard-section" *ngIf="context?.isLoggedIn && (userPledge || userVote)">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h4>Current Positions</h4>
       </div>
 
       <div class="col-12 col-sm-6 col-md-4 col-xl-3">

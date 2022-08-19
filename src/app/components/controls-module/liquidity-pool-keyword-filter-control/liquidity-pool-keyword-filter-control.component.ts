@@ -43,7 +43,7 @@ export class LiquidityPoolKeywordFilterControlComponent implements OnInit {
 
   async getLiquidityPools(keyword?: string): Promise<void> {
     if (!keyword) {
-      const pools = await this._liquidityPoolsService.buildLiquidityPools(0, 5);
+      const pools = await this._liquidityPoolsService.getLiquidityPools(0, 5);
       this.liquidityPools = pools.results;
     } else {
       this.liquidityPools = await this._liquidityPoolsService.searchPools(keyword);

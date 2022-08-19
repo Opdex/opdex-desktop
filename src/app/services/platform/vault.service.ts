@@ -1,3 +1,4 @@
+import { ICompleteVaultProposalLog, IRevokeVaultCertificateLog, ICreateVaultCertificateLog } from '@interfaces/contract-logs.interface';
 import { UserContextService } from '@services/utility/user-context.service';
 import { VaultMethods } from '@enums/contracts/methods/vault-methods';
 import { FixedDecimal } from '@models/types/fixed-decimal';
@@ -9,7 +10,7 @@ import { Vault } from '@models/platform/vault';
 import { catchError, firstValueFrom, map, Observable, of, zip } from 'rxjs';
 import { VaultCertificate } from '@models/platform/vault-certificate';
 import { VaultProposal } from '@models/platform/vault-proposal';
-import { IPagination, IVaultProposalEntity } from '@interfaces/database.interface';
+import { IPagination, IVaultProposalEntity, IVaultCertificateEntity } from '@interfaces/database.interface';
 import { VaultStateKeys } from '@enums/contracts/state-keys/vault-state-keys';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { ParameterType } from '@enums/parameter-type';
@@ -17,6 +18,14 @@ import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { LocalCallRequest, Parameter } from '@models/cirrusApi/contract-call';
 import { TransactionQuote } from '@models/platform/transaction-quote';
 import { IHydratedVault, IHydratedProposal } from '@interfaces/contract-properties.interface';
+
+export type CompletedVaultProposalTransaction = {
+  from: string;
+  blockHeight: number;
+  completionLog: ICompleteVaultProposalLog;
+  certRevocationLog?: IRevokeVaultCertificateLog;
+  certCreationLog?: ICreateVaultCertificateLog;
+}
 
 @Injectable({providedIn: 'root'})
 export class VaultService {
@@ -32,7 +41,7 @@ export class VaultService {
   }
 
   async getVault(): Promise<Vault> {
-    const hydrated = await firstValueFrom(this.getHydratedVault());
+    const hydrated = await firstValueFrom(this._getRawHydratedVault$());
     return new Vault(this._vault, hydrated);
   }
 
@@ -48,11 +57,58 @@ export class VaultService {
     return { skip: result.skip, take: result.take, results: proposals, count: result.count };
   }
 
+  async getCertificateByProposalId(proposalId: number): Promise<VaultCertificate> {
+    const result = await this._vaultRepository.getCertificateByProposalId(proposalId);
+    return new VaultCertificate(result);
+  }
+
   async getCertificates(skip: number, take: number): Promise<IPagination<VaultCertificate>> {
     const result = await this._vaultRepository.getCertificates(skip, take);
     const certificates = result.results.map(entity => new VaultCertificate(entity));
     return { skip: result.skip, take: result.take, results: certificates, count: result.count };
   }
+
+  ////////////////////////////////////////
+  //          RECEIPT METHODS           //
+  ////////////////////////////////////////
+
+  public getCreatedVaultProposalReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.CreateVaultProposalLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getRedeemedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
+    const logType = TransactionLogTypes.RedeemVaultCertificateLog;
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    return this._searchReceipt$(request, logType);
+  }
+
+  public getCompletedVaultProposalReceipts(fromBlock: number): Observable<CompletedVaultProposalTransaction[]> {
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, TransactionLogTypes.CompleteVaultProposalLog);
+
+    return this._cirrusApi.searchContractReceipts(request)
+      .pipe(
+        map(response => {
+          const txs: CompletedVaultProposalTransaction[] = [];
+
+          response.forEach(tx => {
+            txs.push({
+              from: tx.from,
+              blockHeight: tx.blockNumber,
+              completionLog: tx.logs.find(log => log.log.event === TransactionLogTypes.CompleteVaultProposalLog).log.data,
+              certRevocationLog: tx.logs.find(log => log.log.event === TransactionLogTypes.RevokeVaultCertificateLog)?.log?.data,
+              certCreationLog: tx.logs.find(log => log.log.event === TransactionLogTypes.CreateVaultCertificateLog)?.log?.data,
+            });
+          });
+
+          return txs;
+      }));
+  }
+
+  ////////////////////////////////////////
+  //          QUOTE METHODS             //
+  ////////////////////////////////////////
 
   public async pledgeQuote(proposalId: number, amount: FixedDecimal): Promise<TransactionQuote> {
     const {wallet} = this._context.userContext;
@@ -183,12 +239,44 @@ export class VaultService {
     return new TransactionQuote(request, response);
   }
 
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
   private async _buildProposal(entity: IVaultProposalEntity): Promise<VaultProposal> {
-    const hydrated = await firstValueFrom(this.getHydratedProposal(entity.proposalId));
-    return new VaultProposal(this._vault, this._env.contracts.odx, entity, hydrated);
+    const hydrated = await firstValueFrom(this._getRawHydratedProposal$(entity.proposalId));
+
+    let certificate: IVaultCertificateEntity;
+
+    if (VaultProposal.getType(entity.type) === 'Create') {
+      certificate = await this._vaultRepository.getCertificateByProposalId(entity.proposalId);
+    } else if (VaultProposal.getType(entity.type) === 'Revoke') {
+      // Latest cert by holder in descending order
+      certificate = await (await this._vaultRepository
+          .getCertificatesByOwner(entity.wallet))
+          .sort((a, b) => b.vestedBlock - a.vestedBlock)[0];
+    }
+
+    return new VaultProposal(this._vault, this._env.contracts.odx, entity, hydrated, certificate);
   }
 
-  getHydratedVault(): Observable<IHydratedVault> {
+  private _searchReceipt$(request: ReceiptSearchRequest, logType: TransactionLogTypes): Observable<any[]> {
+    return this._cirrusApi.searchContractReceipts(request)
+      .pipe(
+        map(response => {
+          const logs = [];
+
+          response.forEach(tx => {
+            tx.logs
+              .filter(log => log.log.event === logType)
+              .forEach(log => logs.push({...log.log.data, blockHeight: tx.blockNumber, from: tx.from,}));
+          });
+
+          return logs;
+      }));
+  }
+
+  private _getRawHydratedVault$(): Observable<IHydratedVault> {
     const vault = this._vault;
     const balanceRequest = new LocalCallRequest(this._env.contracts.odx, 'GetBalance', this._vault, [new Parameter(ParameterType.Address, this._vault)]);
 
@@ -217,55 +305,9 @@ export class VaultService {
         }));
   }
 
-  getHydratedProposal(proposalId: number): Observable<IHydratedProposal> {
+  private _getRawHydratedProposal$(proposalId: number): Observable<IHydratedProposal> {
     const vault = this._vault;
     const request = new LocalCallRequest(vault, VaultMethods.GetProposal, vault, [new Parameter(ParameterType.ULong, proposalId)])
     return this._cirrusApi.localCall(request).pipe(map(response => response.return));
-  }
-
-  getCreatedVaultProposals(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CreateVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getCompletedVaultProposals(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CompleteVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getCreatedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.CreateVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getRevokedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.RevokeVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  getRedeemedVaultCertificates(fromBlock: number): Observable<any> {
-    const logType = TransactionLogTypes.RedeemVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
-    return this._searchReceipt$(request, logType);
-  }
-
-  private _searchReceipt$(request: ReceiptSearchRequest, logType: TransactionLogTypes): Observable<any> {
-    return this._cirrusApi.searchContractReceipts(request)
-      .pipe(
-        map(response => {
-          const logs = [];
-
-          response.forEach(tx => {
-            tx.logs
-              .filter(log => log.log.event === logType)
-              .forEach(log => logs.push({...log.log.data, blockHeight: tx.blockNumber, from: tx.from,}));
-          });
-
-          return logs;
-      }));
   }
 }

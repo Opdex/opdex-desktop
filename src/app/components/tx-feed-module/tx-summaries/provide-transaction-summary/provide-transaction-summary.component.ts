@@ -38,7 +38,7 @@ export class ProvideTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    this.pool = await this._liquidityPoolService.buildLiquidityPool(provideEvents[0].address);
+    this.pool = await this._liquidityPoolService.getLiquidityPool(provideEvents[0].address);
 
     if (provideEvents[0].log.event === TransactionLogTypes.MintLog) {
       const event = provideEvents[0].log.data as IMintLog;

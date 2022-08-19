@@ -93,7 +93,7 @@ export class AppComponent implements OnInit {
 
   private async _checkAppUpdate(): Promise<void> {
     const latestVersion = await firstValueFrom(this._githubApi.getLatestVersion());
-    if (latestVersion && this._env.version.compare(latestVersion.tag_name) === 1) {
+    if (latestVersion && this._env.version.compare(latestVersion.tag_name) === -1) {
       this.appUpdateUrl = latestVersion.html_url;
     }
   }

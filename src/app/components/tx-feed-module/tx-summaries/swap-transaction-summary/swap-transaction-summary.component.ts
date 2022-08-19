@@ -33,7 +33,7 @@ export class SwapTransactionSummaryComponent implements OnChanges {
     if (swapEvents.length === 1) {
       const event = swapEvents[0];
       const log = <ISwapLog>swapEvents[0].log.data;
-      const pool = await this._liquidityPoolService.buildLiquidityPool(event.address);
+      const pool = await this._liquidityPoolService.getLiquidityPool(event.address);
       const crsIn = FixedDecimal.FromBigInt(log.amountCrsIn, 8);
 
       this.tokenIn = crsIn.isZero ? pool.srcToken : pool.crsToken;
@@ -50,8 +50,8 @@ export class SwapTransactionSummaryComponent implements OnChanges {
       const firstLog = <ISwapLog>swapEvents[0].log.data;
       const secondEvent = swapEvents[1];
       const secondLog = <ISwapLog>swapEvents[1].log.data;
-      const firstPool = await this._liquidityPoolService.buildLiquidityPool(firstEvent.address);
-      const secondPool = await this._liquidityPoolService.buildLiquidityPool(secondEvent.address);
+      const firstPool = await this._liquidityPoolService.getLiquidityPool(firstEvent.address);
+      const secondPool = await this._liquidityPoolService.getLiquidityPool(secondEvent.address);
 
       this.tokenIn = firstPool.srcToken;
       this.tokenOut = secondPool.srcToken;

@@ -51,7 +51,7 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
   }
 
   private async getLiquidityPools$(skip: number, take: number): Promise<IPagination<LiquidityPool>> {
-    const result = await this._liquidityPoolsService.buildLiquidityPools(skip, take);
+    const result = await this._liquidityPoolsService.getLiquidityPools(skip, take);
     this.dataSource.data = [...result.results];
     this.previous = this.skip > 0 && result.count > this.skip;
     this.next = result.count > this.take + this.skip;

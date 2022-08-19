@@ -37,7 +37,7 @@ export class EnableMiningTransactionSummaryComponent implements OnChanges {
     const pools = await Promise.all(rewardEvents.map(event => {
       const log = <IRewardMiningPoolLog>event.log.data;
       logs.push(log);
-      return this._liquidityPoolService.buildLiquidityPool(log.stakingPool);
+      return this._liquidityPoolService.getLiquidityPool(log.stakingPool);
     }))
 
     this.pools = pools;

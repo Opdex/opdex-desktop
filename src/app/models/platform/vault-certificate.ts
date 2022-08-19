@@ -6,6 +6,7 @@ export class VaultCertificate {
   private _amount: FixedDecimal;
   private _vestingStartBlock: number;
   private _vestingEndBlock: number;
+  private _proposalId: number;
   private _redeemed: boolean;
   private _revoked: boolean;
 
@@ -23,6 +24,10 @@ export class VaultCertificate {
 
   public get vestingEndBlock(): number {
     return this._vestingEndBlock;
+  }
+
+  public get proposalId(): number {
+    return this._proposalId;
   }
 
   public get redeemed(): boolean {
@@ -43,6 +48,7 @@ export class VaultCertificate {
     this._amount = FixedDecimal.FromBigInt(certificate.amount, 8);
     this._vestingStartBlock = certificate.createdBlock;
     this._vestingEndBlock = certificate.vestedBlock;
+    this._proposalId = certificate.proposalId;
     this._redeemed = certificate.redeemed === 1;
     this._revoked = certificate.revoked === 1;
   }

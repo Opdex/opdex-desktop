@@ -1,13 +1,7 @@
 <opdex-card>
   <ng-container *ngIf="cert; else loading">
     <div class="flex-row-center-between">
-      <div class="flex-row-center">
-        <mat-icon class="yellow tiny mr-1" *ngIf="context.isLoggedIn && context.wallet.address === cert.owner">{{icons.rewards}}</mat-icon>
-
-        <h4 class="mb-0">
-          <opdex-number [value]="cert.amount" suffix="ODX" [short]="true"></opdex-number>
-        </h4>
-      </div>
+      <a class="small-link no-decoration" routerLink="/vault/proposal/{{cert.proposalId}}">Proposal #{{cert.proposalId}}</a>
 
       <button mat-icon-button color="primary" class="tiny" [matMenuTriggerFor]="beforeMenu" *ngIf="showMenu">
         <mat-icon>{{icons.more}}</mat-icon>
@@ -26,6 +20,14 @@
           <mat-icon class="red">{{icons.closeOutline}}</mat-icon> Revoke
         </button>
       </mat-menu>
+    </div>
+
+    <div class="flex-row-center">
+      <mat-icon class="yellow tiny mr-1" *ngIf="context.isLoggedIn && context.wallet.address === cert.owner">{{icons.rewards}}</mat-icon>
+
+      <h4 class="mb-0">
+        <opdex-number [value]="cert.amount" suffix="ODX" [short]="true"></opdex-number>
+      </h4>
     </div>
 
     <opdex-copy-address [address]="cert.owner"></opdex-copy-address>

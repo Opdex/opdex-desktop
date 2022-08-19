@@ -99,7 +99,7 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
       const withdrawVoteEvent = this.pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalWithdrawVoteLog);
       const withdrawVoteLog = withdrawVoteEvent ? <IVaultProposalWithdrawVoteLog>withdrawVoteEvent.log.data : undefined;
 
-      const crs = await this._tokenFactory.buildToken('CRS')
+      const crs = await this._tokenFactory.getToken('CRS')
       summary.crs = crs;
       summary.pledgeOrVote = { inFavor: null } as IVaultProposalPledgeOrVoteSummary;
 
@@ -128,7 +128,7 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
       const completeLog = completeEvent ? <ICompleteVaultProposalLog>completeEvent.log.data : undefined;
 
       const vault = await this._vaultService.getVault();
-      const token = await this._tokenFactory.buildToken(vault.token);
+      const token = await this._tokenFactory.getToken(vault.token);
 
       summary.vault = vault
       summary.vaultToken = token;

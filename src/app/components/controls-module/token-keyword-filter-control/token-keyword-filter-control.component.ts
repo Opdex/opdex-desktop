@@ -42,7 +42,7 @@ export class TokenKeywordFilterControlComponent implements OnInit, OnDestroy {
   async ngOnInit(): Promise<void> {
     setTimeout(() => this.filterInput.nativeElement.focus());
 
-    this.crs = await this._tokensService.buildToken('CRS')
+    this.crs = await this._tokensService.getToken('CRS')
     await this.getTokens(null);
   }
 
@@ -52,7 +52,7 @@ export class TokenKeywordFilterControlComponent implements OnInit, OnDestroy {
 
   async getTokens(keyword: string): Promise<void> {
     if (keyword === null) {
-      const tokens = await this._tokensService.buildTokens(0, 5);
+      const tokens = await this._tokensService.getTokens(0, 5);
       this.tokens = tokens.results;
     } else {
       this.tokens = await this._tokensService.searchTokens(keyword);

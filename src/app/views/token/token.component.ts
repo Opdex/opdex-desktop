@@ -93,8 +93,8 @@ export class TokenComponent implements OnInit, OnDestroy {
   private async _setPoolAndToken(address: string): Promise<void> {
     if (address !== 'CRS') {
       // SRC token first, fallback if not found to OLPT
-      this.pool = await this._liquidityPoolService.buildLiquidityPoolBySrcToken(address) ||
-                  await this._liquidityPoolService.buildLiquidityPool(address);
+      this.pool = await this._liquidityPoolService.getLiquidityPoolBySrcToken(address) ||
+                  await this._liquidityPoolService.getLiquidityPool(address);
 
       // Todo: If no pool is found, display an error
 
@@ -113,7 +113,7 @@ export class TokenComponent implements OnInit, OnDestroy {
 
       this.token = address === this.pool.srcToken.address ? this.pool.srcToken : this.pool.lpToken;
     } else {
-      this.token = await this._tokenService.buildToken('CRS');
+      this.token = await this._tokenService.getToken('CRS');
     }
   }
 

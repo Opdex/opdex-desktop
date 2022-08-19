@@ -65,7 +65,7 @@ export class TxVaultProposalPledgeComponent extends TxBase implements OnInit, On
   }
 
   async ngOnInit() {
-    this.crs = await this._tokenService.buildToken('CRS');
+    this.crs = await this._tokenService.getToken('CRS');
   }
 
   ngOnChanges() {

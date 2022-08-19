@@ -35,13 +35,13 @@ export class TokenService {
     return await Promise.all(entities.map(entity => this._buildToken(entity)));
   }
 
-  public async buildTokens(skip: number, take: number): Promise<IPagination<Token>> {
+  public async getTokens(skip: number, take: number): Promise<IPagination<Token>> {
     const result = await this._tokenRepository.getTokens(skip, take);
     const tokens = await Promise.all(result.results.map(entity => this._buildToken(entity)));
     return { skip: result.skip, take: result.take, results: tokens, count: result.count }
   }
 
-  public async buildToken(address: string): Promise<Token> {
+  public async getToken(address: string): Promise<Token> {
     let entity: ITokenEntity = address === 'CRS'
       ? { address: 'CRS', symbol: 'CRS', name: 'Cirrus', decimals: 8, createdBlock: 1 }
       : await firstValueFrom(this._tokenRepository.getTokenByAddress(address));
@@ -58,7 +58,7 @@ export class TokenService {
       }
       // Else lookup the token from Cirrus
       else {
-        const base = await firstValueFrom(this.getToken(address));
+        const base = await firstValueFrom(this.getRawStaticTokenProperties(address));
 
         isLpt = base.symbol === 'OLPT' && base.name === 'Opdex Liquidity Pool Token';
         entity = {
@@ -75,6 +75,43 @@ export class TokenService {
 
     return await this._buildToken(entity, isLpt);
   }
+
+  public getRawStaticTokenProperties(address: string): Observable<ITokenDetailsDto> {
+    const isODX = address === this._env.contracts.odx;
+
+    const keys = {
+      name: isODX ? OdxStateKeys.Name : StandardTokenStateKeys.Name,
+      symbol: isODX ? OdxStateKeys.Symbol : StandardTokenStateKeys.Symbol,
+      decimals: isODX ? OdxStateKeys.Decimals : StandardTokenStateKeys.Decimals,
+      totalSupply: isODX ? OdxStateKeys.TotalSupply : StandardTokenStateKeys.TotalSupply
+    };
+
+    const properties = [
+      this._cirrusApi.getContractStorageItem(address, keys.name, ParameterType.String),
+      this._cirrusApi.getContractStorageItem(address, keys.symbol, ParameterType.String),
+      this._cirrusApi.getContractStorageItem(address, keys.decimals, ParameterType.Byte),
+      this._cirrusApi.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256),
+      this._cirrusApi.getContractStorageItem(address, InterfluxTokenStateKeys.NativeChain, ParameterType.String).pipe(catchError(_ => of(''))),
+      this._cirrusApi.getContractStorageItem(address, InterfluxTokenStateKeys.NativeAddress, ParameterType.String).pipe(catchError(_ => of(''))),
+    ];
+
+    return zip(properties)
+      .pipe(map(([name, symbol, decimals, totalSupply, nativeChain, nativeChainAddress]) => {
+        return {
+          address,
+          name,
+          symbol,
+          decimals: parseFloat(decimals),
+          totalSupply: BigInt(totalSupply),
+          nativeChain,
+          nativeChainAddress
+        }
+      }));
+  }
+
+  ////////////////////////////////////////
+  //          QUOTE METHODS             //
+  ////////////////////////////////////////
 
   public async amountInQuote(amountOut: FixedDecimal, tokenIn: string, poolIn: LiquidityPool, poolOut: LiquidityPool): Promise<TransactionQuote> {
     // Need a sender for the local call, doesn't affect the outcome, fall back to router when user is not logged in.
@@ -259,12 +296,16 @@ export class TokenService {
     return new TransactionQuote(request, response);
   }
 
+  ////////////////////////////////////////
+  //          HELPER METHODS            //
+  ////////////////////////////////////////
+
   private async _buildToken(entity: ITokenEntity, lpToken: boolean = false): Promise<Token> {
     const hydrated = entity.address === 'CRS'
       ? { totalSupply: BigInt('10000000000000000') } // 100M
-      : await firstValueFrom(this.getHydratedToken(entity.address, lpToken));
+      : await firstValueFrom(this._getRawHydratedToken$(entity.address, lpToken));
 
-    const pricing = await this.getTokenPricing(entity);
+    const pricing = await this._getTokenPricing(entity);
 
     let trusted = false;
     if (entity.nativeChainAddress) {
@@ -275,40 +316,7 @@ export class TokenService {
     return new Token(entity, hydrated, pricing, trusted);
   }
 
-  getToken(address: string): Observable<ITokenDetailsDto> {
-    const isODX = address === this._env.contracts.odx;
-
-    const keys = {
-      name: isODX ? OdxStateKeys.Name : StandardTokenStateKeys.Name,
-      symbol: isODX ? OdxStateKeys.Symbol : StandardTokenStateKeys.Symbol,
-      decimals: isODX ? OdxStateKeys.Decimals : StandardTokenStateKeys.Decimals,
-      totalSupply: isODX ? OdxStateKeys.TotalSupply : StandardTokenStateKeys.TotalSupply
-    };
-
-    const properties = [
-      this._cirrusApi.getContractStorageItem(address, keys.name, ParameterType.String),
-      this._cirrusApi.getContractStorageItem(address, keys.symbol, ParameterType.String),
-      this._cirrusApi.getContractStorageItem(address, keys.decimals, ParameterType.Byte),
-      this._cirrusApi.getContractStorageItem(address, keys.totalSupply, ParameterType.UInt256),
-      this._cirrusApi.getContractStorageItem(address, InterfluxTokenStateKeys.NativeChain, ParameterType.String).pipe(catchError(_ => of(''))),
-      this._cirrusApi.getContractStorageItem(address, InterfluxTokenStateKeys.NativeAddress, ParameterType.String).pipe(catchError(_ => of(''))),
-    ];
-
-    return zip(properties)
-      .pipe(map(([name, symbol, decimals, totalSupply, nativeChain, nativeChainAddress]) => {
-        return {
-          address,
-          name,
-          symbol,
-          decimals: parseFloat(decimals),
-          totalSupply: BigInt(totalSupply),
-          nativeChain,
-          nativeChainAddress
-        }
-      }));
-  }
-
-  getHydratedToken(address: string, lpToken: boolean = false): Observable<IHydratedTokenDetailsDto> {
+  private _getRawHydratedToken$(address: string, lpToken: boolean = false): Observable<IHydratedTokenDetailsDto> {
     const isODX = address === this._env.contracts.odx;
     const totalSupplyKey = isODX
       ? OdxStateKeys.TotalSupply
@@ -346,7 +354,7 @@ export class TokenService {
       )
   }
 
-  async getTokenPricing(token: ITokenEntity) {
+  private async _getTokenPricing(token: ITokenEntity): Promise<any> {
     const { pricing } = this._currency;
     let prices: any = { }
 
@@ -358,40 +366,29 @@ export class TokenService {
     const pool = await firstValueFrom(this._liquidityPoolRepository.getPoolBySrcAddress(token.address)) ||
                  await firstValueFrom(this._liquidityPoolRepository.getPoolByAddress(token.address));
 
-    if (!pool) {
-      return prices;
-    }
+    if (!pool) return prices;
 
     if /* LP Token */ (pool.address === token.address) {
-      const totalSupply = FixedDecimal.FromBigInt(
-        BigInt(await firstValueFrom(this._cirrusApi.getContractStorageItem(token.address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
-        8
-      );
-
-      const reserveCrs = FixedDecimal.FromBigInt(
-        BigInt(await firstValueFrom(this._cirrusApi.getContractStorageItem(token.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
-        8
-      );
+      const totalSupply = await this._getStorageFixedDecimal(token.address, LiquidityPoolStateKeys.TotalSupply, ParameterType.UInt256, token.decimals);
+      const reserveCrs = await this._getStorageFixedDecimal(token.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong, 8);
 
       pricing.forEach(currency => prices[currency.abbreviation] = currency.price.multiply(reserveCrs).multiply(new FixedDecimal('2', 8)).divide(totalSupply));
 
       return prices;
     } else /* SRC Token */ {
-      const reserveCrs = FixedDecimal.FromBigInt(
-        BigInt(await firstValueFrom(this._cirrusApi.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong).pipe(catchError(_ => of('0'))))),
-        8
-      );
-
-      const reserveSrc = FixedDecimal.FromBigInt(
-        BigInt(await firstValueFrom(this._cirrusApi.getContractStorageItem(pool.address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256).pipe(catchError(_ => of('0'))))),
-        token.decimals
-      );
-
+      const reserveCrs = await this._getStorageFixedDecimal(pool.address, LiquidityPoolStateKeys.ReserveCrs, ParameterType.ULong, 8);
+      const reserveSrc = await this._getStorageFixedDecimal(pool.address, LiquidityPoolStateKeys.ReserveSrc, ParameterType.UInt256, token.decimals);
       const crsPerSrc = reserveCrs.divide(reserveSrc);
 
       pricing.forEach(currency => prices[currency.abbreviation] = currency.price.multiply(crsPerSrc));
 
       return prices;
     }
+  }
+
+  private async _getStorageFixedDecimal(address: string, stateKey: string, parameterType: ParameterType, decimals: number): Promise<FixedDecimal> {
+    const call = this._cirrusApi.getContractStorageItem(address, stateKey, parameterType).pipe(catchError(_ => of('0')));
+    const response = await firstValueFrom(call);
+    return FixedDecimal.FromBigInt(BigInt(response), decimals);
   }
 }

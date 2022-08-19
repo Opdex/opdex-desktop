@@ -28,7 +28,7 @@ export class LiquidityPoolSelectorComponent implements OnDestroy {
         .pipe(
           skip(1),
           filter(_ => !!this.pool),
-          switchMap(_ => this._liquidityPoolsService.buildLiquidityPool(this.pool.address)))
+          switchMap(_ => this._liquidityPoolsService.getLiquidityPool(this.pool.address)))
         .subscribe((pool: LiquidityPool) => this.pool = pool));
   }
 

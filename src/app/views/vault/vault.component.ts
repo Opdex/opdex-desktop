@@ -66,7 +66,7 @@ export class VaultComponent implements OnInit, OnDestroy {
           tap(latestBlock => this.latestBlock = latestBlock),
           switchMap(_ => this._vaultService.getVault()),
           tap(vault => this.vault = vault),
-          switchMap(vault => this._tokenService.buildToken(vault.token)),
+          switchMap(vault => this._tokenService.getToken(vault.token)),
           tap(token => this.token = token),
           switchMap(_ => this._getCertificates(this.skipCertificates, this.takeCertificates)))
         .subscribe(_ => {

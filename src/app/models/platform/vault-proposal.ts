@@ -1,5 +1,6 @@
+import { VaultCertificate } from '@models/platform/vault-certificate';
 import { IHydratedProposal } from '@interfaces/contract-properties.interface';
-import { IVaultProposalEntity } from '@interfaces/database.interface';
+import { IVaultProposalEntity, IVaultCertificateEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 
 export class VaultProposal {
@@ -17,7 +18,7 @@ export class VaultProposal {
   private _noAmount: FixedDecimal;
   private _pledgeAmount: FixedDecimal;
   private _approved: boolean;
-  // private _certificate?: VaultCertificate;
+  private _certificate?: VaultCertificate;
   private _createdBlock: number;
 
   public get vault(): string {
@@ -76,9 +77,9 @@ export class VaultProposal {
     return this._approved;
   }
 
-  // public get certificate(): VaultCertificate {
-  //   return this._certificate;
-  // }
+  public get certificate(): VaultCertificate {
+    return this._certificate;
+  }
 
   public get createdBlock(): number {
     return this._createdBlock;
@@ -102,7 +103,7 @@ export class VaultProposal {
     return oneHundred.multiply(percentageYes);
   }
 
-  constructor(vault: string, token: string, entity: IVaultProposalEntity, hydratedProposal: IHydratedProposal) {
+  constructor(vault: string, token: string, entity: IVaultProposalEntity, hydratedProposal: IHydratedProposal, certificate?: IVaultCertificateEntity) {
     this._vault = vault;
     this._token = token;
     this._proposalId = entity.proposalId,
@@ -110,7 +111,7 @@ export class VaultProposal {
     this._wallet = entity.wallet;
     this._amount = FixedDecimal.FromBigInt(hydratedProposal.amount, 8);
     this._description = entity.description;
-    this._type = this._getType(entity.type);
+    this._type = VaultProposal.getType(entity.type);
     this._status = this._getStatus(hydratedProposal.status);
     this._expiration = hydratedProposal.expiration;
     this._yesAmount = FixedDecimal.FromBigInt(hydratedProposal.yesAmount, 8);
@@ -118,7 +119,7 @@ export class VaultProposal {
     this._pledgeAmount = FixedDecimal.FromBigInt(hydratedProposal.pledgeAmount, 8);
     this._approved = entity.approved === 1;
     this._createdBlock = entity.createdBlock;
-    // this._certificate = !!proposal.certificate ? new VaultCertificate(proposal.certificate) : null;
+    this._certificate = !!certificate ? new VaultCertificate(certificate) : null;
   }
 
   private _getStatus(status: number): string {
@@ -130,7 +131,7 @@ export class VaultProposal {
     }
   }
 
-  private _getType(type: number): string {
+  static getType(type: number): string {
     switch(type) {
       case 1: return 'Create';
       case 2: return 'Revoke';

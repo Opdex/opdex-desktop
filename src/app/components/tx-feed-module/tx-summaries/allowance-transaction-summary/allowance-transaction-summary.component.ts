@@ -37,7 +37,7 @@ export class AllowanceTransactionSummaryComponent implements OnChanges {
     try {
       const log = <IApprovalLog>approveEvents[0].log.data;
 
-      this.token = await this._tokenService.buildToken(approveEvents[0].address);
+      this.token = await this._tokenService.getToken(approveEvents[0].address);
       this.amount = FixedDecimal.FromBigInt(log.amount, this.token.decimals);
       this.to = log.spender;
     } catch {
