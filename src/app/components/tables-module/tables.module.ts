@@ -19,6 +19,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
 import { SharedModule } from '@components/shared-module/shared.module';
 import { WalletPoolPositionsTableComponent } from './wallet-pool-positions-table/wallet-pool-positions-table.component';
+import { WalletVaultPositionsTableComponent } from './wallet-vault-positions-table/wallet-vault-positions-table.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { WalletPoolPositionsTableComponent } from './wallet-pool-positions-table
     SkeletonTableComponent,
     TokensTableComponent,
     VaultProposalsTableComponent,
-    WalletPoolPositionsTableComponent
+    WalletPoolPositionsTableComponent,
+    WalletVaultPositionsTableComponent
   ],
   imports: [
     CommonModule,
@@ -47,7 +49,8 @@ import { WalletPoolPositionsTableComponent } from './wallet-pool-positions-table
     PoolsTableComponent,
     TokensTableComponent,
     VaultProposalsTableComponent,
-    WalletPoolPositionsTableComponent
+    WalletPoolPositionsTableComponent,
+    WalletVaultPositionsTableComponent
   ]
 })
 export class TablesModule { }

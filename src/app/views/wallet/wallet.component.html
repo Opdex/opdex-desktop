@@ -41,7 +41,12 @@
         <div class="col-12 col-sm-6 col-xl-8">
           <opdex-card>
             <h4>Liquidity Pool Positions</h4>
-            <opdex-wallet-pool-positions-table></opdex-wallet-pool-positions-table>
+            <opdex-wallet-pool-positions-table [take]="5"></opdex-wallet-pool-positions-table>
+          </opdex-card>
+
+          <opdex-card>
+            <h4>Vault Proposal Positions</h4>
+            <opdex-wallet-vault-positions-table [take]="5"></opdex-wallet-vault-positions-table>
           </opdex-card>
         </div>
 
