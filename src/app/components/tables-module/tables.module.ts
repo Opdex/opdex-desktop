@@ -18,13 +18,15 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SharedPipesModule } from '@pipes/shared-pipes.module';
 import { SharedModule } from '@components/shared-module/shared.module';
+import { WalletPoolPositionsTableComponent } from './wallet-pool-positions-table/wallet-pool-positions-table.component';
 
 @NgModule({
   declarations: [
     PoolsTableComponent,
     SkeletonTableComponent,
     TokensTableComponent,
-    VaultProposalsTableComponent
+    VaultProposalsTableComponent,
+    WalletPoolPositionsTableComponent
   ],
   imports: [
     CommonModule,
@@ -44,7 +46,8 @@ import { SharedModule } from '@components/shared-module/shared.module';
   exports: [
     PoolsTableComponent,
     TokensTableComponent,
-    VaultProposalsTableComponent
+    VaultProposalsTableComponent,
+    WalletPoolPositionsTableComponent
   ]
 })
 export class TablesModule { }

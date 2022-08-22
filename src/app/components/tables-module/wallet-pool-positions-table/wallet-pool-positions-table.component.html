@@ -5,48 +5,64 @@
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let element">
           <div class="no-wrap flex-row-center">
-            <opdex-token-icons [tokens]="[element.crsToken, element.srcToken]"></opdex-token-icons>
-            <span class="ml-2 b-400">{{element.name}}</span>
+            <opdex-token-icons [tokens]="[element.pool.crsToken, element.pool.srcToken]"></opdex-token-icons>
+            <span class="ml-2 b-400">{{element.pool.name}}</span>
           </div>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="liquidity">
-        <th mat-header-cell *matHeaderCellDef> Liquidity </th>
+      <ng-container matColumnDef="srcBalance">
+        <th mat-header-cell *matHeaderCellDef> SRC Balance </th>
         <td mat-cell *matCellDef="let element">
           <div class="no-wrap flex-row-center">
             <opdex-number
               [short]="true"
-              [prefix]="selectedCurrency?.htmlEntity"
               [preventCopy]="true"
-              [value]="element.crsToken.pricing[selectedCurrency?.abbreviation].multiply(element.reserveCrs).add(element.srcToken.pricing[selectedCurrency?.abbreviation].multiply(element.reserveSrc))">
+              [suffix]="element.pool.srcToken.symbol"
+              [value]="element.srcBalance">
             </opdex-number>
           </div>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="stakingWeight">
-        <th mat-header-cell *matHeaderCellDef> Staking </th>
+      <ng-container matColumnDef="providingBalance">
+        <th mat-header-cell *matHeaderCellDef> Providing Balance </th>
         <td mat-cell *matCellDef="let element">
-          <ng-container *ngIf="element.stakingToken?.address !== element.srcToken?.address; else stakingDisabled">
-            <div class="no-wrap flex-row-center">
-              <opdex-number [precision]="0" [short]="true" [suffix]="element.stakingToken?.symbol" [value]="element.totalStaked" [preventCopy]="true"></opdex-number>
-            </div>
+          <opdex-number
+            [short]="true"
+            [preventCopy]="true"
+            [suffix]="element.pool.lpToken.symbol"
+            [value]="element.providingBalance">
+          </opdex-number>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="stakingBalance">
+        <th mat-header-cell *matHeaderCellDef> Staking Balance</th>
+        <td mat-cell *matCellDef="let element">
+          <ng-container *ngIf="element.pool.miningPool; else noStaking">
+            <opdex-number
+              [value]="element.stakingBalance"
+              [short]="true"
+              [suffix]="element.pool.stakingToken.symbol"
+              [preventCopy]="true">
+            </opdex-number>
           </ng-container>
-          <ng-template #stakingDisabled>
+
+          <ng-template #noStaking>
             <span class="badge purple">Disabled</span>
           </ng-template>
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="mining">
-        <th mat-header-cell *matHeaderCellDef> Mining</th>
+      <ng-container matColumnDef="miningBalance">
+        <th mat-header-cell *matHeaderCellDef> Mining Balance</th>
         <td mat-cell *matCellDef="let element">
-          <ng-container *ngIf="element.miningPool; else noMining">
+          <ng-container *ngIf="element.pool.miningPool; else noMining">
             <opdex-number
-              [value]="element.miningPool?.tokensMining"
+              [value]="element.miningBalance"
               [short]="true"
-              [suffix]="element.lpToken?.symbol"
+              [suffix]="element.pool.lpToken.symbol"
               [preventCopy]="true">
             </opdex-number>
           </ng-container>
@@ -66,21 +82,20 @@
             </button>
 
             <mat-menu #beforeMenu="matMenu" xPosition="before" class="w-100">
-              <button mat-menu-item class="small" (click)="swap(element)">
+              <button mat-menu-item class="small" (click)="swap(element.pool)">
                 <mat-icon class="swap">{{icons.swap}}</mat-icon> Swap
               </button>
-              <button mat-menu-item class="small" (click)="provide(element)">
+              <button mat-menu-item class="small" (click)="provide(element.pool)">
                 <mat-icon class="provide">{{icons.provide}}</mat-icon> Provide
               </button>
-              <button mat-menu-item class="small" (click)="stake(element)" *ngIf="element.miningPool">
+              <button mat-menu-item class="small" (click)="stake(element.pool)" *ngIf="element.pool.miningPool">
                 <mat-icon class="stake">{{icons.staking}}</mat-icon> Stake
               </button>
-              <button mat-menu-item class="small" (click)="mine(element)" *ngIf="element.miningPool">
+              <button mat-menu-item class="small" (click)="mine(element.pool)" *ngIf="element.pool.miningPool">
                 <mat-icon class="mine">{{icons.mining}}</mat-icon> Mine
               </button>
             </mat-menu>
           </div>
-
         </td>
       </ng-container>
 
@@ -88,7 +103,7 @@
       <tr mat-row
         class="hoverable"
         *matRowDef="let row; columns: displayedColumns;"
-        (click)="navigate(row.address)"></tr>
+        (click)="navigate(row.pool.address)"></tr>
     </table>
   </div>
 

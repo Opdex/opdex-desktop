@@ -74,19 +74,19 @@ export class PoolsTableComponent implements OnInit, OnDestroy {
     await this.getLiquidityPools$(this.skip, this.take)
   }
 
-  provide(pool: any): void {
+  provide(pool: LiquidityPool): void {
     this._tradeRoute(pool, TransactionView.provide);
   }
 
-  swap(pool: any): void {
+  swap(pool: LiquidityPool): void {
     this._tradeRoute(pool, TransactionView.swap);
   }
 
-  stake(pool: any): void {
+  stake(pool: LiquidityPool): void {
     this._tradeRoute(pool, TransactionView.stake);
   }
 
-  mine(pool: any): void {
+  mine(pool: LiquidityPool): void {
     this._tradeRoute(pool, TransactionView.mine);
   }
 
