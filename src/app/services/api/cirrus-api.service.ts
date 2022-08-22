@@ -71,7 +71,8 @@ export class CirrusApiService extends CacheService {
   }
 
   localCall(request: LocalCallRequest): Observable<ILocalCallResult> {
-    return this._rest.post(`${this.api}/SmartContracts/local-call`, request.payload);
+    const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload);
+    return this.getItem(request.cacheKey, observable$);
   }
 
   call(request: CallRequest): Observable<IContractCallResult> {

@@ -78,6 +78,17 @@ export class LocalCallRequest extends CallRequestBase {
     super(contractAddress, methodName, sender, parameters, amount);
   }
 
+  public get cacheKey(): string {
+    let key = this.contractAddress;
+    key += `-${this.methodName}`;
+    key += `-${this.sender}`;
+    key += `-${this.amount}`;
+
+    this.parameters.forEach(param => key += param.result);
+
+    return key;
+  }
+
   public get payload(): ILocalCallRequest {
     return {
       contractAddress: this.contractAddress,
