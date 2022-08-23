@@ -1,5 +1,5 @@
 import { LiquidityPoolService } from '@services/platform/liquidity-pool.service';
-import { Component, Input, Injector, OnDestroy } from '@angular/core';
+import { Component, Input, Injector, OnDestroy, OnChanges } from '@angular/core';
 import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { switchMap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
@@ -12,11 +12,11 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
   templateUrl: './tx-stake-collect.component.html',
   styleUrls: ['./tx-stake-collect.component.scss']
 })
-export class TxStakeCollectComponent extends TxBase implements OnDestroy {
+export class TxStakeCollectComponent extends TxBase implements OnChanges, OnDestroy {
   @Input() pool: LiquidityPool;
   form: FormGroup;
   balanceError: boolean;
-  subscription = new Subscription();
+  subscription: Subscription;
 
   get liquidate(): FormControl {
     return this.form.get('liquidate') as FormControl;
@@ -32,11 +32,17 @@ export class TxStakeCollectComponent extends TxBase implements OnDestroy {
     this.form = this._fb.group({
       liquidate: [false]
     });
+  }
 
-    this.subscription.add(
-      this._indexerService.latestBlock$
-        .pipe(switchMap(_ => this.validateStakingBalance()))
-        .subscribe());
+  ngOnChanges(): void {
+    if (this.pool && !this.subscription) {
+      this.subscription = new Subscription();
+
+      this.subscription.add(
+        this._indexerService.latestBlock$
+          .pipe(switchMap(_ => this.validateStakingBalance()))
+          .subscribe());
+    }
   }
 
   async submit(): Promise<void> {

@@ -15,18 +15,24 @@ import { FixedDecimal } from '@models/types/fixed-decimal';
 export class TxMineCollectComponent extends TxBase implements OnDestroy {
   @Input() pool: LiquidityPool;
   balanceError: boolean;
-  subscription = new Subscription();
+  subscription: Subscription;
 
   constructor(
     private _liquidityPoolService: LiquidityPoolService,
     protected _injector: Injector
   ) {
     super(_injector);
+  }
 
-    this.subscription.add(
-      this._indexerService.latestBlock$
-        .pipe(switchMap(_ => this.validateMiningBalance()))
-        .subscribe());
+  ngOnChanges(): void {
+    if (this.pool && !this.subscription) {
+      this.subscription = new Subscription();
+
+      this.subscription.add(
+        this._indexerService.latestBlock$
+          .pipe(switchMap(_ => this.validateMiningBalance()))
+          .subscribe());
+    }
   }
 
   async submit(): Promise<void> {

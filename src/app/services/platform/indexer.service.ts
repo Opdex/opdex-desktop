@@ -51,7 +51,6 @@ export class IndexerService {
 
     if (resync) {
       this.hasIndexed.next(false);
-
       await this._db.delete();
       await this._db.open();
     }
@@ -59,8 +58,6 @@ export class IndexerService {
     const indexer = await this._db.indexer.get(1);
     const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight
     const nodeStatus = this._nodeService.status;
-
-    // Todo: Combine completedVaultProposals, revokedCertificates and createdCertificates since they all log in one transaction
     const [poolReceipts, rewardedMiningPoolReceipts, nominations, createdProposals, completedProposals, redeemedCertificates] = await Promise.all([
       firstValueFrom(this._marketService.getMarketPools(lastUpdateBlock)),
       firstValueFrom(this._miningGovernanceService.getRewardedPoolReceipts$(lastUpdateBlock)),
