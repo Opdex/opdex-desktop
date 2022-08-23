@@ -14,13 +14,14 @@ export class TxButtonsComponent {
   @Input() disableCreatePool = false;
   @Input() hideStaking = false;
   @Input() hideMining = false;
+  @Input() activeView: TransactionView;
 
   showCreatePool = true
-
   icons = Icons;
   transactionViews = TransactionView;
 
   selectOption(option: TransactionView) {
+    this.activeView = option;
     this.onSelectOption.emit(option);
   }
 }

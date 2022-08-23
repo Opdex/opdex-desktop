@@ -6,6 +6,7 @@
   border-radius: 8px;
   min-width: auto;
   transition: background .25s ease;
+  border: 3px solid transparent;
 
   &:disabled {
     .mat-icon {
@@ -20,6 +21,10 @@
       background: rgba($blue-primary, .4) !important;
     }
 
+    &.active {
+      border-color: $blue-primary;
+    }
+
     .mat-icon {
       color: $blue-primary;
     }
@@ -30,6 +35,10 @@
 
     &:hover {
       background: rgba($green-primary, .4) !important;
+    }
+
+    &.active {
+      border-color: $green-primary;
     }
 
     .mat-icon {
@@ -44,6 +53,10 @@
       background: rgba($purple-primary, .4) !important;
     }
 
+    &.active {
+      border-color: $purple-primary;
+    }
+
     .mat-icon {
       color: $purple-primary;
     }
@@ -54,6 +67,10 @@
 
     &:hover {
       background: rgba($red-primary, .4) !important;
+    }
+
+    &.active {
+      border-color: $red-primary;
     }
 
     .mat-icon {
