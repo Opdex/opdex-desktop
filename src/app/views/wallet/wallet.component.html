@@ -48,6 +48,16 @@
             <h4>Vault Proposal Positions</h4>
             <opdex-wallet-vault-positions-table [take]="5"></opdex-wallet-vault-positions-table>
           </opdex-card>
+
+          <ng-container *ngIf="certificates.length">
+            <h4>Vault Certificates</h4>
+            <div class="row">
+              <div class="col-12 col-xl-6" *ngFor="let cert of certificates">
+                <opdex-vault-certificate-card [cert]="cert"></opdex-vault-certificate-card>
+
+              </div>
+            </div>
+          </ng-container>
         </div>
 
         <div class="col-12 col-sm-6 col-xl-4">

@@ -1,3 +1,5 @@
+import { VaultCertificate } from '@models/platform/vault-certificate';
+import { VaultService } from '@services/platform/vault.service';
 import { IndexerService } from '@services/platform/indexer.service';
 import { TokenService } from '@services/platform/token.service';
 import { CurrencyService } from '@services/platform/currency.service';
@@ -29,6 +31,7 @@ export class WalletComponent implements OnInit, OnDestroy {
   selectedCurrency: ICurrency;
   crsBalance: FixedDecimal;
   crsBalanceValue: FixedDecimal;
+  certificates: VaultCertificate[];
   icons = Icons;
   subscription = new Subscription();
 
@@ -38,26 +41,26 @@ export class WalletComponent implements OnInit, OnDestroy {
     private _walletService: WalletService,
     private _currencyService: CurrencyService,
     private _tokenService: TokenService,
-    private _router: Router
+    private _router: Router,
+    private _vaultService: VaultService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.context = this._userContextService.userContext;
 
     this.subscription.add(
       this._currencyService.selectedCurrency$
-        .pipe(tap(currency => this._setSelectedCurrency(currency)))
-        .subscribe());
+        .subscribe(currency => this._setSelectedCurrency(currency)));
 
     this.subscription.add(
       this._indexerService.latestBlock$
         .pipe(
           switchMap(_ => this._setCrsToken()),
           switchMap(_ => this._walletService.getBalance('CRS', this.context.wallet.address)),
-          tap(balance => this._setCrsBalance(balance))
-        )
-        .subscribe()
-    )
+          tap(balance => this._setCrsBalance(balance)))
+        .subscribe());
+
+    this.certificates = await this._vaultService.getCertificatesByOwner('tQ9RukZsB6bBsenHnGSo1q69CJzWGnxohm');
   }
 
   handleDeadlineChange(threshold: number): void {

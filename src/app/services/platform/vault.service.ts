@@ -68,6 +68,11 @@ export class VaultService {
     return { skip: result.skip, take: result.take, results: certificates, count: result.count };
   }
 
+  async getCertificatesByOwner(owner: string): Promise<VaultCertificate[]> {
+    const results = await this._vaultRepository.getCertificatesByOwner(owner);
+    return results.map(cert => new VaultCertificate(cert));
+  }
+
   ////////////////////////////////////////
   //          RECEIPT METHODS           //
   ////////////////////////////////////////
