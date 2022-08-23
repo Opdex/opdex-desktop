@@ -1,5 +1,5 @@
 trigger:
-  - feature/cd
+  - main
 
 pool:
   vmImage: macOS-12
@@ -32,7 +32,7 @@ stages:
   - stage: Deployment
     displayName: Deployment
     dependsOn: CI
-    condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
+    condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     jobs:
       - job: PreValidation
         displayName: Pre-validation
@@ -87,6 +87,6 @@ stages:
                     tag: '$(RELEASE_VERSION)'
                     title: 'Opdex Desktop $(RELEASE_VERSION)'
                     assets: '$(Pipeline.Workspace)/application/*'
-                    isDraft: true
+                    isDraft: false
                     isPreRelease: $(IS_PRERELEASE)
                     addChangeLog: false
