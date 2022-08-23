@@ -70,7 +70,7 @@ stages:
                   inputs:
                     targetType: "inline"
                     script: |
-                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version $(Build.SourcesDirectory)/package.json | sed 's/.*"version": "\(.*\)".*/\1/')"
+                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version $(Pipeline.Workspace)/application/latest.yml | sed 's/.*"version": "\(.*\)".*/\1/')"
                 - task: GitHubRelease@1
                   inputs:
                     gitHubConnection: 'Opdex Desktop Releases'
@@ -78,8 +78,8 @@ stages:
                     action: 'create'
                     target: '$(Build.SourceVersion)'
                     tagSource: 'userSpecifiedTag'
-                    tag: '0.0.1-beta1'
-                    title: 'Opdex Desktop 0.0.1-beta1'
+                    tag: '$(RELEASE_VERSION)'
+                    title: 'Opdex Desktop $(RELEASE_VERSION)'
                     assets: '$(Pipeline.Workspace)/application/*'
                     isDraft: true
                     isPreRelease: true
