@@ -71,6 +71,12 @@ stages:
                     targetType: "inline"
                     script: |
                       echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version $(Pipeline.Workspace)/application/latest.yml | cut -d ' ' -f2-)"
+                - task: Bash@3
+                  displayName: Evaluate pre-release
+                  inputs:
+                   targetType: "inline"
+                   script: |
+                     echo "##vso[task.setvariable variable=IS_PRERELEASE;isreadonly=true]$(if [[ $(RELEASE_VERSION) == *"beta"* ]]; then echo "true"; else echo "false"; fi)"
                 - task: GitHubRelease@1
                   inputs:
                     gitHubConnection: 'Opdex Desktop Releases'
@@ -82,5 +88,5 @@ stages:
                     title: 'Opdex Desktop $(RELEASE_VERSION)'
                     assets: '$(Pipeline.Workspace)/application/*'
                     isDraft: true
-                    isPreRelease: $[ contains(variables.RELEASE_VERSION, 'beta') ]
+                    isPreRelease: $(IS_PRERELEASE)
                     addChangeLog: false
