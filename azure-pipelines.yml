@@ -70,7 +70,7 @@ stages:
                   inputs:
                     targetType: "inline"
                     script: |
-                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version $(Pipeline.Workspace)/application/latest.yml | sed 's/.*"version": "\(.*\)".*/\1/')"
+                      echo "##vso[task.setvariable variable=RELEASE_VERSION;isreadonly=true]$(grep version $(Pipeline.Workspace)/application/latest.yml | cut -d ' ' -f2-)"
                 - task: GitHubRelease@1
                   inputs:
                     gitHubConnection: 'Opdex Desktop Releases'
@@ -82,5 +82,5 @@ stages:
                     title: 'Opdex Desktop $(RELEASE_VERSION)'
                     assets: '$(Pipeline.Workspace)/application/*'
                     isDraft: true
-                    isPreRelease: true
+                    isPreRelease: ${{ contains($(RELEASE_VERSION), 'beta') }}
                     addChangeLog: false
