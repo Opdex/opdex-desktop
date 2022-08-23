@@ -1,5 +1,5 @@
 trigger:
-  - main
+  - feature/cd
 
 pool:
   vmImage: macOS-12
@@ -32,7 +32,7 @@ stages:
   - stage: Deployment
     displayName: Deployment
     dependsOn: CI
-    condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    condition: and(succeeded('CI'), eq(variables['Build.SourceBranch'], 'refs/heads/feature/cd'))
     jobs:
       - job: PreValidation
         displayName: Pre-validation
@@ -74,19 +74,21 @@ stages:
                 - task: Bash@3
                   displayName: Evaluate pre-release
                   inputs:
-                   targetType: "inline"
-                   script: |
-                     echo "##vso[task.setvariable variable=IS_PRERELEASE;isreadonly=true]$(if [[ $(RELEASE_VERSION) == *"beta"* ]]; then echo "true"; else echo "false"; fi)"
+                    targetType: "inline"
+                    script: |
+                      echo "##vso[task.setvariable variable=IS_PRERELEASE;isreadonly=true]$(if [[ $(RELEASE_VERSION) == *"beta"* ]]; then echo "true"; else echo "false"; fi)"
                 - task: GitHubRelease@1
                   inputs:
-                    gitHubConnection: 'Opdex Desktop Releases'
-                    repositoryName: 'Opdex/opdex-desktop'
-                    action: 'create'
-                    target: '$(Build.SourceVersion)'
-                    tagSource: 'userSpecifiedTag'
-                    tag: '$(RELEASE_VERSION)'
-                    title: 'Opdex Desktop $(RELEASE_VERSION)'
-                    assets: '$(Pipeline.Workspace)/application/*'
-                    isDraft: false
+                    gitHubConnection: "Opdex Desktop Releases"
+                    repositoryName: "Opdex/opdex-desktop"
+                    action: "create"
+                    target: "$(Build.SourceVersion)"
+                    tagSource: "userSpecifiedTag"
+                    tag: "$(RELEASE_VERSION)"
+                    title: "Opdex Desktop $(RELEASE_VERSION)"
+                    assets: "$(Pipeline.Workspace)/application/*"
+                    isDraft: true
                     isPreRelease: $(IS_PRERELEASE)
-                    addChangeLog: false
+                    addChangeLog: true
+                    changeLogType: commitBased
+                    changeLogCompareToRelease: lastFullRelease
