@@ -31,7 +31,7 @@ export class WalletComponent implements OnInit, OnDestroy {
   selectedCurrency: ICurrency;
   crsBalance: FixedDecimal;
   crsBalanceValue: FixedDecimal;
-  certificates: VaultCertificate[];
+  certificates: VaultCertificate[] = [];
   icons = Icons;
   subscription = new Subscription();
 
@@ -60,7 +60,7 @@ export class WalletComponent implements OnInit, OnDestroy {
           tap(balance => this._setCrsBalance(balance)))
         .subscribe());
 
-    this.certificates = await this._vaultService.getCertificatesByOwner('tQ9RukZsB6bBsenHnGSo1q69CJzWGnxohm');
+    this.certificates = await this._vaultService.getCertificatesByOwner(this.context.wallet.address);
   }
 
   handleDeadlineChange(threshold: number): void {
