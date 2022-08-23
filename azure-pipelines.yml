@@ -82,5 +82,5 @@ stages:
                     title: 'Opdex Desktop $(RELEASE_VERSION)'
                     assets: '$(Pipeline.Workspace)/application/*'
                     isDraft: true
-                    isPreRelease: contains($(RELEASE_VERSION), 'beta')
+                    isPreRelease: $[ contains($(RELEASE_VERSION), 'beta') ]
                     addChangeLog: false
