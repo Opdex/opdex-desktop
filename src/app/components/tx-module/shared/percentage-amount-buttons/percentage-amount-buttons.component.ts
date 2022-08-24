@@ -83,8 +83,6 @@ export class PercentageAmountButtonsComponent implements OnChanges {
   selectPercentage(value: string) {
     if (!this.balance) return;
 
-    console.log(this.balance)
-
     const formattedValue = value === '100' ? '1.00' : `0.${value}`;
     const result = this.balance.multiply(new FixedDecimal(formattedValue, 2));
 

@@ -49,7 +49,6 @@ export class StakeTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    // Todo: could be collection only...
     this.isAddition = startEvent !== undefined;
     this.isCollection = collectEvent !== undefined;
     this.collectionLiquidatedRewards = this.isCollection && burnEvent !== undefined;

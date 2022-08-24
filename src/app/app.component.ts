@@ -71,7 +71,7 @@ export class AppComponent implements OnInit {
       });
 
     await this._checkAppUpdate();
-    await this._checkNodeVersion();
+    this._checkNodeVersion();
   }
 
   public handlePinnedToggle(event: boolean): void {
