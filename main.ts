@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import * as logger from 'electron-log';
 import * as path from 'path'
 import * as url from 'url'
 
@@ -63,11 +64,17 @@ ipcMain.on('getNetwork', event => {
   event.sender.send('getNetworkResponse', network);
 });
 
+ipcMain.on('log', (event: any, arg: any) => {
+  logger[arg.level](arg.data);
+});
+
 ////////////////////////////////////
 //  Private helper methods        //
 ////////////////////////////////////
 
 const createWindow = () => {
+  setupLogger();
+
   win = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -101,3 +108,15 @@ const createWindow = () => {
     });
   }
 };
+
+const setupLogger = () => {
+  logger.transports.file.level = 'info';
+
+  const d = new Date();
+  const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+
+  // Linux: ~/.config/{app name}/logs/{process type}.log
+  // macOS: ~/Library/Logs/{app name}/{process type}.log
+  // Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{process type}.log
+  logger.transports.file.fileName = `${dateString}.log`;
+}

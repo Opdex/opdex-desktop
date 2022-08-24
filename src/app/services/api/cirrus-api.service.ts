@@ -1,9 +1,9 @@
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { Injectable, Injector } from "@angular/core";
-import { IContractCallResult, IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
+import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
 import { catchError, map, Observable, of } from "rxjs";
 import { RestApiService } from "./rest-api.service";
-import { CallRequest, LocalCallRequest } from '@models/cirrusApi/contract-call';
+import { LocalCallRequest } from '@models/cirrusApi/contract-call';
 import { ReceiptSearchRequest } from '@models/cirrusApi/receipt-search';
 import { ParameterType } from '@enums/parameter-type';
 import { CacheService } from '@services/utility/cache.service';
@@ -39,10 +39,6 @@ export class CirrusApiService extends CacheService {
     return this._rest.get(`${this.api}/Wallet/list-wallets`);
   }
 
-  loadWallet(payload: { name: string, password: string }):Observable<any> {
-    return this._rest.post(`${this.api}/Wallet/load`, payload);
-  }
-
   getAddresses(walletName: string):Observable<INodeAddressList> {
     return this._rest.get(`${this.api}/Wallet/addresses?walletName=${walletName}&account=account%200`);
   }
@@ -73,10 +69,6 @@ export class CirrusApiService extends CacheService {
   localCall(request: LocalCallRequest): Observable<ILocalCallResult> {
     const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload);
     return this.getItem(request.cacheKey, observable$);
-  }
-
-  call(request: CallRequest): Observable<IContractCallResult> {
-    return this._rest.post(`${this.api}/SmartContractWallet/call`, request.payload);
   }
 
   getContractStorageItem(contractAddress: string, storageKey: string, dataType: ParameterType): Observable<string> {

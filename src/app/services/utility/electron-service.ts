@@ -30,7 +30,7 @@ export class ElectronService {
     this._ipc.on(channel, listener);
   }
 
-  public send(channel: string, ...args): void {
+  public send(channel: string, ...args: any[]): void {
     if (!this._ipc) return;
 
     this._ipc.send(channel, ...args);
