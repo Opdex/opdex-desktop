@@ -19,26 +19,32 @@ export class AllowanceValidationComponent implements OnChanges, OnDestroy {
   ignore: boolean = true;
   waiting: boolean;
   icons = Icons;
-  subscription = new Subscription();
+  subscription: Subscription;
 
   constructor(
     private _bottomSheet: MatBottomSheet,
     private _indexerService: IndexerService,
     private _walletService: WalletService,
     private _tokenService: TokenService
-  ) {
-    this.subscription.add(
-      this._indexerService.latestBlock$
-        .pipe(
-          switchMap(_ => this._walletService.getAllowance(this.allowance.token.address, this.allowance.owner, this.allowance.spender)),
-          tap(allowance => this.allowance.update(allowance)))
-        .subscribe(_ => {
-          if (this.allowance.isApproved) this.waiting = false;
-        }));
-  }
+  ) { }
 
   ngOnChanges() {
-    if (this.allowance?.isApproved) this.waiting = false;
+    if (!!this.allowance) {
+      if (this.allowance.isApproved) this.waiting = false;
+
+      if (!this.subscription) {
+        this.subscription = new Subscription();
+
+        this.subscription.add(
+          this._indexerService.latestBlock$
+            .pipe(
+              switchMap(_ => this._walletService.getAllowance(this.allowance.token.address, this.allowance.owner, this.allowance.spender)),
+              tap(allowance => this.allowance.update(allowance)))
+            .subscribe(_ => {
+              if (this.allowance.isApproved) this.waiting = false;
+            }));
+      }
+    }
   }
 
   async approveAllowance() {
