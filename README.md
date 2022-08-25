@@ -51,14 +51,6 @@ Package electron apps for Linux, Windows, and Mac with a single command.
 npm run pack
 ```
 
-### Publish
-
-Publish for Linux, Windows, and Mac with a single command.
-
-```sh
-$GH_TOKEN <token> npm run publish
-```
-
 ## Requirements
 
 This project requires running a local Full Node of the Cirrus Blockchain using either [Cirrus Core](https://github.com/stratisproject/CirrusCore/releases) or [Stratis Full Node](https://github.com/stratisproject/StratisFullNode).
