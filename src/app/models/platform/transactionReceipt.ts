@@ -1,7 +1,9 @@
+import { ITransactionError } from '@interfaces/transaction-quote.interface';
 import { IReceiptLogs } from '@interfaces/full-node.interface';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
 import { IContractReceiptResult } from '@interfaces/full-node.interface';
 import { ITransactionType, TransactionTypes } from '@lookups/transaction-types.lookup';
+import { ParseFriendlyErrorMessage } from '@lookups/contract-errors.lookup';
 
 export interface IBlock {
   hash: string;
@@ -16,7 +18,7 @@ export class TransactionReceipt {
   private _gasUsed: number;
   private _block: IBlock;
   private _success: boolean;
-  private _error: string;
+  private _error: ITransactionError;
   private _events: IReceiptLogs[];
   private _transactionType: ITransactionType;
   private _transactionSummary: string;
@@ -49,7 +51,7 @@ export class TransactionReceipt {
     return this._success;
   }
 
-  public get error(): string {
+  public get error(): ITransactionError {
     return this._error;
   }
 
@@ -74,9 +76,12 @@ export class TransactionReceipt {
     this._block = { height: receipt.blockNumber, hash: receipt.blockHash };
     this._success = receipt.success;
     this._events = receipt.logs;
-    this._error = receipt.error;
     this._transactionType = this.findTransactionType();
     this._transactionSummary = this.getTransactionSummary();
+    this._error = {
+      friendly: ParseFriendlyErrorMessage(receipt.error),
+      raw: receipt.error
+    }
   }
 
   public eventsOfType(eventTypes: TransactionLogTypes[]) {
