@@ -122,3 +122,7 @@ export interface ISupportedContract {
   tokenName: string;
   decimals: number;
 }
+
+export interface IWalletsList {
+  walletNames: string[];
+}

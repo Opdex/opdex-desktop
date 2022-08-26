@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
@@ -19,6 +19,7 @@ export class CoinGeckoApiService extends RestApiService {
 
   getLatestPrice(): Observable<ICurrenciesResponse> {
     const currencies = Object.keys(Currencies).map(key => Currencies[key]);
-    return this.get(`${this.api}/simple/price?ids=stratis&vs_currencies=${currencies}`);
+    return this.get<ICurrenciesResponse>(`${this.api}/simple/price?ids=stratis&vs_currencies=${currencies}`)
+      .pipe(catchError(_ => of({ stratis: { usd: 0, eur: 0, gbp: 0, jpy: 0, cny: 0 } })));
   }
 }

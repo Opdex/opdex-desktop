@@ -17,7 +17,7 @@ export class GitHubApiService extends RestApiService {
   }
 
   getLatestVersion(): Observable<IGithubRelease> {
-    return this.get<IGithubRelease>(`${this.api}/repos/opdex/cirrus-desktop/releases/latest`)
+    return this.get<IGithubRelease>(`${this.api}/repos/opdex/opdex-desktop/releases/latest`)
       .pipe(catchError(_ => of(undefined)));
   }
 }
