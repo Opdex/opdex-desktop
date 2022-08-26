@@ -1,3 +1,4 @@
+import { ParseFriendlyErrorMessage } from '@lookups/contract-errors.lookup';
 import { IContractReceiptResult, ILocalCallResult } from "@interfaces/full-node.interface";
 import { ITransactionQuote, ITransactionError, ITransactionEvent, ITransactionQuoteRequest } from "@interfaces/transaction-quote.interface";
 import { LocalCallRequest } from "@models/cirrusApi/contract-call";
@@ -6,10 +7,20 @@ import { TransactionReceipt } from "./transactionReceipt";
 export class TransactionQuote implements ITransactionQuote {
   request: LocalCallRequest;
   response: ILocalCallResult;
+  error: ITransactionError;
 
   constructor(request: LocalCallRequest, response: ILocalCallResult) {
     this.response = response;
     this.request = request;
+
+    if (this.response?.errorMessage) {
+      const { value } = this.response.errorMessage;
+
+      this.error = {
+        raw: value,
+        friendly: ParseFriendlyErrorMessage(value)
+      };
+    }
   }
 
   public get events(): ITransactionEvent[] {
@@ -21,17 +32,6 @@ export class TransactionQuote implements ITransactionQuote {
         ...log.log.data
       }
     })
-  }
-
-  public get error(): ITransactionError {
-    if (this.response.errorMessage) {
-      return {
-        raw: this.response.errorMessage.value,
-        friendly: ''
-      };
-    }
-
-    return null;
   }
 
   public get gasUsed(): number {

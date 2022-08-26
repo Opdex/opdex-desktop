@@ -1,6 +1,14 @@
-import { sanitize } from "./regex.lookup";
+export function ParseFriendlyErrorMessage(input: string): string {
+  if (!input) return null;
 
-export const BaseContractErrors = {
+  const error = tryMatchOpdexError(input);
+
+  return !!error
+    ? tryParseFriendlyOpdexErrorMessage(input, error)
+    : tryParseFriendlyOverflowMessage(input);
+}
+
+const BaseContractErrors = {
   invalidMarket: 'INVALID_MARKET',
   invalidRouter: 'INVALID_ROUTER',
   unauthorized: 'UNAUTHORIZED',
@@ -69,7 +77,7 @@ export const BaseContractErrors = {
   insufficientFunds: 'INSUFFICIENT_FUNDS'
 }
 
-export const ContractErrorMethods = {
+const ContractErrorMethods = {
   // Deployer
   deployerSetOwnership: 'OpdexMarketDeployer.SetPendingOwnership(Address pendingOwner)',
   deployerClaimOwnership: 'OpdexMarketDeployer.ClaimPendingOwnership()',
@@ -150,7 +158,7 @@ export const ContractErrorMethods = {
   vaultRedeemCertificate: 'OpdexVault.RedeemCertificate()'
 }
 
-function EvaluateError(method: string, error: string): string {
+function evaluateOpdexError(method: string, error: string): string {
   // Deployer
   if (method === ContractErrorMethods.deployerSetOwnership) {
     if (error === BaseContractErrors.unauthorized) return 'Unable to set deployer ownership, unauthorized.';
@@ -530,58 +538,35 @@ function EvaluateError(method: string, error: string): string {
   return null;
 }
 
-export function ParseFriendlyErrorMessage(input: string): string {
-  const error = tryMatchOpdexError(input);
-
-  let friendlyError: string;
-
-  if (!!error) friendlyError = tryParseFriendlyOpdexErrorMessage(input, error)
-  else friendlyError = tryParseFriendlyErrorMessage(input);
-
-  return friendlyError;
-}
-
 function tryMatchOpdexError(input: string): string {
-  return sanitize(opdexErrorRegex, input); // Replace line endings - See C# API?
+  const parts = input.split('OPDEX: ');
+
+  if (parts.length !== 2) return null;
+
+  // Index of the first space after our error
+  const spaceIndex = parts[1].indexOf(' ');
+
+  // Remove everything after our error
+  return spaceIndex > 0
+    ? parts[1].slice(0, spaceIndex - 1)
+    : null;
 }
 
 function tryParseFriendlyOpdexErrorMessage(input: string, error: string): string {
-  let friendlyErrorMessage: string;
+  const parts = input.split(' at ');
+  const { length } = parts;
 
-  const method = tryMatchLastMethodDefinition(input);
+  const method = length > 0
+    ? parts[length - 1].trim()
+    : null;
 
-  if (method) {
-    friendlyErrorMessage = EvaluateError(method, input);
-  }
-
-  return friendlyErrorMessage;
+  return !!method
+    ? evaluateOpdexError(method, error)
+    : null;
 }
 
-function tryMatchLastMethodDefinition(input: string): string {
-  let result: string;
-  const any = TryMatchMethodDefinitions(input);
-  if (!any) return result;
-
-  return any[any.length - 1];
+function tryParseFriendlyOverflowMessage(input: string): string {
+  return input.startsWith('OverflowException')
+    ? 'Value overflow.'
+    : null;
 }
-
-function TryMatchMethodDefinitions(input: string): RegExpExecArray {
-  return methodDefinitionRegex.exec(input);
-}
-
-function tryParseFriendlyErrorMessage(input: string): string {
-  let friendlyErrorMessage: string;
-
-  if (!isOverflowException(input)) return friendlyErrorMessage;
-
-  friendlyErrorMessage = 'Value overflow';
-
-  return friendlyErrorMessage;
-}
-
-function isOverflowException(input: string): boolean {
-  return input.startsWith('OverflowException');
-}
-
-const opdexErrorRegex = new RegExp('(?<=OPDEX:\s).+?(?={Environment.NewLine})');
-const methodDefinitionRegex = new RegExp('(?<=at\s).+?(\(.*?\))');
