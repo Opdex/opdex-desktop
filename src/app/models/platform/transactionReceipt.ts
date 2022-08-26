@@ -74,8 +74,8 @@ export class TransactionReceipt {
     this._newContractAddress = receipt.newContractAddress;
     this._gasUsed = receipt.gasUsed;
     this._block = { height: receipt.blockNumber, hash: receipt.blockHash };
-    this._success = receipt.success;
-    this._events = receipt.logs;
+    this._success = !!receipt.success;
+    this._events = receipt.logs || [];
     this._transactionType = this.findTransactionType();
     this._transactionSummary = this.getTransactionSummary();
     this._error = {

@@ -1,3 +1,5 @@
+import { ILocalCallErrorResult } from '@interfaces/full-node.interface';
+import { OpdexHttpError } from '@models/opdex-http-error';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { Injectable, Injector } from "@angular/core";
 import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
@@ -67,7 +69,26 @@ export class CirrusApiService extends CacheService {
   }
 
   localCall(request: LocalCallRequest): Observable<ILocalCallResult> {
-    const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload);
+    const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload)
+      .pipe(
+        map((response: ILocalCallResult | ILocalCallErrorResult) => {
+          if ('statusCode' in response && response.statusCode !== 200) {
+            let error = response as ILocalCallErrorResult;
+            return {
+              gasConsumed: { value: 0 },
+              errorMessage: { value: error.value.errors[0]?.message || 'Unknown Error'}
+            } as ILocalCallResult
+          }
+
+          return response as ILocalCallResult;
+        }),
+        catchError((error: OpdexHttpError) => {
+          return of ({
+            gasConsumed: { value: 0 },
+            errorMessage: { value: error.errors[0]}
+          } as ILocalCallResult)
+      }));
+
     return this.getItem(request.cacheKey, observable$);
   }
 

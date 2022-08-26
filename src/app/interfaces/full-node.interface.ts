@@ -23,6 +23,14 @@ export interface ILocalCallResult {
   logs: IReceiptLogs[];
 }
 
+export interface ILocalCallErrorResult {
+  value: { errors: { status: number; message: string; description: string }[] },
+  formatters: any[];
+  contentTypes: any[];
+  declaredType?: any;
+  statusCode: number
+}
+
 export interface IGasConsumed {
   value: number;
 }
