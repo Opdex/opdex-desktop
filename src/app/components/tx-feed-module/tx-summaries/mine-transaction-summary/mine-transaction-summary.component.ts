@@ -25,9 +25,11 @@ export class MineTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.CollectMiningRewardsLog
   ]
 
-  constructor(
-    private _liquidityPoolService: LiquidityPoolService
-  ) { }
+  get loading(): boolean {
+    return !this.error && (!this.lptAmount || !this.collectAmount || !this.pool);
+  }
+
+  constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
     const mineEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
@@ -41,22 +43,26 @@ export class MineTransactionSummaryComponent implements OnChanges {
       return;
     }
 
-    this.pool = await this._liquidityPoolService.getLiquidityPoolByMiningPoolAddress(startEvent?.address || stopEvent?.address || collectEvent?.address)
+    try {
+      this.pool = await this._liquidityPoolService.getLiquidityPoolByMiningPoolAddress(startEvent?.address || stopEvent?.address || collectEvent?.address)
 
-    const collectAmount = collectEvent === undefined ? BigInt('0') : (<ICollectMiningRewardsLog>collectEvent.log.data).amount;
-    this.collectAmount = FixedDecimal.FromBigInt(collectAmount, this.pool.stakingToken?.decimals);
+      const collectAmount = collectEvent === undefined ? BigInt('0') : (<ICollectMiningRewardsLog>collectEvent.log.data).amount;
+      this.collectAmount = FixedDecimal.FromBigInt(collectAmount, this.pool.stakingToken?.decimals);
 
-    let lptAmount = FixedDecimal.Zero(this.pool.lpToken.decimals);
+      let lptAmount = FixedDecimal.Zero(this.pool.lpToken.decimals);
 
-    if (startEvent !== undefined) {
-      this.isAddition = true;
-      lptAmount = FixedDecimal.FromBigInt((<IStartMiningLog>startEvent.log.data).amount, this.pool.lpToken.decimals);
+      if (startEvent !== undefined) {
+        this.isAddition = true;
+        lptAmount = FixedDecimal.FromBigInt((<IStartMiningLog>startEvent.log.data).amount, this.pool.lpToken.decimals);
+      }
+      else if (stopEvent !== undefined) {
+        this.isAddition = false;
+        lptAmount = FixedDecimal.FromBigInt((<IStopMiningLog>stopEvent.log.data).amount, this.pool.lpToken.decimals);
+      }
+
+      this.lptAmount = lptAmount;
+    } catch {
+      this.error = 'Oops, something went wrong';
     }
-    else if (stopEvent !== undefined) {
-      this.isAddition = false;
-      lptAmount = FixedDecimal.FromBigInt((<IStopMiningLog>stopEvent.log.data).amount, this.pool.lpToken.decimals);
-    }
-
-    this.lptAmount = lptAmount;
   }
 }

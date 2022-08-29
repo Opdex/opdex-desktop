@@ -27,6 +27,7 @@ export class TokenIconComponent {
   }
 
   public get backgroundImage(): string {
+    if (!this.token) return '';
     if (this.token.isCrs) return 'url(assets/tokens/crs.png)';
     else if (this.token.isStaking) return 'url(assets/tokens/odx.png)';
     else return `url(${this.iconPath}), url(assets/tokens/missing.png)`;

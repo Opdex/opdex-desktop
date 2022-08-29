@@ -1,16 +1,19 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="vaultToken && amount">
+  <ng-container *ngIf="token && !error">
     <div class="flex-row-center">
       <opdex-number
-        prefix="+"
-        [value]="amount"
+        class="mr-2"
+        prefix="-"
+        [value]="transferAmount"
         [short]="true"
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="ml-1 no-decoration" routerLink="/tokens/{{vaultToken.address}}">{{vaultToken.symbol}}</a>
+      <a class="ml-1 no-decoration" routerLink="/tokens/{{token.address}}">{{token.symbol}}</a>
     </div>
   </ng-container>
+
+  <div *ngIf="error">{{error}}</div>
 </ng-container>
 
 <ng-template #loader>
