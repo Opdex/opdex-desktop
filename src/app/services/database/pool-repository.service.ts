@@ -12,7 +12,7 @@ export class PoolRepositoryService extends CacheService {
     protected _injector: Injector,
     private _logger: LoggerService
   ) {
-      super(_injector);
+    super(_injector);
   }
 
   async searchLiquidityPools(keyword: string): Promise<ILiquidityPoolEntity[]> {
