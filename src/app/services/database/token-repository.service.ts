@@ -1,3 +1,4 @@
+import { LoggerService } from '@services/utility/logger.service';
 import { IPagination, ITokenEntity } from '@interfaces/database.interface';
 import { Injectable, Injector } from "@angular/core";
 import { OpdexDB } from "./db.service";
@@ -8,7 +9,8 @@ import { from, Observable } from 'rxjs';
 export class TokenRepositoryService extends CacheService {
   constructor(
     protected _injector: Injector,
-    private _db: OpdexDB
+    private _db: OpdexDB,
+    private _logger: LoggerService
   ) {
     super(_injector);
   }
@@ -32,13 +34,18 @@ export class TokenRepositoryService extends CacheService {
   }
 
   async persistTokens(tokens: ITokenEntity[]) {
-    const entities = await this._db.token.toArray();
+    try {
+      const entities = await this._db.token.toArray();
 
-    await this._db.token.bulkPut(tokens.map(token => {
-      return {
-        ...token,
-        id: entities.find(entity => entity.address === token.address)?.id
-      }
-    }));
+      await this._db.token.bulkPut(tokens.map(token => {
+        return {
+          ...token,
+          id: entities.find(entity => entity.address === token.address)?.id
+        }
+      }));
+    } catch (error) {
+      this._logger.error(error);
+      throw new Error('Unexpected error persisting tokens.')
+    }
   }
 }

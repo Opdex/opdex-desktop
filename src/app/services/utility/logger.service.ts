@@ -1,11 +1,10 @@
 import { Injectable } from "@angular/core";
+import { Log } from "@models/log";
 import { ElectronService } from "./electron-service";
 
 @Injectable({providedIn: 'root'})
 export class LoggerService {
-  constructor(
-    private _electron: ElectronService
-  ) { }
+  constructor(private _electron: ElectronService) { }
 
   public info = (data: any) => this._log('info', data);
   public warn = (data: any) => this._log('warn', data);
@@ -20,19 +19,5 @@ export class LoggerService {
     if (this._electron.isElectron) {
       this._electron.send('log', new Log(level, data));
     }
-
-    // if (notify) {
-    //   this._notifications.alert(new Notification('Error', data));
-    // }
-  }
-}
-
-class Log {
-  level: string;
-  data: any;
-
-  constructor(level: string, data: any) {
-    this.level = level;
-    this.data = data;
   }
 }
