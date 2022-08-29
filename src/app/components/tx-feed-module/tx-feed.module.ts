@@ -30,6 +30,7 @@ import { TxReceiptComponent } from './tx-receipt/tx-receipt.component';
 import { VaultProposalTransactionSummaryComponent } from './tx-summaries/vault-proposal-transaction-summary/vault-proposal-transaction-summary.component';
 import { ContractFeedComponent } from './contract-feed/contract-feed.component';
 import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
+import { TransferSummaryComponent } from './tx-summaries/transfer-summary/transfer-summary.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { WalletFeedComponent } from './wallet-feed/wallet-feed.component';
     TxReceiptComponent,
     VaultProposalTransactionSummaryComponent,
     ContractFeedComponent,
-    WalletFeedComponent
+    WalletFeedComponent,
+    TransferSummaryComponent
   ],
   imports: [
     CommonModule,

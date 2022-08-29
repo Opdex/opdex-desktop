@@ -160,5 +160,14 @@ export const TransactionTypes: ITransactionType[] = [
     icon: Icons.approve,
     iconColor: 'provide',
     targetEvents: [TransactionLogTypes.ApprovalLog]
+  },
+  {
+    eventPriority: 12,
+    title: 'Transfer',
+    view: null,
+    viewRequiresAuth: true,
+    icon: Icons.transfer,
+    iconColor: 'primary',
+    targetEvents: [TransactionLogTypes.TransferLog]
   }
 ]

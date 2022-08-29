@@ -117,6 +117,7 @@ export class TransactionReceipt {
       case 'Permissions': return 'Set Permission';
       case 'Allowance': return 'Approve Allowance';
       case 'Vault Proposal': return this.getVaultProposalSummary();
+      case 'Transfer': return 'Transfer';
       default: return 'Unknown';
     }
   }
