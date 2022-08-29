@@ -1,3 +1,4 @@
+import { LoggerService } from './services/utility/logger.service';
 import { ICurrency } from '@lookups/currencyDetails.lookup';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { IndexerService } from './services/platform/indexer.service';
@@ -42,7 +43,8 @@ export class AppComponent implements OnInit {
     private _themeService: ThemeService,
     private _indexerService: IndexerService,
     private _env: EnvironmentsService,
-    private _githubApi: GitHubApiService
+    private _githubApi: GitHubApiService,
+    private _logger: LoggerService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -59,16 +61,12 @@ export class AppComponent implements OnInit {
 
     // intentionally offset 10 seconds
     timer(10000, 10000)
-      .pipe(
-        switchMap(_ => this._refreshNodeStatus()),
-        tap(status => this.nodeStatus = status))
-      .subscribe();
+      .pipe(switchMap(_ => this._refreshNodeStatus()))
+      .subscribe(status => this.nodeStatus = status);
 
     this._nodeService.latestBlock$
       .pipe(filter(_ => !!this.nodeStatus && this.nodeStatus.state === 'Started' && !this.nodeStatus.inIbd && !this._indexerService.indexing))
-      .subscribe(async block => {
-        await this._indexerService.index();
-      });
+      .subscribe(async _ => await this._indexLatest());
 
     await this._checkAppUpdate();
     this._checkNodeVersion();
@@ -89,6 +87,16 @@ export class AppComponent implements OnInit {
 
   public prepareRoute(outlet: RouterOutlet) {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
+
+  private async _indexLatest(): Promise<void> {
+    try {
+      await this._indexerService.index();
+    } catch (error) {
+      // Log and re-index all data on failure
+      this._logger.error(error);
+      await this._indexerService.index(true);
+    }
   }
 
   private async _checkAppUpdate(): Promise<void> {

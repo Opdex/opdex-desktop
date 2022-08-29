@@ -1,3 +1,4 @@
+import { LoggerService } from '@services/utility/logger.service';
 import { CacheService } from '@services/utility/cache.service';
 import { ILiquidityPoolEntity, IPagination } from '@interfaces/database.interface';
 import { OpdexDB } from './db.service';
@@ -8,8 +9,10 @@ import { from, Observable } from 'rxjs';
 export class PoolRepositoryService extends CacheService {
   constructor(
     private _db: OpdexDB,
-    protected _injector: Injector) {
-      super(_injector);
+    protected _injector: Injector,
+    private _logger: LoggerService
+  ) {
+    super(_injector);
   }
 
   async searchLiquidityPools(keyword: string): Promise<ILiquidityPoolEntity[]> {
@@ -48,18 +51,23 @@ export class PoolRepositoryService extends CacheService {
   }
 
   async persistPools(pools: ILiquidityPoolEntity[]) {
-    const addresses = pools.map(pool => pool.address);
+    try {
+      const addresses = pools.map(pool => pool.address);
 
-    const entities = await this._db.liquidityPool
-      .where('address')
-      .anyOf(addresses).toArray();
+      const entities = await this._db.liquidityPool
+        .where('address')
+        .anyOf(addresses).toArray();
 
-    await this._db.liquidityPool.bulkPut(pools.map(pool => {
-      return {
-        ...pool,
-        id: entities.find(entity => entity.address === pool.address)?.id
-      }
-    }));
+      await this._db.liquidityPool.bulkPut(pools.map(pool => {
+        return {
+          ...pool,
+          id: entities.find(entity => entity.address === pool.address)?.id
+        }
+      }));
+    } catch (error) {
+      this._logger.error(error);
+      throw new Error('Unexpected error persisting liquidity pools.');
+    }
   }
 
   async getNominatedPools(): Promise<ILiquidityPoolEntity[]> {
@@ -74,16 +82,21 @@ export class PoolRepositoryService extends CacheService {
   }
 
   async setNominations(nominations: string[]): Promise<void> {
-    // Clear all non nominated pools
-    await this._db.liquidityPool
-      .where('isNominated').equals(1)
-        .and(item => !nominations.includes(item.address))
-          .modify({isNominated: 0});
+    try {
+      // Clear all non nominated pools
+      await this._db.liquidityPool
+        .where('isNominated').equals(1)
+          .and(item => !nominations.includes(item.address))
+            .modify({isNominated: 0});
 
-    // Set new nominated pools
-    await this._db.liquidityPool
-      .where('address').anyOf(nominations)
-        .and(item => item.isNominated === 0)
-          .modify({isNominated: 1});
+      // Set new nominated pools
+      await this._db.liquidityPool
+        .where('address').anyOf(nominations)
+          .and(item => item.isNominated === 0)
+            .modify({isNominated: 1});
+    } catch (error) {
+      this._logger.error(error);
+      throw new Error('Unexpected error persisting nominations.');
+    }
   }
 }

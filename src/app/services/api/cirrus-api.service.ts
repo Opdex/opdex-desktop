@@ -1,6 +1,8 @@
+import { ILocalCallErrorResult, IWalletsList } from '@interfaces/full-node.interface';
+import { OpdexHttpError } from '@models/opdex-http-error';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { Injectable, Injector } from "@angular/core";
-import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISignalRResponse, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
+import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
 import { catchError, map, Observable, of } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { LocalCallRequest } from '@models/cirrusApi/contract-call';
@@ -21,11 +23,6 @@ export class CirrusApiService extends CacheService {
     super(_injector);
   }
 
-  // Signalr
-  getConnectionInfo(): Observable<ISignalRResponse> {
-    return this._rest.get<ISignalRResponse>(`${this.api}/SignalR/getConnectionInfo`);
-  }
-
   // Node
   getNodeStatus():Observable<INodeStatus> {
     // No caching this call
@@ -35,12 +32,14 @@ export class CirrusApiService extends CacheService {
   }
 
   // Wallets
-  getWalletsList(): Observable<{walletNames: string[]}> {
-    return this._rest.get(`${this.api}/Wallet/list-wallets`);
+  getWalletsList(): Observable<IWalletsList> {
+    return this._rest.get<IWalletsList>(`${this.api}/Wallet/list-wallets`)
+      .pipe(catchError(_ => of({walletNames: []})));
   }
 
   getAddresses(walletName: string):Observable<INodeAddressList> {
-    return this._rest.get(`${this.api}/Wallet/addresses?walletName=${walletName}&account=account%200`);
+    return this._rest.get<INodeAddressList>(`${this.api}/Wallet/addresses?walletName=${walletName}&account=account%200`)
+      .pipe(catchError(_ => of({addresses: []})));
   }
 
   getAddressBalance(address: string):Observable<number> {
@@ -67,7 +66,26 @@ export class CirrusApiService extends CacheService {
   }
 
   localCall(request: LocalCallRequest): Observable<ILocalCallResult> {
-    const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload);
+    const observable$ = this._rest.post<ILocalCallResult>(`${this.api}/SmartContracts/local-call`, request.payload)
+      .pipe(
+        map((response: ILocalCallResult | ILocalCallErrorResult) => {
+          if ('statusCode' in response && response.statusCode !== 200) {
+            let error = response as ILocalCallErrorResult;
+            return {
+              gasConsumed: { value: 0 },
+              errorMessage: { value: error.value.errors[0]?.message || 'Unknown Error'}
+            } as ILocalCallResult
+          }
+
+          return response as ILocalCallResult;
+        }),
+        catchError((error: OpdexHttpError) => {
+          return of ({
+            gasConsumed: { value: 0 },
+            errorMessage: { value: error.errors[0]}
+          } as ILocalCallResult)
+      }));
+
     return this.getItem(request.cacheKey, observable$);
   }
 
