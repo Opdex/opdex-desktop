@@ -23,26 +23,34 @@ export class EnableMiningTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.RewardMiningPoolLog,
   ]
 
+  get loading(): boolean {
+    return !this.error && (!this.poolAmount || !this.pools?.length || !this.stakingToken);
+  }
+
   constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
-    const rewardEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
+    try {
+      const rewardEvents = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
 
-    if (rewardEvents.length > 4 || rewardEvents.length === 0) {
-      this.error = 'Unable to read enable mining transaction.';
-      return;
-    }
+      if (rewardEvents.length > 4 || rewardEvents.length === 0) {
+        this.error = 'Unable to read enable mining transaction.';
+        return;
+      }
 
-    let logs: IRewardMiningPoolLog[] = [];
-    const pools = await Promise.all(rewardEvents.map(event => {
-      const log = <IRewardMiningPoolLog>event.log.data;
-      logs.push(log);
-      return this._liquidityPoolService.getLiquidityPool(log.stakingPool);
-    }))
+      let logs: IRewardMiningPoolLog[] = [];
+      const pools = await Promise.all(rewardEvents.map(event => {
+        const log = <IRewardMiningPoolLog>event.log.data;
+        logs.push(log);
+        return this._liquidityPoolService.getLiquidityPool(log.stakingPool);
+      }))
 
-    this.pools = pools;
-    this.poolAmount = FixedDecimal.FromBigInt(logs[0].amount, pools[0].stakingToken?.decimals);
+      this.pools = pools;
+      this.poolAmount = FixedDecimal.FromBigInt(logs[0].amount, pools[0].stakingToken?.decimals);
     this.stakingToken = pools[0].stakingToken;
+    } catch {
+      this.error = 'Oops, something went wrong.';
+    }
   }
 
   poolsTrackBy(index: number, pool: LiquidityPool): string {

@@ -26,6 +26,10 @@ export class CreatePoolTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.CreateLiquidityPoolLog,
   ]
 
+  get loading(): boolean {
+    return !this.error && (!this.pool && (!this.crs && !this.src));
+  }
+
   constructor(
     private _liquidityPoolService: LiquidityPoolService,
     private _tokenService: TokenService

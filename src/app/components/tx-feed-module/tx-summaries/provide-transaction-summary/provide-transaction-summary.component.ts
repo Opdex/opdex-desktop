@@ -26,32 +26,40 @@ export class ProvideTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.BurnLog
   ]
 
+  get loading(): boolean {
+    return !this.error && (!this.lptAmount || !this.crsAmount || !this.srcAmount || !this.pool);
+  }
+
   constructor(private _liquidityPoolService: LiquidityPoolService) { }
 
   async ngOnChanges(): Promise<void> {
-    // Should only be one
-    const provideEvents = this.transaction.events
-      .filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
+    try {
+      // Should only be one
+      const provideEvents = this.transaction.events
+        .filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
 
-    if (provideEvents.length > 1 || provideEvents.length === 0) {
-      this.error = 'Unable to read provide transaction.';
-      return;
-    }
+      if (provideEvents.length > 1 || provideEvents.length === 0) {
+        this.error = 'Unable to read provide transaction.';
+        return;
+      }
 
-    this.pool = await this._liquidityPoolService.getLiquidityPool(provideEvents[0].address);
+      this.pool = await this._liquidityPoolService.getLiquidityPool(provideEvents[0].address);
 
-    if (provideEvents[0].log.event === TransactionLogTypes.MintLog) {
-      const event = provideEvents[0].log.data as IMintLog;
-      this.isAddition = true;
-      this.lptAmount = FixedDecimal.FromBigInt(event.amountLpt, this.pool.lpToken.decimals);
-      this.srcAmount = FixedDecimal.FromBigInt(event.amountSrc, this.pool.srcToken.decimals);
-      this.crsAmount = FixedDecimal.FromBigInt(event.amountCrs, this.pool.crsToken.decimals);
-    } else {
-      const event = provideEvents[0].log.data as IBurnLog;
-      this.isAddition = false;
-      this.lptAmount = FixedDecimal.FromBigInt(event.amountLpt, this.pool.lpToken.decimals);
-      this.srcAmount = FixedDecimal.FromBigInt(event.amountSrc, this.pool.srcToken.decimals);
-      this.crsAmount = FixedDecimal.FromBigInt(event.amountCrs, this.pool.crsToken.decimals);
+      if (provideEvents[0].log.event === TransactionLogTypes.MintLog) {
+        const event = provideEvents[0].log.data as IMintLog;
+        this.isAddition = true;
+        this.lptAmount = FixedDecimal.FromBigInt(event.amountLpt, this.pool.lpToken.decimals);
+        this.srcAmount = FixedDecimal.FromBigInt(event.amountSrc, this.pool.srcToken.decimals);
+        this.crsAmount = FixedDecimal.FromBigInt(event.amountCrs, this.pool.crsToken.decimals);
+      } else {
+        const event = provideEvents[0].log.data as IBurnLog;
+        this.isAddition = false;
+        this.lptAmount = FixedDecimal.FromBigInt(event.amountLpt, this.pool.lpToken.decimals);
+        this.srcAmount = FixedDecimal.FromBigInt(event.amountSrc, this.pool.srcToken.decimals);
+        this.crsAmount = FixedDecimal.FromBigInt(event.amountCrs, this.pool.crsToken.decimals);
+      }
+    } catch {
+      this.error = 'Oops, something went wrong.';
     }
   }
 }

@@ -58,31 +58,39 @@ export class VaultProposalTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.CompleteVaultProposalLog,
   ];
 
+  get loading(): boolean {
+    return !this.error && !this.summary;
+  }
+
   constructor(
     private _vaultService: VaultService,
     private _tokenFactory: TokenService
   ) { }
 
   async ngOnChanges(): Promise<void> {
-    this.createOrCompleteEvents = this.transaction.events.filter(event => this.createOrCompleteEventTypes.includes(event.log.event as TransactionLogTypes));
-    this.pledgeOrVoteEvents = this.transaction.events.filter(event => this.pledgeOrVoteEventTypes.includes(event.log.event as TransactionLogTypes));
+    try {
+      this.createOrCompleteEvents = this.transaction.events.filter(event => this.createOrCompleteEventTypes.includes(event.log.event as TransactionLogTypes));
+      this.pledgeOrVoteEvents = this.transaction.events.filter(event => this.pledgeOrVoteEventTypes.includes(event.log.event as TransactionLogTypes));
 
-    if (this.createOrCompleteEvents.length > 1 ||
-        this.pledgeOrVoteEvents.length > 1 ||
-        (this.createOrCompleteEvents.length === 0 && this.pledgeOrVoteEvents.length === 0)) {
-      this.error = 'Unable to read vault proposal transaction.';
-      return;
+      if (this.createOrCompleteEvents.length > 1 ||
+          this.pledgeOrVoteEvents.length > 1 ||
+          (this.createOrCompleteEvents.length === 0 && this.pledgeOrVoteEvents.length === 0)) {
+        this.error = 'Unable to read vault proposal transaction.';
+        return;
+      }
+
+      const proposalId = this.createOrCompleteEvents.length > 0
+        ? this.createOrCompleteEvents[0].log.data.proposalId
+        : this.pledgeOrVoteEvents[0].log.data.proposalId
+
+      const proposal = await this._vaultService.getProposal(proposalId);
+
+      let proposalSummary = { proposal, proposalId } as IVaultProposalSummary;
+      proposalSummary = await this.buildPledgeOrVoteSummary(proposalSummary);
+      this.summary = await this.buildCreateOrCompleteSummary(proposalSummary);
+    } catch {
+      this.error = 'Oops, something went wrong.';
     }
-
-    const proposalId = this.createOrCompleteEvents.length > 0
-      ? this.createOrCompleteEvents[0].log.data.proposalId
-      : this.pledgeOrVoteEvents[0].log.data.proposalId
-
-    const proposal = await this._vaultService.getProposal(proposalId);
-
-    let proposalSummary = { proposal, proposalId } as IVaultProposalSummary;
-    proposalSummary = await this.buildPledgeOrVoteSummary(proposalSummary);
-    this.summary = await this.buildCreateOrCompleteSummary(proposalSummary);
   }
 
   private async buildPledgeOrVoteSummary(summary: IVaultProposalSummary): Promise<IVaultProposalSummary> {

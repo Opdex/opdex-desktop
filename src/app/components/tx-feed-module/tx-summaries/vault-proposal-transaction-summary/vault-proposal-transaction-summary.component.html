@@ -1,39 +1,45 @@
-<ng-container *ngIf="summary">
-  <div *ngIf="summary.pledgeOrVote?.amount" class="w-100 flex-row-center">
-    <div class="col no-wrap flex-shrink" *ngIf="summary.proposal?.proposalId">
-      <a class="no-decoration" href="javascript:void(0)" routerLink="/vault/proposal/{{summary.proposal.proposalId}}">#{{summary.proposal.proposalId}}</a>
+<ng-container *ngIf="!loading; else loader">
+  <ng-container *ngIf="summary">
+    <div *ngIf="summary.pledgeOrVote?.amount" class="w-100 flex-row-center">
+      <div class="col no-wrap flex-shrink" *ngIf="summary.proposal?.proposalId">
+        <a class="no-decoration" href="javascript:void(0)" routerLink="/vault/proposal/{{summary.proposal.proposalId}}">#{{summary.proposal.proposalId}}</a>
+      </div>
+
+      <div class="col no-wrap flex-shrink">
+        <opdex-number
+          class="mr-2"
+          [prefix]="summary.pledgeOrVote.withdrawal ? '-' : '+'"
+          [value]="summary.pledgeOrVote.amount"
+          [short]="true"
+          [stopPropagation]="true">
+        </opdex-number>
+
+        <a class="no-decoration" href="javascript:void(0)" routerLink="/tokens/{{summary.crs.address}}">{{summary.crs.symbol}}</a>
+      </div>
+
+      <div class="col no-wrap" *ngIf="summary.pledgeOrVote.inFavor !== null">
+        <span class="badge {{summary.pledgeOrVote.inFavor ? 'green' : 'red'}}">{{summary.pledgeOrVote.inFavor ? 'In Favor' : 'Opposed'}}</span>
+      </div>
     </div>
 
-    <div class="col no-wrap flex-shrink">
-      <opdex-number
-        class="mr-2"
-        [prefix]="summary.pledgeOrVote.withdrawal ? '-' : '+'"
-        [value]="summary.pledgeOrVote.amount"
-        [short]="true"
-        [stopPropagation]="true">
-      </opdex-number>
+    <div *ngIf="summary.createOrComplete?.type" class="w-100 flex-row-center" [ngClass]="{'mt-1': summary.pledgeOrVote?.amount}">
+      <div class="col no-wrap flex-shrink" *ngIf="!summary.pledgeOrVote?.amount">
+        <a *ngIf="summary.proposal" class="no-decoration" href="javascript:void(0)" routerLink="/vault/proposal/{{summary.proposal.proposalId}}">#{{summary.proposal.proposalId}}</a>
+        <!-- Won't have a proposal object for quoting new proposals through create transactions -->
+        <span *ngIf="!summary.proposal">#{{summary.proposalId}}</span>
+      </div>
 
-      <a class="no-decoration" href="javascript:void(0)" routerLink="/tokens/{{summary.crs.address}}">{{summary.crs.symbol}}</a>
-    </div>
+      <div class="col no-wrap flex-shrink">
+        {{summary.createOrComplete.type}}
+      </div>
 
-    <div class="col no-wrap" *ngIf="summary.pledgeOrVote.inFavor !== null">
-      <span class="badge {{summary.pledgeOrVote.inFavor ? 'green' : 'red'}}">{{summary.pledgeOrVote.inFavor ? 'In Favor' : 'Opposed'}}</span>
+      <div class="col no-wrap" *ngIf="summary.createOrComplete.approved !== null">
+        <span class="badge {{summary.createOrComplete.approved ? 'green' : 'red'}}">{{summary.createOrComplete.approved ? 'Approved' : 'Denied'}}</span>
+      </div>
     </div>
-  </div>
-
-  <div *ngIf="summary.createOrComplete?.type" class="w-100 flex-row-center" [ngClass]="{'mt-1': summary.pledgeOrVote?.amount}">
-    <div class="col no-wrap flex-shrink" *ngIf="!summary.pledgeOrVote?.amount">
-      <a *ngIf="summary.proposal" class="no-decoration" href="javascript:void(0)" routerLink="/vault/proposal/{{summary.proposal.proposalId}}">#{{summary.proposal.proposalId}}</a>
-      <!-- Won't have a proposal object for quoting new proposals through create transactions -->
-      <span *ngIf="!summary.proposal">#{{summary.proposalId}}</span>
-    </div>
-
-    <div class="col no-wrap flex-shrink">
-      {{summary.createOrComplete.type}}
-    </div>
-
-    <div class="col no-wrap" *ngIf="summary.createOrComplete.approved !== null">
-      <span class="badge {{summary.createOrComplete.approved ? 'green' : 'red'}}">{{summary.createOrComplete.approved ? 'Approved' : 'Denied'}}</span>
-    </div>
-  </div>
+  </ng-container>
 </ng-container>
+
+<ng-template #loader>
+  <div class="w-100 skeleton-bg"></div>
+</ng-template>

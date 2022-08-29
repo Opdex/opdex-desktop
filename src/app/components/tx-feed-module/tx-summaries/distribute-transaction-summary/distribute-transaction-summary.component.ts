@@ -24,22 +24,30 @@ export class DistributeTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.DistributionLog
   ]
 
+  get loading(): boolean {
+    return !this.error && (!this.token || !this.miningGovernanceAmount || !this.vaultAmount || !this.token);
+  }
+
   constructor(private _tokenService: TokenService) { }
 
   async ngOnChanges(): Promise<void> {
-    const events = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
+    try {
+      const events = this.transaction.events.filter(event => this.eventTypes.includes(event.log.event as TransactionLogTypes));
 
-    if (events.length !== 1) {
-      this.error = 'Unable to read distribution transaction.';
-      return;
+      if (events.length !== 1) {
+        this.error = 'Unable to read distribution transaction.';
+        return;
+      }
+
+      const event = events[0];
+      const token = await this._tokenService.getToken(event.address);
+      const log = <IDistributionLog>event.log.data;
+
+      this.token = token;
+      this.miningGovernanceAmount = FixedDecimal.FromBigInt(log.miningAmount, this.token.decimals);
+      this.vaultAmount = FixedDecimal.FromBigInt(log.vaultAmount, this.token.decimals);
+    } catch {
+      this.error = 'Oops, something went wrong.';
     }
-
-    const event = events[0];
-    const token = await this._tokenService.getToken(event.address);
-    const log = <IDistributionLog>event.log.data;
-
-    this.token = token;
-    this.miningGovernanceAmount = FixedDecimal.FromBigInt(log.miningAmount, this.token.decimals);
-    this.vaultAmount = FixedDecimal.FromBigInt(log.vaultAmount, this.token.decimals);
   }
 }

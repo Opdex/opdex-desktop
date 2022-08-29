@@ -20,21 +20,29 @@ export class VaultCertificateTransactionSummaryComponent implements OnChanges {
   error: string;
   event = TransactionLogTypes.RedeemVaultCertificateLog;
 
+  get loading(): boolean {
+    return !this.error && (!this.vaultToken || !this.amount);
+  }
+
   constructor(
     private _envService: EnvironmentsService,
     private _tokenService: TokenService
   ) { }
 
   async ngOnChanges(): Promise<void> {
-    const event = this.transaction.events.find(event => this.event === event.log.data);
-    const log = <IRedeemVaultCertificateLog>event.log.data;
+    try {
+      const event = this.transaction.events.find(event => this.event === event.log.data);
+      const log = <IRedeemVaultCertificateLog>event.log.data;
 
-    if (!event) {
-      this.error = 'Unable to read redeem certificate transaction.';
-      return;
+      if (!event) {
+        this.error = 'Unable to read redeem certificate transaction.';
+        return;
+      }
+
+      this.vaultToken = await this._tokenService.getToken(this._envService.contracts.odx);
+      this.amount = FixedDecimal.FromBigInt(log.amount, this.vaultToken.decimals);
+    } catch {
+      this.error = 'Oops, something went wrong.';
     }
-
-    this.vaultToken = await this._tokenService.getToken(this._envService.contracts.odx);
-    this.amount = FixedDecimal.FromBigInt(log.amount, this.vaultToken.decimals);
   }
 }

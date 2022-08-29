@@ -24,6 +24,10 @@ export class AllowanceTransactionSummaryComponent implements OnChanges {
     TransactionLogTypes.ApprovalLog,
   ]
 
+  get loading(): boolean {
+    return !this.error && (!this.token || !this.amount || !this.to);
+  }
+
   constructor(private _tokenService: TokenService) { }
 
   async ngOnChanges(): Promise<void> {
