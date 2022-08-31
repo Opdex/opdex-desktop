@@ -35,29 +35,33 @@
   </div>
 
   <ng-template #disconnected>
-    <div class="container standard-section">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
-          <opdex-card>
-            <h2 class="mb-2">Connecting to Cirrus</h2>
-            <p>Waiting for a connection to Cirrus blockchain.</p>
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </opdex-card>
-        </div>
+    <div class="container standard-section tx-bg vh-100">
+      <div class="flex-row-center-center h-100">
+        <opdex-card class="loading-card">
+          <h2 class="mb-2">Connecting to Cirrus</h2>
+          <p>Waiting for a connection to Cirrus blockchain.</p>
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </opdex-card>
       </div>
     </div>
   </ng-template>
 
   <ng-template #indexing>
-    <div class="container standard-section">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-6 col-lg-3 col-xl-3 mt-5">
-          <opdex-card>
-            <h2 class="mb-2">Indexing Data</h2>
+    <div class="container standard-section tx-bg vh-100">
+      <div class="flex-row-center-center h-100">
+        <opdex-card class="loading-card">
+          <ng-container *ngIf="nodeStatus.inIbd; else indexingOpdex">
+            <h2 class="mb-2">Indexing Cirrus Chain</h2>
+            <p>Waiting for Cirrus to finishing downloading latest blocks. This may take a few minutes.</p>
+          </ng-container>
+
+          <ng-template #indexingOpdex>
+            <h2 class="mb-2">Indexing Opdex Data</h2>
             <p>Waiting for Opdex data to be indexed. This may take a few minutes. Do not close or exit the application.</p>
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </opdex-card>
-        </div>
+          </ng-template>
+
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </opdex-card>
       </div>
     </div>
   </ng-template>

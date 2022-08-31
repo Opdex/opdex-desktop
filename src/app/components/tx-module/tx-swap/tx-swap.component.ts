@@ -200,6 +200,8 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
     this.poolIn = poolOut;
     this.poolOut = poolIn;
 
+    await this.refreshTokens();
+
     if (this.tokenInExact) {
       this.tokenInExact = false;
       this.tokenOutAmount.setValue(tokenInAmount, { emitEvent: false });
@@ -308,7 +310,9 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.calcTotals();
 
       if (!this.context.isLoggedIn) return null;
-      return await this.validateAllowance();
+      const sufficientBalance = await this.validateBalance();
+      const sufficientAllowance = await this.validateAllowance();
+      return sufficientBalance && sufficientAllowance;
     } catch (error) {
       console.log(error)
       this.tokenOutAmount.setErrors({ invalidAmountInQuote: true });
@@ -336,7 +340,9 @@ export class TxSwapComponent extends TxBase implements OnChanges, OnDestroy {
       this.calcTotals();
 
       if (!this.context.isLoggedIn) return null;
-      return await this.validateAllowance();
+      const sufficientBalance = await this.validateBalance();
+      const sufficientAllowance = await this.validateAllowance();
+      return sufficientBalance && sufficientAllowance;
     } catch (error) {
       console.log(error)
       this.tokenInAmount.setErrors({ invalidAmountOutQuote: true });

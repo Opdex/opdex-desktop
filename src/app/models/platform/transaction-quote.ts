@@ -5,26 +5,38 @@ import { LocalCallRequest } from "@models/cirrusApi/contract-call";
 import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionQuote implements ITransactionQuote {
-  request: LocalCallRequest;
-  response: ILocalCallResult;
-  error: ITransactionError;
+  private _request: LocalCallRequest;
+  private _response: ILocalCallResult;
+  private _error: ITransactionError;
 
   constructor(request: LocalCallRequest, response: ILocalCallResult) {
-    this.response = response;
-    this.request = request;
+    this._response = response;
+    this._request = request;
 
-    if (this.response?.errorMessage) {
-      const { value } = this.response.errorMessage;
+    if (this._response?.errorMessage) {
+      const { value } = this._response.errorMessage;
 
-      this.error = {
+      this._error = {
         raw: value,
         friendly: ParseFriendlyErrorMessage(value)
       };
     }
   }
 
+  public get request(): LocalCallRequest {
+    return this._request;
+  }
+
+  public get response(): ILocalCallResult {
+    return this._response;
+  }
+
+  public get error(): ITransactionError {
+    return this._error;
+  }
+
   public get events(): ITransactionEvent[] {
-    return this.response.logs.map((log, i) => {
+    return this._response.logs.map((log, i) => {
       return {
         sortOrder: i,
         contract: log.address,
@@ -35,26 +47,26 @@ export class TransactionQuote implements ITransactionQuote {
   }
 
   public get gasUsed(): number {
-    return this.response.gasConsumed.value;
+    return this._response.gasConsumed.value;
   }
 
   public get result(): any {
-    return this.response.return;
+    return this._response.return;
   }
 
   public get txHandoff(): ITransactionQuoteRequest {
-    return this.request.txHandoff;
+    return this._request.txHandoff;
   }
 
   public get receipt(): TransactionReceipt {
     return new TransactionReceipt({
       gasUsed: this.gasUsed,
-      from: this.request.sender,
-      to: this.request.contractAddress,
-      success: !!this.response.errorMessage?.value === false,
-      logs: this.response.logs,
+      from: this._request.sender,
+      to: this._request.contractAddress,
+      success: !!this._response.errorMessage?.value === false,
+      logs: this._response.logs,
       bloom: null,
-      error: this.response.errorMessage?.value
+      error: this._response.errorMessage?.value
     } as IContractReceiptResult)
   }
 }

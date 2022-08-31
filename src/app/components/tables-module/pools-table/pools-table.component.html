@@ -1,4 +1,4 @@
-<ng-container *ngIf="dataSource?.data?.length; else loading">
+<ng-container *ngIf="dataSource?.data?.length && selectedCurrency; else loading">
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" matSort [trackBy]="trackBy" class="w-100">
       <ng-container matColumnDef="name" sticky>

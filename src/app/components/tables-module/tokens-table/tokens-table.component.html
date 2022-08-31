@@ -1,4 +1,4 @@
-<ng-container *ngIf="!loading; else loader">
+<ng-container *ngIf="!loading && selectedCurrency; else loader">
   <ng-container *ngIf="dataSource?.data?.length; else noResults">
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" matSort [trackBy]="trackBy" class="w-100">

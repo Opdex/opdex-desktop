@@ -49,9 +49,9 @@ export class TokensTableComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this._indexerService.latestBlock$
         .pipe(
-          switchMap(_ => this.getTokens$(this.skip, this.take)),
           switchMap(_ => this._currencyService.selectedCurrency$),
-          tap(currency => this.selectedCurrency = currency))
+          tap(currency => this.selectedCurrency = currency),
+          switchMap(_ => this.getTokens$(this.skip, this.take)))
         .subscribe(_ => this.loading = false));
   }
 

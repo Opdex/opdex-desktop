@@ -5,15 +5,51 @@ import { ITokenEntity } from '@interfaces/database.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 
 export class Token {
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  sats: BigInt;
-  totalSupply: FixedDecimal;
-  wrappedToken: WrappedToken;
-  distribution?: TokenDistribution;
-  pricing: any;
+  private _address: string;
+  private _name: string;
+  private _symbol: string;
+  private _decimals: number;
+  private _sats: BigInt;
+  private _totalSupply: FixedDecimal;
+  private _wrappedToken?: WrappedToken;
+  private _distribution?: TokenDistribution;
+  private _pricing: any;
+
+  get address(): string {
+    return this._address;
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get symbol(): string {
+    return this._symbol;
+  }
+
+  get decimals(): number {
+    return this._decimals;
+  }
+
+  get sats(): BigInt {
+    return this._sats;
+  }
+
+  get totalSupply(): FixedDecimal {
+    return this._totalSupply;
+  }
+
+  get wrappedToken(): WrappedToken {
+    return this._wrappedToken;
+  }
+
+  get distribution(): TokenDistribution {
+    return this._distribution;
+  }
+
+  get pricing(): any {
+    return this._pricing;
+  }
 
   get isCrs(): boolean {
     return this.address === 'CRS';
@@ -29,16 +65,16 @@ export class Token {
   }
 
   constructor(entity: ITokenEntity, hydrated: IHydratedTokenDetailsDto, pricing?: any, trusted?: boolean) {
-    this.address = entity.address;
-    this.name = entity.name;
-    this.symbol = entity.symbol;
-    this.decimals = entity.decimals;
-    this.sats = BigInt('1'.padEnd(entity.decimals+1, '0'));
-    this.totalSupply = FixedDecimal.FromBigInt(hydrated.totalSupply, entity.decimals);
-    this.pricing = pricing;
+    this._address = entity.address;
+    this._name = entity.name;
+    this._symbol = entity.symbol;
+    this._decimals = entity.decimals;
+    this._sats = BigInt('1'.padEnd(entity.decimals+1, '0'));
+    this._totalSupply = FixedDecimal.FromBigInt(hydrated.totalSupply, entity.decimals);
+    this._pricing = pricing;
 
     if (entity.nativeChain && entity.nativeChain !== 'Cirrus') {
-      this.wrappedToken = new WrappedToken({
+      this._wrappedToken = new WrappedToken({
         chain: entity.nativeChain,
         address: entity.nativeChainAddress,
         trusted
@@ -46,7 +82,7 @@ export class Token {
     }
 
     if (hydrated.nextDistributionBlock) {
-      this.distribution = new TokenDistribution(hydrated.nextDistributionBlock);
+      this._distribution = new TokenDistribution(hydrated.nextDistributionBlock);
     }
   }
 
