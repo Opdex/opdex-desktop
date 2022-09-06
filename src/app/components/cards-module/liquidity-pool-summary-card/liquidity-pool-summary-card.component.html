@@ -41,26 +41,27 @@
     <!-- End Liquidity -->
 
     <!-- Start Cost-->
-    <mat-divider class="mb-2 mt-2" style="position:relative;"></mat-divider>
-
-    <div class="flex-row-center-between">
-      <div class="flex-row-center">
-        <mat-icon class="blue mr-1 tiny">{{icons.tokens}}</mat-icon>
-        <p class="mb-0">Cost</p>
+    <ng-container *ngIf="showPoolName">
+      <mat-divider class="mb-2 mt-2" style="position:relative;"></mat-divider>
+      <div class="flex-row-center-between">
+        <div class="flex-row-center">
+          <mat-icon class="blue mr-1 tiny">{{icons.tokens}}</mat-icon>
+          <p class="mb-0">Cost</p>
+        </div>
       </div>
-    </div>
 
-    <div class="flex-row-center">
-      <opdex-number [value]="one" [suffix]="pool?.srcToken?.symbol"></opdex-number>
-      <mat-icon color="primary" class="ml-2 mr-2 small">{{icons.swap}}</mat-icon>
-      <opdex-number [value]="pool?.crsPerSrc" [short]="true" suffix="CRS"></opdex-number>
-    </div>
+      <div class="flex-row-center">
+        <opdex-number [value]="one" [suffix]="pool?.srcToken?.symbol"></opdex-number>
+        <mat-icon color="primary" class="ml-2 mr-2 small">{{icons.swap}}</mat-icon>
+        <opdex-number [value]="pool?.crsPerSrc" [short]="true" suffix="CRS"></opdex-number>
+      </div>
 
-    <div class="flex-row-center">
-      <opdex-number [value]="one" suffix="CRS"></opdex-number>
-      <mat-icon color="primary" class="ml-2 mr-2 small">{{icons.swap}}</mat-icon>
-      <opdex-number [value]="pool?.srcPerCrs" [short]="true" [suffix]="pool?.srcToken.symbol"></opdex-number>
-    </div>
+      <div class="flex-row-center">
+        <opdex-number [value]="one" suffix="CRS"></opdex-number>
+        <mat-icon color="primary" class="ml-2 mr-2 small">{{icons.swap}}</mat-icon>
+        <opdex-number [value]="pool?.srcPerCrs" [short]="true" [suffix]="pool?.srcToken.symbol"></opdex-number>
+      </div>
+    </ng-container>
     <!-- End Cost -->
 
     <!-- Staking -->
