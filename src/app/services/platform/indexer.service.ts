@@ -1,3 +1,4 @@
+import { INodeStatus } from '@interfaces/full-node.interface';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { TokenService } from '@services/platform/token.service';
 import { CompletedVaultProposalTransaction, VaultService } from '@services/platform/vault.service';
@@ -12,6 +13,9 @@ import { MarketService } from "./market.service";
 import { NodeService } from "./node.service";
 import { LiquidityPoolService } from './liquidity-pool.service';
 import { MiningGovernanceService } from './mining-governance.service';
+
+const CHECKPOINT_LENGTH = 50000;
+type Checkpoint = { start: number; end: number; };
 
 @Injectable({providedIn: 'root'})
 export class IndexerService {
@@ -51,38 +55,75 @@ export class IndexerService {
 
     if (resync) {
       this.hasIndexed.next(false);
+      this._block = this._env.startHeight;
+      this._block$.next(this._block);
       await this._db.delete();
       await this._db.open();
     }
 
     const indexer = await this._db.indexer.get(1);
-    const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight
+    const lastUpdateBlock = indexer?.lastUpdateBlock || this._env.startHeight;
     const nodeStatus = this._nodeService.status;
-    const [poolReceipts, rewardedMiningPoolReceipts, nominations, createdProposals, completedProposals, redeemedCertificates] = await Promise.all([
-      firstValueFrom(this._marketService.getMarketPools(lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getRewardedPoolReceipts$(lastUpdateBlock)),
-      firstValueFrom(this._miningGovernanceService.getRawNominatedPools$()),
-      firstValueFrom(this._vaultService.getCreatedVaultProposalReceipts(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getCompletedVaultProposalReceipts(lastUpdateBlock)),
-      firstValueFrom(this._vaultService.getRedeemedVaultCertificateReceipts(lastUpdateBlock)),
+    let lastUpdateWithCheckpoint = lastUpdateBlock + CHECKPOINT_LENGTH;
+    let checkpoints: Checkpoint[] = [
+      {
+        start: lastUpdateBlock,
+        end: lastUpdateWithCheckpoint > nodeStatus.blockStoreHeight
+                ? nodeStatus.blockStoreHeight
+                : lastUpdateWithCheckpoint
+      }
+    ];
+
+    while (lastUpdateWithCheckpoint < nodeStatus.blockStoreHeight) {
+      const start = checkpoints[checkpoints.length - 1].end + 1;
+      const startWithCheckpoint = start + CHECKPOINT_LENGTH;
+
+      lastUpdateWithCheckpoint = startWithCheckpoint > nodeStatus.blockStoreHeight
+        ? nodeStatus.blockStoreHeight
+        : startWithCheckpoint
+
+      checkpoints.push({start, end: lastUpdateWithCheckpoint });
+    }
+
+    console.log(checkpoints);
+
+    for (var i = 0; i < checkpoints.length; i++) {
+      console.log('starting: ', checkpoints[i].start);
+      await this._indexChunk(checkpoints[i], nodeStatus);
+      console.log('ending: ', checkpoints[i].end);
+    }
+
+    this.indexing = false;
+    this.hasIndexed.next(true);
+  }
+
+  private async _indexChunk(checkpoint: Checkpoint, nodeStatus: INodeStatus): Promise<void> {
+    const { start, end } = checkpoint;
+
+    const [poolReceipts, rewardedMiningPoolReceipts, createdProposals, completedProposals, redeemedCertificates] = await Promise.all([
+      firstValueFrom(this._marketService.getMarketPools(start, end)),
+      firstValueFrom(this._miningGovernanceService.getRewardedPoolReceipts$(start, end)),
+      firstValueFrom(this._vaultService.getCreatedVaultProposalReceipts(start, end)),
+      firstValueFrom(this._vaultService.getCompletedVaultProposalReceipts(start, end)),
+      firstValueFrom(this._vaultService.getRedeemedVaultCertificateReceipts(start, end)),
     ]);
 
     await this._indexPoolsAndTokens(poolReceipts, nodeStatus.coinTicker);
     await this._indexRewardedMiningPools(rewardedMiningPoolReceipts);
-    await this._indexNominatedLiquidityPools(nominations);
     await this._indexCreatedVaultProposals(createdProposals);
     await this._indexCompletedVaultProposals(completedProposals);
     await this._indexRedeemedVaultCertificates(redeemedCertificates);
 
-    await this._db.indexer.put({
-      lastUpdateBlock: nodeStatus.blockStoreHeight,
-      id: 1
-    });
+    // Only index nominations on the last checkpoint
+    if (checkpoint.end === nodeStatus.blockStoreHeight) {
+      const nominations = await firstValueFrom(this._miningGovernanceService.getRawNominatedPools$());
+      await this._indexNominatedLiquidityPools(nominations);
+    }
 
-    this._block = nodeStatus.blockStoreHeight;
+    await this._db.indexer.put({ lastUpdateBlock: end, id: 1 });
+
+    this._block = end;
     this._block$.next(this._block);
-    this.indexing = false;
-    this.hasIndexed.next(true);
   }
 
   ////////////////////////////////////////
