@@ -42,7 +42,7 @@ export abstract class TxBase {
 
     const amountToSpend = new FixedDecimal(amount, token.decimals);
 
-    const allowance = await this._walletService.getAllowance(owner, spender, token.address);
+    const allowance = await this._walletService.getAllowance(token.address, owner, spender);
     return new AllowanceValidation(owner, spender, allowance, amountToSpend.formattedValue, token);
   }
 
