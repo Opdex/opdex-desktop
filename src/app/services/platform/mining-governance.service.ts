@@ -36,9 +36,9 @@ export class MiningGovernanceService {
     return new TransactionQuote(request, response);
   }
 
-  public getRewardedPoolReceipts$(fromBlock: number): Observable<any> {
+  public getRewardedPoolReceipts$(fromBlock: number, endBlock: number): Observable<any> {
     const type = TransactionLogTypes.RewardMiningPoolLog;
-    const request = new ReceiptSearchRequest(this._env.contracts.miningGovernance, fromBlock, type);
+    const request = new ReceiptSearchRequest(this._env.contracts.miningGovernance, fromBlock, type, endBlock);
 
     return this._cirrusApi.searchContractReceipts(request)
       .pipe(

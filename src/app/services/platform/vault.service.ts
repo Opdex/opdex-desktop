@@ -77,20 +77,20 @@ export class VaultService {
   //          RECEIPT METHODS           //
   ////////////////////////////////////////
 
-  public getCreatedVaultProposalReceipts(fromBlock: number): Observable<any[]> {
+  public getCreatedVaultProposalReceipts(fromBlock: number,  endBlock: number): Observable<any[]> {
     const logType = TransactionLogTypes.CreateVaultProposalLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType, endBlock);
     return this._searchReceipt$(request, logType);
   }
 
-  public getRedeemedVaultCertificateReceipts(fromBlock: number): Observable<any[]> {
+  public getRedeemedVaultCertificateReceipts(fromBlock: number, endBlock: number): Observable<any[]> {
     const logType = TransactionLogTypes.RedeemVaultCertificateLog;
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType);
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, logType, endBlock);
     return this._searchReceipt$(request, logType);
   }
 
-  public getCompletedVaultProposalReceipts(fromBlock: number): Observable<CompletedVaultProposalTransaction[]> {
-    const request = new ReceiptSearchRequest(this._vault, fromBlock, TransactionLogTypes.CompleteVaultProposalLog);
+  public getCompletedVaultProposalReceipts(fromBlock: number, endBlock: number): Observable<CompletedVaultProposalTransaction[]> {
+    const request = new ReceiptSearchRequest(this._vault, fromBlock, TransactionLogTypes.CompleteVaultProposalLog, endBlock);
 
     return this._cirrusApi.searchContractReceipts(request)
       .pipe(

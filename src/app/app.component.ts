@@ -26,6 +26,8 @@ export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: string;
   nodeStatus: INodeStatus;
   selectedCurrency: ICurrency;
+  indexedBlock: number;
+  indexedPercent: number = 0;
   theme: string;
   icons = Icons;
   menuOpen = false;
@@ -51,6 +53,12 @@ export class AppComponent implements OnInit {
     this.nodeStatus = await this._refreshNodeStatus();
     this._themeService.getTheme().subscribe(theme => this.setTheme(theme));
     this._indexerService.hasIndexed.subscribe(hasIndexed => this.hasIndexed = hasIndexed);
+    this._indexerService.latestBlock$.subscribe(block => {
+      this.indexedBlock = block;
+      if (this.nodeStatus?.blockStoreHeight) {
+        this.indexedPercent = block / this.nodeStatus.blockStoreHeight * 100
+      }
+    });
 
     timer(0, 60000)
       .pipe(

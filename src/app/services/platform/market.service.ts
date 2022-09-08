@@ -34,9 +34,9 @@ export class MarketService {
     return new TransactionQuote(request, response);
   }
 
-  getMarketPools(fromBlock: number): Observable<any> {
+  getMarketPools(fromBlock: number, endBlock: number): Observable<any> {
     const createPoolLog = TransactionLogTypes.CreateLiquidityPoolLog;
-    const request = new ReceiptSearchRequest(this._market, fromBlock, createPoolLog);
+    const request = new ReceiptSearchRequest(this._market, fromBlock, createPoolLog, endBlock);
 
     return this._cirrusApi.searchContractReceipts(request)
       .pipe(
