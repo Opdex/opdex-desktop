@@ -203,7 +203,7 @@ export class LiquidityPoolService {
     const { wallet } = this._context.userContext;
 
     // void StopMining(UInt256 amount);
-    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StoptMining, wallet.address, [
+    const request = new LocalCallRequest(miningPool, MiningPoolMethods.StopMining, wallet.address, [
       new Parameter(ParameterType.UInt256, amount.bigInt.toString(), 'Amount')
     ]);
 

@@ -7,7 +7,7 @@ export enum MiningPoolMethods {
   GetRewardPerStakedToken = 'GetRewardPerStakedToken',
   GetMiningRewards = 'GetMiningRewards',
   StartMining = 'StartMining',
-  StoptMining = 'StoptMining',
+  StopMining = 'StopMining',
   CollectMiningRewards = 'CollectMiningRewards',
   NotifyRewardAmount = 'NotifyRewardAmount'
 }
