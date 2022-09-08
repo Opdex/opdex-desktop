@@ -7,8 +7,8 @@ let win: BrowserWindow;
 
 // Command line arguments
 const args = process.argv.slice(1);
-const serve = args.some(val => val === '--serve');
-const isTestnet = args.some(val => val === `--testnet`);
+const serve = args.some(val => val.includes('serve'));
+const isTestnet = args.some(val => val.includes('testnet'));
 
 const SERVE_URL = url.format({
   pathname: path.join(__dirname, '../../dist/opdex-desktop/index.html'),
