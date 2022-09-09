@@ -69,10 +69,11 @@ export class ReviewQuoteComponent implements OnDestroy {
             if(!this.initialQuoteBlock) this.initialQuoteBlock = block
           }),
           filter(_ => !!this.txHash === false),
+          switchMap(_ => this._checkForBroadcastReceipt()),
+          filter(_ => !!this.txHash === false),
           switchMap(_ => this._transactionsService.replayQuote(this.quote)),
           tap(q => this.quoteRequest = q.txHandoff),
-          tap(q => this.setQuoteReceipt(q)),
-          switchMap(_ => this._checkForBroadcastReceipt()))
+          tap(q => this.setQuoteReceipt(q)))
         .subscribe()
     )
   }
