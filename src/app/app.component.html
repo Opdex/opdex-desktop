@@ -35,37 +35,41 @@
   </div>
 
   <ng-template #disconnected>
-    <div class="container standard-section tx-bg vh-100">
-      <div class="flex-row-center-center h-100">
-        <opdex-card class="loading-card">
-          <h2 class="mb-2">Connecting to Cirrus</h2>
-          <p>Waiting for a connection to Cirrus blockchain.</p>
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-        </opdex-card>
+    <div class="standard-section tx-bg vh-100">
+      <div class="container h-100">
+        <div class="flex-row-center-center h-100">
+          <opdex-card class="loading-card">
+            <h2 class="mb-2">Connecting to Cirrus</h2>
+            <p>Waiting for a connection to Cirrus blockchain.</p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          </opdex-card>
+        </div>
       </div>
     </div>
   </ng-template>
 
   <ng-template #indexing>
-    <div class="container standard-section tx-bg vh-100">
-      <div class="flex-row-center-center h-100">
-        <opdex-card class="loading-card">
-          <ng-container *ngIf="nodeStatus.inIbd; else indexingOpdex">
-            <h2 class="mb-2">Indexing Cirrus Chain</h2>
-            <p>Waiting for Cirrus to finishing downloading latest blocks. This may take a while.</p>
-          </ng-container>
+    <div class="standard-section tx-bg h-100">
+      <div class="container vh-100">
+        <div class="flex-row-center-center h-100">
+          <opdex-card class="loading-card">
+            <ng-container *ngIf="nodeStatus.inIbd; else indexingOpdex">
+              <h2 class="mb-2">Indexing Cirrus Chain</h2>
+              <p>Waiting for Cirrus to finishing downloading latest blocks. This may take a while.</p>
+            </ng-container>
 
-          <ng-template #indexingOpdex>
-            <h2 class="mb-2">Indexing Opdex Data</h2>
-            <p>Waiting for Opdex data to be indexed. This may take a while. Do not close or exit the application.</p>
-          </ng-template>
+            <ng-template #indexingOpdex>
+              <h2 class="mb-2">Indexing Opdex Data</h2>
+              <p>Waiting for Opdex data to be indexed. This may take a while. Do not close or exit the application.</p>
+            </ng-template>
 
-          <mat-progress-bar mode="determinate" [value]="indexedPercent | formatNumber:0"></mat-progress-bar>
-          <div class="flex-row-center-between">
-            <small>Block #{{(indexedBlock || 0) | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
-            <small>{{ indexedPercent | formatNumber:0 }}%</small>
-          </div>
-        </opdex-card>
+            <mat-progress-bar mode="determinate" [value]="indexedPercent | formatNumber:0"></mat-progress-bar>
+            <div class="flex-row-center-between">
+              <small>Block #{{(indexedBlock || 0) | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
+              <small>{{ indexedPercent | formatNumber:0 }}%</small>
+            </div>
+          </opdex-card>
+        </div>
       </div>
     </div>
   </ng-template>

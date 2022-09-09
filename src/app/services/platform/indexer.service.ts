@@ -14,7 +14,7 @@ import { NodeService } from "./node.service";
 import { LiquidityPoolService } from './liquidity-pool.service';
 import { MiningGovernanceService } from './mining-governance.service';
 
-const CHECKPOINT_LENGTH = 50000;
+const CHECKPOINT_LENGTH = 5000;
 type Checkpoint = { start: number; end: number; };
 
 @Injectable({providedIn: 'root'})
@@ -75,7 +75,7 @@ export class IndexerService {
     ];
 
     while (lastUpdateWithCheckpoint < nodeStatus.blockStoreHeight) {
-      const start = checkpoints[checkpoints.length - 1].end + 1;
+      const start = checkpoints[checkpoints.length - 1].end;
       const startWithCheckpoint = start + CHECKPOINT_LENGTH;
 
       lastUpdateWithCheckpoint = startWithCheckpoint > nodeStatus.blockStoreHeight
