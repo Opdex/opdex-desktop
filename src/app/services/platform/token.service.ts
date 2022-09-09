@@ -235,7 +235,7 @@ export class TokenService {
         parameters = [
           new Parameter(ParameterType.ULong, tokenOutAmount.bigInt.toString(), 'Amount Received'),
           new Parameter(ParameterType.UInt256, tokenInMaxAmount.bigInt.toString(), 'Maximum Amount Spent'),
-          new Parameter(ParameterType.Address, tokenOut, 'Token Received'),
+          new Parameter(ParameterType.Address, tokenIn, 'Token Spent'),
           new Parameter(ParameterType.Address, wallet.address, 'Recipient'),
           new Parameter(ParameterType.ULong, deadline, 'Deadline'),
         ];

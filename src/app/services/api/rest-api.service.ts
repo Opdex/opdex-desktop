@@ -8,7 +8,7 @@ import { OpdexHttpError } from '@models/opdex-http-error';
 // Retryable error codes
 // Note 404 is excluded intentionally due to checking of wallet balances primarily in liquidity pools
 // The check will always be made, likely often will fail and are not *expecting* it to succeed.
-const retryableErrors = [401, 429, 500]
+const retryableErrors = [400, 401, 429, 500]
 
 @Injectable({ providedIn: 'root' })
 export class RestApiService {
@@ -26,7 +26,7 @@ export class RestApiService {
 
           return err.pipe(
             mergeMap((error) => retryableErrors.includes(error.status) ? of(error) : throwError(error)),
-            delay(1000),
+            delay((retries + 1) * 1000),
             map(error => {
               if (retries++ === 2) {
                 throw error;
@@ -67,9 +67,10 @@ export class RestApiService {
     const errors = [];
 
     if (!!error?.error) {
-      if (!!error.error.errors) {
-        // Covers problem details validation errors - we don't care about they key, we'll tell the users all errors
-        Object.keys(error.error.errors).map(key => errors.push(...error.error.errors[key]));
+      if (!!error.error?.errors && error.error.errors.length > 0) {
+        error.error.errors.forEach(error => {
+          errors.push(error?.description || error?.message || error.toString());
+        })
       }
 
       // Covers Exception based errors
