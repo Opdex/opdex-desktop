@@ -56,18 +56,22 @@
             <ng-container *ngIf="nodeStatus.inIbd; else indexingOpdex">
               <h2 class="mb-2">Indexing Cirrus Chain</h2>
               <p>Waiting for Cirrus to finishing downloading latest blocks. This may take a while.</p>
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
             </ng-container>
 
             <ng-template #indexingOpdex>
               <h2 class="mb-2">Indexing Opdex Data</h2>
               <p>Waiting for Opdex data to be indexed. This may take a while. Do not close or exit the application.</p>
+
+              <mat-progress-bar mode="determinate" [value]="indexedPercent | formatNumber:0"></mat-progress-bar>
+
+              <div class="flex-row-center-between">
+                <small>Block #{{(indexedBlock || 0) | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
+                <small>{{ indexedPercent | formatNumber:0 }}%</small>
+              </div>
             </ng-template>
 
-            <mat-progress-bar mode="determinate" [value]="indexedPercent | formatNumber:0"></mat-progress-bar>
-            <div class="flex-row-center-between">
-              <small>Block #{{(indexedBlock || 0) | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
-              <small>{{ indexedPercent | formatNumber:0 }}%</small>
-            </div>
+
           </opdex-card>
         </div>
       </div>

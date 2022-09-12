@@ -73,6 +73,10 @@ export class ContractFeedComponent {
 
               this.transactionsRequest = new ReceiptSearchRequest(this.contract, fromBlock);
             }),
+            // Prevent continuing if we're loading already or if we're only pulling latest blocks transactions
+            // -- Allows continuation if we're pulling the first set of transactions or the most recent block
+            // -- when we're not changing the target timeframe
+            filter(latestBlock => !this.loading || this.transactionsRequest.fromBlock !== latestBlock - 1),
             switchMap(_ => this._getTransactions()))
           .subscribe());
     }
