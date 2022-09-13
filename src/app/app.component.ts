@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   nodeStatus: INodeStatus;
   selectedCurrency: ICurrency;
   indexedBlock: number;
-  indexedPercent: number = 0;
+  indexedPercent: number = this._env.startHeight;
   theme: string;
   icons = Icons;
   menuOpen = false;
