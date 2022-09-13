@@ -79,7 +79,7 @@ stages:
                       echo "##vso[task.setvariable variable=IS_PRERELEASE;isreadonly=true]$(if [[ $(RELEASE_VERSION) == *"beta"* ]]; then echo "true"; else echo "false"; fi)"
                 - task: GitHubRelease@1
                   inputs:
-                    gitHubConnection: "Opdex Desktop Releases"
+                    gitHubConnection: "Opdex Desktop"
                     repositoryName: "Opdex/opdex-desktop"
                     action: "create"
                     target: "$(Build.SourceVersion)"
