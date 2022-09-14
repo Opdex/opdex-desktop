@@ -14,7 +14,7 @@ import { NodeService } from "./node.service";
 import { LiquidityPoolService } from './liquidity-pool.service';
 import { MiningGovernanceService } from './mining-governance.service';
 
-const CHECKPOINT_LENGTH = 5000;
+const CHECKPOINT_LENGTH = 2500;
 type Checkpoint = { start: number; end: number; };
 
 @Injectable({providedIn: 'root'})

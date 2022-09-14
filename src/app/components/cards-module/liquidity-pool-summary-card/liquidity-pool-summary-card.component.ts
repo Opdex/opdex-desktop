@@ -22,10 +22,10 @@ export class LiquidityPoolSummaryCardComponent implements OnDestroy {
   one = FixedDecimal.One(0);
 
   public get liquidityFiat(): FixedDecimal {
-    if (!!this.pool?.miningPool === false) return FixedDecimal.Zero(0);
-
     const { abbreviation } = this.selectedCurrency;
     const { crsToken, srcToken, reserveCrs, reserveSrc } = this.pool;
+
+    if (reserveCrs.isZero || reserveSrc.isZero) return FixedDecimal.Zero(0);
 
     return crsToken.pricing[abbreviation]
       .multiply(reserveCrs)
