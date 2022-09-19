@@ -1,8 +1,8 @@
-import { ILocalCallErrorResult, IWalletsList } from '@interfaces/full-node.interface';
 import { OpdexHttpError } from '@models/opdex-http-error';
 import { EnvironmentsService } from '@services/utility/environments.service';
 import { Injectable, Injector } from "@angular/core";
-import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISmartContractWalletHistory, ISupportedContract } from "@interfaces/full-node.interface";
+import { IContractReceiptResult, ILocalCallResult, INodeAddressList, INodeStatus, ISmartContractWalletHistory,
+         ISupportedContract, IBlockDetails, ILocalCallErrorResult, IWalletsList } from "@interfaces/full-node.interface";
 import { catchError, map, Observable, of } from "rxjs";
 import { RestApiService } from "./rest-api.service";
 import { LocalCallRequest } from '@models/cirrusApi/contract-call';
@@ -109,5 +109,12 @@ export class CirrusApiService extends CacheService {
 
     // cache for 5400 blocks
     return this.getItem(endpoint, observable$, 5400);
+  }
+
+  // Blocks
+  getBlockByHash(blockHash: string): Observable<IBlockDetails> {
+    const endpoint = `${this.api}/BlockStore/Block?hash=${blockHash}&OutputJson=true&ShowTransactionDetails=false`;
+    const observable$ = this._rest.get<IBlockDetails>(endpoint);
+    return this.getItem(endpoint, observable$);
   }
 }

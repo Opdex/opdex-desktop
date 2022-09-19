@@ -1,0 +1,25 @@
+<div class="flex-row-center-between mb-3">
+  <h3 class="mb-0">Download Transaction History</h3>
+  <button mat-icon-button class="tiny" mat-dialog-close><mat-icon>{{icons.close}}</mat-icon></button>
+</div>
+
+<p>Click to download wallet transaction history. This may take a while. Fiat values will be estimates based on historical daily closing pricing.</p>
+<div class="flex-row-center" *ngIf="!inProgress && !blob; else downloading">
+  <button mat-stroked-button mat-dialog-close class="w-100 mr-2">Cancel</button>
+  <button mat-flat-button (click)="initDownload()" cdkFocusInitial class="w-100" color="primary" [disabled]="inProgress">Download</button>
+</div>
+
+<ng-template #downloading>
+  <ng-container *ngIf="!blob">
+    <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+    <small>Downloading...</small>
+  </ng-container>
+
+  <ng-container *ngIf="blob">
+    <mat-progress-bar mode="determinate" value="100" color="primary"></mat-progress-bar>
+    <div class="flex-row-center-between">
+      <small>Export Complete</small>
+      <a href="javascript:void(0)" (click)="save()"><small>Download</small></a>
+    </div>
+  </ng-container>
+</ng-template>

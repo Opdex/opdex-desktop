@@ -51,6 +51,7 @@
     "electron-context-menu": "^3.3.0",
     "electron-log": "^4.4.8",
     "ethereum-checksum-address": "^0.0.8",
+    "file-saver": "^2.0.5",
     "ng-qrcode": "^7.0.0",
     "ngx-infinite-scroll": "^14.0.0",
     "ngx-timeago": "^2.0.0",

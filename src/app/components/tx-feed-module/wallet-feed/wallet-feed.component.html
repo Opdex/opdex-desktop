@@ -1,7 +1,8 @@
 <opdex-card [hasToolbar]="true" style="position: relative;" [noPadding]="true">
   <ng-container toolbar>
-    <div class="details">
-      <h4 class="title d-inline">Recent Transactions</h4>
+    <div class="flex-row-center-between w-100">
+      <h4 class="title d-inline mb-0">Recent Transactions</h4>
+      <button class="small" (click)="exportHistory()" mat-icon-button><mat-icon>{{icons.download}}</mat-icon></button>
     </div>
   </ng-container>
 

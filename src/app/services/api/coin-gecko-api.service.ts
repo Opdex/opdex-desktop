@@ -22,4 +22,9 @@ export class CoinGeckoApiService extends RestApiService {
     return this.get<ICurrenciesResponse>(`${this.api}/simple/price?ids=stratis&vs_currencies=${currencies}`)
       .pipe(catchError(_ => of({ stratis: { usd: 0, eur: 0, gbp: 0, jpy: 0, cny: 0 } })));
   }
+
+  getHistoricalPrice(date: Date): Observable<any> {
+    let formattedDate = `${date.getDay()}-${date.getMonth()}-${date.getFullYear()}`; // dd-mm-yyyy
+    return this.get<any>(`${this.api}/coins/stratis/history?date=${formattedDate}&localization=false`);
+  }
 }

@@ -1,3 +1,5 @@
+import { FixedDecimal } from '@models/types/fixed-decimal';
+import { ISmartContractWalletHistory } from '@interfaces/full-node.interface';
 import { ITransactionError } from '@interfaces/transaction-quote.interface';
 import { IReceiptLogs } from '@interfaces/full-node.interface';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
@@ -8,6 +10,7 @@ import { ParseFriendlyErrorMessage } from '@lookups/contract-errors.lookup';
 export interface IBlock {
   hash: string;
   height: number;
+  time?: Date;
 }
 
 export class TransactionReceipt {
@@ -16,6 +19,7 @@ export class TransactionReceipt {
   private _to: string;
   private _newContractAddress?: string;
   private _gasUsed: number;
+  private _gasCost: FixedDecimal | null;
   private _block: IBlock;
   private _success: boolean;
   private _error: ITransactionError;
@@ -43,6 +47,10 @@ export class TransactionReceipt {
     return this._gasUsed;
   }
 
+  public get gasCost(): FixedDecimal | null {
+    return this._gasCost;
+  }
+
   public get block(): IBlock {
     return this._block;
   }
@@ -67,13 +75,18 @@ export class TransactionReceipt {
     return this._transactionSummary;
   }
 
-  constructor(receipt: IContractReceiptResult) {
+  public get isOpdexTx(): boolean {
+    return this.transactionSummary !== 'Unknown' && this.transactionSummary !== 'Transfer' && this.success;
+  }
+
+  constructor(receipt: IContractReceiptResult, walletHistory?: ISmartContractWalletHistory, blockTime?: Date) {
     this._hash = receipt.transactionHash;
     this._from = receipt.from;
     this._to = receipt.to;
     this._newContractAddress = receipt.newContractAddress;
     this._gasUsed = receipt.gasUsed;
-    this._block = { height: receipt.blockNumber, hash: receipt.blockHash };
+    this._gasCost = !!walletHistory?.gasFee ? FixedDecimal.FromBigInt(BigInt(walletHistory?.gasFee?.toString()), 8) : null;
+    this._block = { height: receipt.blockNumber, hash: receipt.blockHash, time: blockTime };
     this._success = !!receipt.success;
     this._events = receipt.logs || [];
     this._transactionType = this.findTransactionType();
