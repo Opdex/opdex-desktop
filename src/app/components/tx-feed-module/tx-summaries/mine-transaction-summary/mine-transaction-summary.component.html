@@ -1,35 +1,37 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="pool && !error">
-    <div class="flex-row-center" *ngIf="!lptAmount.isZero" [ngClass]="{'mb-2': !collectAmount.isZero}">
+  <ng-container *ngIf="summary.pool && !summary.error">
+    <div class="flex-row-center" *ngIf="!summary.lptAmount.isZero" [ngClass]="{'mb-2': !summary.collectAmount.isZero}">
       <div class="no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '+' : '-'"
-          [value]="lptAmount"
+          [prefix]="summary.isAddition ? '+' : '-'"
+          [value]="summary.lptAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{pool.address}}">{{pool.lpToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/pools/{{summary.pool.address}}">{{summary.pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.pool.address}}">{{summary.pool.lpToken.symbol}}</a>
       </div>
     </div>
 
-    <div class="flex-row-center" *ngIf="!collectAmount.isZero">
+    <div class="flex-row-center" *ngIf="!summary.collectAmount.isZero">
       <div class="no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '-' : '+'"
-          [value]="collectAmount"
+          [prefix]="summary.isAddition ? '-' : '+'"
+          [value]="summary.collectAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/tokens/{{pool.stakingToken?.address}}">{{pool.stakingToken?.symbol}}</a>
+        <a class="no-decoration" routerLink="/tokens/{{summary.pool.stakingToken?.address}}">{{summary.pool.stakingToken?.symbol}}</a>
       </div>
     </div>
   </ng-container>
 
-  <div *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>
