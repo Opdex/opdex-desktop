@@ -24,7 +24,7 @@ export class CoinGeckoApiService extends RestApiService {
   }
 
   getHistoricalPrice(date: Date): Observable<any> {
-    let formattedDate = `${date.getDay()}-${date.getMonth()}-${date.getFullYear()}`; // dd-mm-yyyy
+    let formattedDate = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()}`; // dd-mm-yyyy
     return this.get<any>(`${this.api}/coins/stratis/history?date=${formattedDate}&localization=false`);
   }
 }

@@ -24,21 +24,21 @@ const CsvColumns = [
   { header: 'Total Fiat Received', property: 'totalFiatReceived' },
 ];
 
-type CsvData = {
+export type CsvData = {
   transactionHash: string;
   transactionEventNumber: number;
   blockNumber: number;
-  blockTime: Date;
+  blockTime: string;
   account: 'Cirrus' | 'Opdex';
-  gasFeeCrs: number;
+  gasFeeCrs: string;
   gasFeeFiat: number;
   transactionType: string;
-  amountSpent: string;
-  tokenSpent: string;
-  totalFiatSpent: string;
-  amountReceived: string;
-  tokenReceived: string;
-  totalFiatReceived: string;
+  amountSpent?: string;
+  tokenSpent?: string;
+  totalFiatSpent?: string;
+  amountReceived?: string;
+  tokenReceived?: string;
+  totalFiatReceived?: string;
 }
 
 @Component({
