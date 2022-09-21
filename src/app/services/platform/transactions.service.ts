@@ -1,3 +1,4 @@
+import { IEnableMiningTransactionSummary, IStakeTransactionSummary } from './../../interfaces/transaction-summaries.interface';
 import { IAllowanceTransactionSummary, ICreatePoolTransactionSummary, IDistributeTransactionSummary, IMineTransactionSummary, IProvideTransactionSummary } from '@interfaces/transaction-summaries.interface';
 import { CoinGeckoApiService } from './../api/coin-gecko-api.service';
 import { VaultService } from './vault.service';
@@ -11,7 +12,7 @@ import { Injectable } from "@angular/core";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 import { TransactionQuote } from '@models/platform/transaction-quote';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
-import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICreateLiquidityPoolLog, IDistributionLog, IMintLog, IStartMiningLog, IStopMiningLog } from '@interfaces/contract-logs.interface';
+import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICollectStakingRewardsLog, ICreateLiquidityPoolLog, IDistributionLog, IMintLog, IRewardMiningPoolLog, IStartMiningLog, IStartStakingLog, IStopMiningLog, IStopStakingLog } from '@interfaces/contract-logs.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { CsvData } from '@components/modals-module/export-wallet-history-modal/export-wallet-history-modal.component';
 
@@ -89,8 +90,8 @@ export class TransactionsService {
   }
 
   public async getDistributionTransactionSummary(tx: TransactionReceipt): Promise<IDistributeTransactionSummary> {
-    let response: IDistributeTransactionSummary = {}
-    ;
+    let response: IDistributeTransactionSummary = {};
+
     try {
       const events = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.DistributionLog);
 
@@ -195,6 +196,96 @@ export class TransactionsService {
 
     return response;
   }
+
+  public async getEnableMiningTransactionSummary(tx: TransactionReceipt): Promise<IEnableMiningTransactionSummary> {
+    let response: IEnableMiningTransactionSummary = {};
+
+    try {
+      const rewardEvents = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.RewardMiningPoolLog);
+
+      if (rewardEvents.length > 4 || rewardEvents.length === 0) {
+        response.error = 'Unable to read enable mining transaction.';
+        return response;
+      }
+
+      let logs: IRewardMiningPoolLog[] = [];
+      const pools = await Promise.all(rewardEvents.map(event => {
+        const log = <IRewardMiningPoolLog>event.log.data;
+        logs.push(log);
+        return this._liquidityPoolService.getLiquidityPool(log.stakingPool);
+      }))
+
+      response.pools = pools;
+      response.poolAmount = FixedDecimal.FromBigInt(logs[0].amount, pools[0].stakingToken?.decimals);
+      response.stakingToken = pools[0].stakingToken;
+    } catch {
+      response.error = 'Oops, something went wrong.';
+    }
+
+    return response;
+  }
+
+  public async getStakingTransactionSummary(tx: TransactionReceipt): Promise<IStakeTransactionSummary> {
+    let response: IStakeTransactionSummary = {};
+    const eventTypes = [
+      TransactionLogTypes.StartStakingLog,
+      TransactionLogTypes.StopStakingLog,
+      TransactionLogTypes.CollectStakingRewardsLog,
+      TransactionLogTypes.BurnLog
+    ];
+
+    try {
+      const stakeEvents = tx.events.filter(event => eventTypes.includes(event.log.event as TransactionLogTypes));
+
+      var startEvent = stakeEvents.find(event => event.log.event === TransactionLogTypes.StartStakingLog);
+      var stopEvent = stakeEvents.find(event => event.log.event === TransactionLogTypes.StopStakingLog);
+      var collectEvent = stakeEvents.find(event => event.log.event === TransactionLogTypes.CollectStakingRewardsLog);
+      var burnEvent = stakeEvents.find(event => event.log.event === TransactionLogTypes.BurnLog);
+
+      if (stakeEvents.length > 4 || stakeEvents.length === 0 || (!collectEvent && !startEvent && !stopEvent)) {
+        response.error = 'Unable to read stake transaction.';
+        return response;
+      }
+
+      response.isAddition = startEvent !== undefined;
+      response.isCollection = collectEvent !== undefined;
+      response.collectionLiquidatedRewards = response.isCollection && burnEvent !== undefined;
+      response.pool = await this._liquidityPoolService.getLiquidityPool(startEvent?.address || stopEvent?.address || collectEvent?.address);
+
+      let stakingAmount: BigInt;
+
+      if (!!startEvent) stakingAmount = (<IStartStakingLog>startEvent.log.data).amount;
+      else if (!!stopEvent) stakingAmount = (<IStopStakingLog>stopEvent.log.data).amount;
+      else stakingAmount = BigInt('0');
+
+      response.stakingAmount = FixedDecimal.FromBigInt(stakingAmount, response.pool.stakingToken?.decimals);
+
+      if (response.isCollection) {
+        if (response.collectionLiquidatedRewards) {
+          response.amountOneToken = response.pool.crsToken;
+          response.amountTwoToken = response.pool.srcToken;
+
+          const burnLog = <IBurnLog>burnEvent.log.data;
+          const amountOne = burnLog.amountCrs;
+          const amountTwo = burnLog.amountSrc;
+
+          response.collectAmountOne = FixedDecimal.FromBigInt(amountOne, response.amountOneToken.decimals);
+          response.collectAmountTwo = FixedDecimal.FromBigInt(amountTwo, response.amountTwoToken.decimals);
+        } else {
+          const collectionLog = <ICollectStakingRewardsLog>collectEvent.log.data;
+
+          response.amountOneToken = response.pool.lpToken;
+          response.collectAmountOne = FixedDecimal.FromBigInt(collectionLog.amount, response.amountOneToken.decimals);
+        }
+      }
+    } catch {
+      response.error = 'Oops, something went wrong.'
+    }
+
+    return response;
+  }
+
+
 
   /////////////////////////////////////////
   // Wallet Export Summaries

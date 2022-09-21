@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Currencies } from '@enums/currencies';
 import { RestApiService } from "./rest-api.service";
-import { ICurrenciesResponse } from '@interfaces/coin-gecko.interface';
+import { ICurrenciesResponse, IHistoricalPricing } from '@interfaces/coin-gecko.interface';
 
 @Injectable({providedIn: 'root'})
 export class CoinGeckoApiService extends RestApiService {
@@ -23,8 +23,9 @@ export class CoinGeckoApiService extends RestApiService {
       .pipe(catchError(_ => of({ stratis: { usd: 0, eur: 0, gbp: 0, jpy: 0, cny: 0 } })));
   }
 
-  getHistoricalPrice(date: Date): Observable<any> {
-    let formattedDate = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()}`; // dd-mm-yyyy
-    return this.get<any>(`${this.api}/coins/stratis/history?date=${formattedDate}&localization=false`);
+  getHistoricalPrice(date: Date): Observable<IHistoricalPricing> {
+    // dd-mm-yyyy
+    let formattedDate = `${date.getUTCDate()}-${date.getUTCMonth()+1}-${date.getUTCFullYear()}`;
+    return this.get<IHistoricalPricing>(`${this.api}/coins/stratis/history?date=${formattedDate}&localization=false`);
   }
 }
