@@ -1,6 +1,8 @@
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { Token } from '@models/platform/token';
 import { LiquidityPool } from '@models/platform/liquidity-pool';
+import { Vault } from '@models/platform/vault';
+import { VaultProposal } from '@models/platform/vault-proposal';
 
 export interface IAllowanceTransactionSummary {
   token?: Token;
@@ -69,14 +71,37 @@ export interface ISwapTransactionSummary {
   error?: string;
 }
 
-export interface ITransferSummary {
+export interface ITransferTransactionSummary {
   transferAmount?: FixedDecimal;
   token?: Token;
   error?: string;
 }
 
-export interface IVaultCertificateSummary {
+export interface IVaultCertificateTransactionSummary {
   vaultToken?: Token;
   amount?: FixedDecimal;
   error?: string;
+}
+
+export interface IVaultProposalTransactionSummary {
+  vault?: Vault,
+  proposal?: VaultProposal;
+  pledgeOrVote?: IVaultProposalPledgeOrVoteSummary;
+  createOrComplete?: IVaultProposalCreateOrCompleteSummary;
+  crs?: Token;
+  vaultToken?: Token;
+  proposalId?: number;
+  error?: string;
+}
+
+export interface IVaultProposalPledgeOrVoteSummary {
+  amount: FixedDecimal;
+  withdrawal: boolean;
+  inFavor?: boolean;
+}
+
+export interface IVaultProposalCreateOrCompleteSummary {
+  type?: string;
+  approved?: boolean;
+  amount?: FixedDecimal;
 }

@@ -1,6 +1,6 @@
-import { IEnableMiningTransactionSummary, IStakeTransactionSummary } from './../../interfaces/transaction-summaries.interface';
-import { IAllowanceTransactionSummary, ICreatePoolTransactionSummary, IDistributeTransactionSummary, IMineTransactionSummary, IProvideTransactionSummary } from '@interfaces/transaction-summaries.interface';
-import { CoinGeckoApiService } from './../api/coin-gecko-api.service';
+import { IReceiptLogs } from '@interfaces/full-node.interface';
+import { EnvironmentsService } from '@services/utility/environments.service';
+import { CoinGeckoApiService } from '@services/api/coin-gecko-api.service';
 import { VaultService } from './vault.service';
 import { MiningGovernanceService } from './mining-governance.service';
 import { LiquidityPoolService } from './liquidity-pool.service';
@@ -12,9 +12,15 @@ import { Injectable } from "@angular/core";
 import { CirrusApiService } from "@services/api/cirrus-api.service";
 import { TransactionQuote } from '@models/platform/transaction-quote';
 import { TransactionLogTypes } from '@enums/contracts/transaction-log-types';
-import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICollectStakingRewardsLog, ICreateLiquidityPoolLog, IDistributionLog, IMintLog, IRewardMiningPoolLog, IStartMiningLog, IStartStakingLog, IStopMiningLog, IStopStakingLog } from '@interfaces/contract-logs.interface';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { CsvData } from '@components/modals-module/export-wallet-history-modal/export-wallet-history-modal.component';
+import { ProposalType } from '@models/platform/vault-proposal';
+import { IEnableMiningTransactionSummary, IStakeTransactionSummary, ISwapTransactionSummary, ITransferTransactionSummary,
+  IVaultCertificateTransactionSummary, IVaultProposalPledgeOrVoteSummary, IVaultProposalTransactionSummary, IAllowanceTransactionSummary,
+  ICreatePoolTransactionSummary, IDistributeTransactionSummary, IMineTransactionSummary, IProvideTransactionSummary } from '@interfaces/transaction-summaries.interface';
+import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICollectStakingRewardsLog, ICompleteVaultProposalLog, ICreateLiquidityPoolLog, ICreateVaultProposalLog,
+  IDistributionLog, IMintLog, IRedeemVaultCertificateLog, IRewardMiningPoolLog, IStartMiningLog, IStartStakingLog, IStopMiningLog, IStopStakingLog, ISwapLog,
+  ITransferLog, IVaultProposalPledgeLog, IVaultProposalVoteLog, IVaultProposalWithdrawPledgeLog, IVaultProposalWithdrawVoteLog } from '@interfaces/contract-logs.interface';
 
 @Injectable({providedIn: 'root'})
 export class TransactionsService {
@@ -24,7 +30,8 @@ export class TransactionsService {
     private _liquidityPoolService: LiquidityPoolService,
     private _miningGovernanceService: MiningGovernanceService,
     private _vaultService: VaultService,
-    private _coinGecko: CoinGeckoApiService
+    private _coinGecko: CoinGeckoApiService,
+    private _envService: EnvironmentsService
   ) { }
 
   async searchTransactionReceipts(request: ReceiptSearchRequest) {
@@ -43,7 +50,7 @@ export class TransactionsService {
   public async getAllowanceTransactionSummary(tx: TransactionReceipt): Promise<IAllowanceTransactionSummary> {
     let response: IAllowanceTransactionSummary = {};
 
-    const approveEvents = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.ApprovalLog);
+    const approveEvents = tx.events.filter(event => event.log.event === TransactionLogTypes.ApprovalLog);
 
     if (approveEvents[0] === undefined) {
       response.error = 'Unable to read approve allowance transaction.';
@@ -66,7 +73,7 @@ export class TransactionsService {
   public async getCreatePoolTransactionSummary(tx: TransactionReceipt): Promise<ICreatePoolTransactionSummary> {
     let response: ICreatePoolTransactionSummary = { isQuote: !tx.hash};
 
-    const createEvents = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.CreateLiquidityPoolLog);
+    const createEvents = tx.events.filter(event => event.log.event === TransactionLogTypes.CreateLiquidityPoolLog);
 
     if (createEvents[0] === undefined) {
       response.error = 'Oops, something is wrong.';
@@ -93,7 +100,7 @@ export class TransactionsService {
     let response: IDistributeTransactionSummary = {};
 
     try {
-      const events = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.DistributionLog);
+      const events = tx.events.filter(event => event.log.event === TransactionLogTypes.DistributionLog);
 
       if (events.length !== 1) {
         response.error = 'Unable to read distribution transaction.';
@@ -201,7 +208,7 @@ export class TransactionsService {
     let response: IEnableMiningTransactionSummary = {};
 
     try {
-      const rewardEvents = tx.events.filter(event => (event.log.event as TransactionLogTypes) === TransactionLogTypes.RewardMiningPoolLog);
+      const rewardEvents = tx.events.filter(event => event.log.event === TransactionLogTypes.RewardMiningPoolLog);
 
       if (rewardEvents.length > 4 || rewardEvents.length === 0) {
         response.error = 'Unable to read enable mining transaction.';
@@ -285,7 +292,216 @@ export class TransactionsService {
     return response;
   }
 
+  public async getTransferTransactionSummary(tx: TransactionReceipt): Promise<ITransferTransactionSummary> {
+    let response: ITransferTransactionSummary = {};
 
+    try {
+      const events = tx.events.filter(event => event.log.event === TransactionLogTypes.TransferLog);
+
+      if (events.length !== 1 || tx.events.length !== 1) {
+        response.error = 'Unable to read non-standard token transfer.';
+        return response;
+      }
+
+      const event = events[0];
+      const log = <ITransferLog>event.log.data;
+
+      if (!log.amount) {
+        response.error = 'Unknown token transfer type.';
+        return response;
+      }
+
+      const token = await this._tokenService.getToken(event.address);
+
+      response.token = token;
+      response.transferAmount = FixedDecimal.FromBigInt(log.amount, token.decimals);
+    } catch {
+      response.error = 'Oops, something went wrong.';
+    }
+
+    return response;
+  }
+
+  public async getVaultCertificateTransactionSummary(tx: TransactionReceipt): Promise<IVaultCertificateTransactionSummary> {
+    let response: IVaultCertificateTransactionSummary = {};
+
+    try {
+      const event = tx.events.find(event => event.log.data === TransactionLogTypes.RedeemVaultCertificateLog);
+      const log = <IRedeemVaultCertificateLog>event.log.data;
+
+      if (!event) {
+        response.error = 'Unable to read redeem certificate transaction.';
+        return response;
+      }
+
+      response.vaultToken = await this._tokenService.getToken(this._envService.contracts.odx);
+      response.amount = FixedDecimal.FromBigInt(log.amount, response.vaultToken.decimals);
+    } catch {
+      response.error = 'Oops, something went wrong.';
+    }
+
+    return response;
+  }
+
+  public async getSwapTransactionSummary(tx: TransactionReceipt): Promise<ISwapTransactionSummary> {
+    let response: ISwapTransactionSummary = {};
+
+    try {
+      const swapEvents = tx.events.filter(event => event.log.event === TransactionLogTypes.SwapLog);
+
+      if (swapEvents.length == 0 || swapEvents.length > 2) {
+        response.error = 'Unable to read swap transaction.'
+        return response;
+      }
+
+      if (swapEvents.length === 1) {
+        const event = swapEvents[0];
+        const log = <ISwapLog>swapEvents[0].log.data;
+        const pool = await this._liquidityPoolService.getLiquidityPool(event.address);
+
+        if (!pool) {
+          response.error = 'Unrecognized liquidity pool.';
+          return response;
+        }
+
+        const crsIn = FixedDecimal.FromBigInt(log.amountCrsIn, 8);
+
+        response.tokenIn = crsIn.isZero ? pool.srcToken : pool.crsToken;
+        response.tokenOut = crsIn.isZero ? pool.crsToken : pool.srcToken;
+
+        const tokenInAmount = crsIn.isZero ? log.amountSrcIn : log.amountCrsIn;
+        response.tokenInAmount = FixedDecimal.FromBigInt(tokenInAmount, response.tokenIn.decimals);
+
+        const tokenOutAmount = crsIn.isZero ? log.amountCrsOut : log.amountSrcOut;
+        response.tokenOutAmount = FixedDecimal.FromBigInt(tokenOutAmount, response.tokenOut.decimals);
+      }
+      else if (swapEvents.length === 2) {
+        const firstEvent = swapEvents[0];
+        const firstLog = <ISwapLog>swapEvents[0].log.data;
+        const secondEvent = swapEvents[1];
+        const secondLog = <ISwapLog>swapEvents[1].log.data;
+        const firstPool = await this._liquidityPoolService.getLiquidityPool(firstEvent.address);
+        const secondPool = await this._liquidityPoolService.getLiquidityPool(secondEvent.address);
+
+        if (!firstPool || !secondPool) {
+          response.error = 'Unrecognized liquidity pools.';
+          return response;
+        }
+
+        response.tokenIn = firstPool.srcToken;
+        response.tokenOut = secondPool.srcToken;
+        response.tokenInAmount = FixedDecimal.FromBigInt(firstLog.amountSrcIn, response.tokenIn.decimals);
+        response.tokenOutAmount = FixedDecimal.FromBigInt(secondLog.amountSrcOut, response.tokenOut.decimals);
+      }
+    } catch {
+      response.error = 'Oops, something went wrong.'
+    }
+
+    return response;
+  }
+
+  public async getVaultProposalTransactionSummary(tx: TransactionReceipt): Promise<IVaultProposalTransactionSummary> {
+    let response: IVaultProposalTransactionSummary = {};
+    let createOrCompleteEvents: IReceiptLogs[];
+    let pledgeOrVoteEvents: IReceiptLogs[];
+
+    const pledgeOrVoteEventTypes = [
+      TransactionLogTypes.VaultProposalPledgeLog,
+      TransactionLogTypes.VaultProposalWithdrawPledgeLog,
+      TransactionLogTypes.VaultProposalVoteLog,
+      TransactionLogTypes.VaultProposalWithdrawVoteLog
+    ];
+
+    const createOrCompleteEventTypes = [
+      TransactionLogTypes.CreateVaultProposalLog,
+      TransactionLogTypes.CompleteVaultProposalLog,
+    ];
+
+    try {
+      createOrCompleteEvents = tx.events.filter(event => createOrCompleteEventTypes.includes(event.log.event as TransactionLogTypes));
+      pledgeOrVoteEvents = tx.events.filter(event => pledgeOrVoteEventTypes.includes(event.log.event as TransactionLogTypes));
+
+      if (createOrCompleteEvents.length > 1 ||
+          pledgeOrVoteEvents.length > 1 ||
+          (createOrCompleteEvents.length === 0 && pledgeOrVoteEvents.length === 0)) {
+        response.error = 'Unable to read vault proposal transaction.';
+        return response;
+      }
+
+      response.proposalId = createOrCompleteEvents.length > 0
+        ? createOrCompleteEvents[0].log.data.proposalId
+        : pledgeOrVoteEvents[0].log.data.proposalId
+
+      response.proposal = await this._vaultService.getProposal(response.proposalId);
+
+      response = await this._buildPledgeOrVoteSummary(response, pledgeOrVoteEvents);
+      response = await this._buildCreateOrCompleteSummary(response, createOrCompleteEvents);
+    } catch {
+      response.error = 'Oops, something went wrong.';
+    }
+
+    return response;
+  }
+
+  private async _buildPledgeOrVoteSummary(summary: IVaultProposalTransactionSummary, pledgeOrVoteEvents: IReceiptLogs[]): Promise<IVaultProposalTransactionSummary> {
+    if (pledgeOrVoteEvents.length > 0) {
+      const pledgeEvent = pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalPledgeLog);
+      const pledgeLog = pledgeEvent ? <IVaultProposalPledgeLog>pledgeEvent.log.data : undefined;
+
+      const withdrawPledgeEvent = pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalWithdrawPledgeLog);
+      const withdrawPledgeLog = withdrawPledgeEvent ? <IVaultProposalWithdrawPledgeLog>withdrawPledgeEvent.log.data : undefined;
+
+      const voteEvent = pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalVoteLog);
+      const voteLog = voteEvent ? <IVaultProposalVoteLog>voteEvent.log.data : undefined;
+
+      const withdrawVoteEvent = pledgeOrVoteEvents.find(event => event.log.event === TransactionLogTypes.VaultProposalWithdrawVoteLog);
+      const withdrawVoteLog = withdrawVoteEvent ? <IVaultProposalWithdrawVoteLog>withdrawVoteEvent.log.data : undefined;
+
+      const crs = await this._tokenService.getToken('CRS')
+      summary.crs = crs;
+      summary.pledgeOrVote = { inFavor: null } as IVaultProposalPledgeOrVoteSummary;
+
+      if (pledgeLog || voteLog) {
+        summary.pledgeOrVote.inFavor = pledgeLog ? null : voteLog.inFavor;
+        summary.pledgeOrVote.amount = pledgeLog
+          ? FixedDecimal.FromBigInt(pledgeLog.pledgeAmount, crs.decimals)
+          : FixedDecimal.FromBigInt(voteLog.voteAmount, crs.decimals);
+      }
+      else if (withdrawPledgeLog || withdrawVoteLog) {
+        summary.pledgeOrVote.withdrawal = true;
+        summary.pledgeOrVote.amount = withdrawPledgeLog
+          ? FixedDecimal.FromBigInt(withdrawPledgeLog.withdrawAmount, crs.decimals)
+          : FixedDecimal.FromBigInt(withdrawVoteLog.withdrawAmount, crs.decimals);
+      }
+    }
+
+    return summary;
+  }
+
+  private async _buildCreateOrCompleteSummary(summary: IVaultProposalTransactionSummary, createOrCompleteEvents: IReceiptLogs[]): Promise<IVaultProposalTransactionSummary> {
+    if (createOrCompleteEvents.length > 0) {
+      const createEvent = createOrCompleteEvents.find(event => event.log.event === TransactionLogTypes.CreateVaultProposalLog);
+      const completeEvent = createOrCompleteEvents.find(event => event.log.event === TransactionLogTypes.CompleteVaultProposalLog);
+      const createLog = createEvent ? <ICreateVaultProposalLog>createEvent.log.data : undefined;
+      const completeLog = completeEvent ? <ICompleteVaultProposalLog>completeEvent.log.data : undefined;
+
+      const vault = await this._vaultService.getVault();
+      const token = await this._tokenService.getToken(vault.token);
+
+      summary.vault = vault
+      summary.vaultToken = token;
+      summary.createOrComplete = { approved: null };
+
+      if (summary.proposal?.type === 'Create' || createLog?.type === ProposalType.Create) summary.createOrComplete.type = 'New Certificate';
+      else if (summary.proposal?.type === 'Revoke' || createLog?.type === ProposalType.Revoke) summary.createOrComplete.type = 'Revoke Certificate';
+      else if (summary.proposal?.type === 'TotalPledgeMinimum' || createLog?.type === ProposalType.TotalPledgeMinimum) summary.createOrComplete.type = 'Pledge Change';
+      else if (summary.proposal?.type === 'TotalVoteMinimum' || createLog?.type === ProposalType.TotalVoteMinimum) summary.createOrComplete.type = 'Vote Change';
+
+      if (completeLog) summary.createOrComplete.approved = completeLog.approved;
+    }
+
+    return summary;
+  }
 
   /////////////////////////////////////////
   // Wallet Export Summaries
@@ -358,7 +574,6 @@ export class TransactionsService {
 
     return data;
   }
-
 
   /////////////////////////////////////////
   // Helpers

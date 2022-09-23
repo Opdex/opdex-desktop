@@ -1,17 +1,19 @@
 <ng-container *ngIf="!loading; else loader">
-  <div class="w-100 flex-row-center" *ngIf="tokenInAmount && tokenOutAmount && tokenIn && tokenOut && !error">
+  <div class="w-100 flex-row-center" *ngIf="summary.tokenInAmount && summary.tokenOutAmount && summary.tokenIn && summary.tokenOut && !summary.error">
     <div class="col no-wrap flex-shrink">
-      <opdex-number class="mr-2" [value]="tokenInAmount" prefix="-" [short]="true" [stopPropagation]="true"></opdex-number>
-      <a class="no-decoration" routerLink="/tokens/{{tokenIn.address}}">{{tokenIn.symbol}}</a>
+      <opdex-number class="mr-2" [value]="summary.tokenInAmount" prefix="-" [short]="true" [stopPropagation]="true"></opdex-number>
+      <a class="no-decoration" routerLink="/tokens/{{summary.tokenIn.address}}">{{summary.tokenIn.symbol}}</a>
     </div>
 
     <div class="col no-wrap">
-      <opdex-number class="mr-2" [value]="tokenOutAmount" prefix="+" [short]="true" [stopPropagation]="true"></opdex-number>
-      <a class="no-decoration" routerLink="/tokens/{{tokenOut.address}}">{{tokenOut.symbol}}</a>
+      <opdex-number class="mr-2" [value]="summary.tokenOutAmount" prefix="+" [short]="true" [stopPropagation]="true"></opdex-number>
+      <a class="no-decoration" routerLink="/tokens/{{summary.tokenOut.address}}">{{summary.tokenOut.symbol}}</a>
     </div>
   </div>
 
-  <div class="col" *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>
