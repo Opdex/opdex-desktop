@@ -21,6 +21,7 @@ import { IEnableMiningTransactionSummary, IStakeTransactionSummary, ISwapTransac
 import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICollectStakingRewardsLog, ICompleteVaultProposalLog, ICreateLiquidityPoolLog, ICreateVaultProposalLog,
   IDistributionLog, IMintLog, IRedeemVaultCertificateLog, IRewardMiningPoolLog, IStartMiningLog, IStartStakingLog, IStopMiningLog, IStopStakingLog, ISwapLog,
   ITransferLog, IVaultProposalPledgeLog, IVaultProposalVoteLog, IVaultProposalWithdrawPledgeLog, IVaultProposalWithdrawVoteLog } from '@interfaces/contract-logs.interface';
+import { IPriceHistory } from '@interfaces/coin-gecko.interface';
 
 @Injectable({providedIn: 'root'})
 export class TransactionsService {
@@ -506,74 +507,114 @@ export class TransactionsService {
   /////////////////////////////////////////
   // Wallet Export Summaries
   /////////////////////////////////////////
-  public async getCsvSummary(tx: TransactionReceipt): Promise<CsvData> {
-    if (tx.transactionType.title === 'Allowance') return await this.getAllowanceCsvSummary(tx);
-    else if (tx.transactionType.title === 'Provide') return null;
-    else if (tx.transactionType.title === 'Stake') return null;
-    else if (tx.transactionType.title === 'Mine') return null;
-    else if (tx.transactionType.title === 'Vault Certificate') return null;
-    else if (tx.transactionType.title === 'Ownership') return null;
-    else if (tx.transactionType.title === 'Swap') return null;
-    else if (tx.transactionType.title === 'Create Pool') return this.getCreatePoolCsvSummary(tx);
-    else if (tx.transactionType.title === 'Enable Mining') return null;
-    else if (tx.transactionType.title === 'Distribute') return null;
-    else if (tx.transactionType.title === 'Vault Proposal') return null;
-    else if (tx.transactionType.title === 'Transfer') return null;
-    // else if (tx.transactionSummary === 'Permissions') return null;
-    else return null;
+  public async getCsvSummaries(txs: TransactionReceipt[], history: IPriceHistory[]): Promise<CsvData[]> {
+    let csvData: CsvData[] = [];
+
+    for (let i = 0; i < txs.length; i++) {
+      const tx = txs[i];
+
+      const crsPrice = history.find(history => {
+        const priceDate = new Date(history.date);
+        const txDate = new Date(tx.block.time);
+        priceDate.setHours(0,0,0,0);
+        txDate.setHours(0,0,0,0);
+        return priceDate.getTime() === txDate.getTime();
+      });
+
+      const csv = await this._getCsvSummary(tx, crsPrice.price);
+
+      // concat is generally more performant than csvData.push(...csv);
+      csvData = csvData.concat(csv);
+    }
+
+    return csvData;
   }
 
-  public async getAllowanceCsvSummary(tx: TransactionReceipt): Promise<CsvData> {
-    // const summary = await this.getAllowanceTransactionSummary(tx);
-    const crsPrice = await this._coinGecko.getHistoricalPrice(tx.block.time);
-    // Todo: Get CRS cost at block time
+  private async _getCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+    if (tx.transactionType?.title === 'Allowance') return this._getGeneralCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Provide') return [];
+    else if (tx.transactionType?.title === 'Stake') return [];
+    else if (tx.transactionType?.title === 'Mine') return [];
+    else if (tx.transactionType?.title === 'Vault Certificate') return [];
+    else if (tx.transactionType?.title === 'Ownership') return this._getGeneralCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Swap') return await this._getSwapCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Create Pool') return this._getGeneralCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Enable Mining') return this._getGeneralCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Distribute') return this._getGeneralCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Vault Proposal') return [];
+    else if (tx.transactionType?.title === 'Transfer') return await this._getTransferCsvSummary(tx, crsPrice);
+    else if (tx.transactionType?.title === 'Permissions') return this._getGeneralCsvSummary(tx, crsPrice);
+    else return this._getGeneralCsvSummary(tx, crsPrice);
+  }
 
-    let data: CsvData = {
+  private _getGeneralCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): CsvData[] {
+    return [{
       transactionHash: tx.hash,
       transactionEventNumber: 0,
       blockNumber: tx.block.height,
       blockTime: this._getUtcDate(tx.block.time),
-      account: 'Opdex',
+      account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
       gasFeeCrs: tx.gasCost.formattedValue,
-      gasFeeFiat: 0,
-      transactionType: tx.transactionSummary,
-      // Todo: Rip nulls
-      amountSpent: null,
-      tokenSpent: null,
-      totalFiatSpent: null,
-      amountReceived: null,
-      tokenReceived: null,
-      totalFiatReceived: null
-    };
+      gasFeeFiat: tx.gasCost.multiply(crsPrice).formattedValue,
+      transactionType: tx.transactionSummary
+    }];
+  }
+
+  private async _getTransferCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+    const summary = await this.getTransferTransactionSummary(tx);
+    const data = this._getGeneralCsvSummary(tx, crsPrice);
+
+    if (!summary.error) {
+      data[0].amountSpent = summary.transferAmount.formattedValue;
+      data[0].tokenSpent = summary.token.symbol;
+      // Todo: Get token fiat amount
+      data[0].totalFiatSpent = '0';
+    }
 
     return data;
   }
 
-  public async getCreatePoolCsvSummary(tx: TransactionReceipt): Promise<CsvData> {
-    // const summary = await this.getAllowanceTransactionSummary(tx);
-    const crsPrice = await this._coinGecko.getHistoricalPrice(tx.block.time);
-    // Todo: Get CRS cost at block time
+  private async _getSwapCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+    const summary = await this.getSwapTransactionSummary(tx);
+    const data = this._getGeneralCsvSummary(tx, crsPrice);
 
-    let data: CsvData = {
-      transactionHash: tx.hash,
-      transactionEventNumber: 0,
-      blockNumber: tx.block.height,
-      blockTime: this._getUtcDate(tx.block.time),
-      account: 'Opdex',
-      gasFeeCrs: tx.gasCost.formattedValue,
-      gasFeeFiat: 0,
-      transactionType: tx.transactionSummary,
-      // Todo: Rip nulls
-      amountSpent: null,
-      tokenSpent: null,
-      totalFiatSpent: null,
-      amountReceived: null,
-      tokenReceived: null,
-      totalFiatReceived: null
-    };
+    if (!summary.error) {
+      data[0].amountSpent = summary.tokenInAmount.formattedValue
+      data[0].tokenSpent = summary.tokenIn.symbol;
+      // Todo: Get spent fiat amount
+      data[0].totalFiatSpent = '0';
+      data[0].amountReceived = summary.tokenOutAmount.formattedValue
+      data[0].tokenReceived = summary.tokenOut.symbol;
+      // Todo: Get received fiat amount
+      data[0].totalFiatReceived = '0';
+    }
 
     return data;
   }
+
+  // public async getAllowanceCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+  //   const data = this.getGeneralCsvSummary(tx, crsPrice);
+
+  //   let data: CsvData = {
+  //     transactionHash: tx.hash,
+  //     transactionEventNumber: 0,
+  //     blockNumber: tx.block.height,
+  //     blockTime: this._getUtcDate(tx.block.time),
+  //     account: 'Opdex',
+  //     gasFeeCrs: tx.gasCost.formattedValue,
+  //     gasFeeFiat: tx.gasCost.multiply(crsPrice).formattedValue,
+  //     transactionType: tx.transactionSummary,
+  //     // Todo: Rip nulls
+  //     amountSpent: null,
+  //     tokenSpent: null,
+  //     totalFiatSpent: null,
+  //     amountReceived: null,
+  //     tokenReceived: null,
+  //     totalFiatReceived: null
+  //   };
+
+  //   return [data];
+  // }
 
   /////////////////////////////////////////
   // Helpers

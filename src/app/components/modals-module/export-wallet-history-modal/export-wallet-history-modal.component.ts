@@ -1,11 +1,14 @@
+import { TransactionsService } from '@services/platform/transactions.service';
+import { CoinGeckoApiService } from '@services/api/coin-gecko-api.service';
 import { Icons } from '@enums/icons';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
 import { UserContextService } from '@services/utility/user-context.service';
 import { UserContext } from '@models/user-context';
 import { WalletService } from '@services/platform/wallet.service';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { Component, OnDestroy } from '@angular/core';
 import { saveAs } from 'file-saver';
+import { Currencies } from '@enums/currencies';
 
 const CsvColumns = [
   { header: 'Transaction Hash', property: 'transactionHash' },
@@ -31,7 +34,7 @@ export type CsvData = {
   blockTime: string;
   account: 'Cirrus' | 'Opdex';
   gasFeeCrs: string;
-  gasFeeFiat: number;
+  gasFeeFiat: string;
   transactionType: string;
   amountSpent?: string;
   tokenSpent?: string;
@@ -55,7 +58,9 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
 
   constructor(
     private _walletService: WalletService,
-    private _contextService: UserContextService
+    private _contextService: UserContextService,
+    private _coinGeckoService: CoinGeckoApiService,
+    private _transactionService: TransactionsService
   ) {
     this.subscription.add(
       this._contextService.context$
@@ -77,14 +82,12 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
       if (transactions.length < take) break;
     }
 
+    const priceHistory = await firstValueFrom(this._coinGeckoService.getPriceHistory(Currencies.USD));
+    const csvData = await this._transactionService.getCsvSummaries(txs, priceHistory);
+    console.log(priceHistory);
     console.log(txs);
 
-    // Todo: For each tx
-    // -------- Get Tx summary data (from feed)
-    // -------- Get CsvData
-
-    // Todo: pass in CsvData
-    this._formatCsv(txs);
+    this._formatCsv(csvData);
     this.save();
     this.inProgress = false;
   }
@@ -94,63 +97,15 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
     saveAs(this.blob, 'Wallet History');
   }
 
-  private _formatCsv(txs: TransactionReceipt[]): void {
+  private _formatCsv(data: CsvData[]): void {
     const headers = CsvColumns.map(col => col.header).join(',') + '\n';
-
-    const data = txs.map(tx => {
-      return CsvColumns.map(col => {
-        const { header, property } = col;
-        // transactionHash
-        if (header === CsvColumns[0].header) return tx.hash
-        // transactionEventNumber
-        else if (header === CsvColumns[1].header) return '0';
-        // blockNumber
-        else if (header === CsvColumns[2].header) return tx.block.height;
-        // blockTime
-        else if (header === CsvColumns[3].header) return this._getUtcDate(tx.block.time)
-        // account
-        else if (header === CsvColumns[4].header) return tx.isOpdexTx ? 'Opdex' : 'Cirrus';
-        // gasFeeCrs
-        // If eventNo !== 0 then set to 0, first event only has gas fee
-        else if (header === CsvColumns[5].header) return tx.gasCost.formattedValue;
-        // gasFeeFiat
-        // If eventNo !== 0 then set to 0, first event only has gas fee
-        else if (header === CsvColumns[6].header) return ''
-        // transactionType
-        else if (header === CsvColumns[7].header) return tx.transactionSummary;
-        // amountSpent
-        else if (header === CsvColumns[8].header) return ''
-        // tokenSpent
-        else if (header === CsvColumns[9].header) return ''
-        // totalFiatSpent
-        else if (header === CsvColumns[10].header) return ''
-        // amountReceived
-        else if (header === CsvColumns[11].header) return ''
-        // tokenReceived
-        else if (header === CsvColumns[12].header) return ''
-        // totalFiatReceived
-        else if (header === CsvColumns[13].header) return ''
-        // Default - Shouldn't happen
-        else return '';
-      }).join(',');
+    const csvData = data.map(summary => {
+      return CsvColumns
+        .map(col => summary[col.property])
+        .join(',');
     }).join('\n');
 
-    this.blob = new Blob([headers + data], { type: 'text/csv'});
-  }
-
-  private _getUtcDate(time: Date): string {
-    // Returned as YYYY-MM-DD HH:mm:ss Z
-    const year = time.getUTCFullYear();
-    const month = this._padTo2Digits(time.getUTCMonth());
-    const day = this._padTo2Digits(time.getUTCDate());
-    const hours = this._padTo2Digits(time.getUTCHours());
-    const minutes = this._padTo2Digits(time.getUTCMinutes());
-    const seconds = this._padTo2Digits(time.getUTCSeconds());
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} Z`;
-  }
-
-  private _padTo2Digits(num: number): string {
-    return num.toString().padStart(2, '0');
+    this.blob = new Blob([headers + csvData], { type: 'text/csv'});
   }
 
   ngOnDestroy(): void {
