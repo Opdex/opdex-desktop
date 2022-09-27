@@ -10,6 +10,7 @@ abstract class CallRequestBase {
   amount: string;
   gasPrice: number;
   gasLimit: number;
+  blockHeight: number;
 
   constructor(
     contractAddress: string,
@@ -17,8 +18,9 @@ abstract class CallRequestBase {
     sender: string,
     parameters: Parameter[] = [],
     amount: string = '0',
+    blockHeight: number = undefined,
     gasLimit: number = 250000,
-    gasPrice: number = 100
+    gasPrice: number = 100,
   ) {
     this.contractAddress = contractAddress;
     this.methodName = methodName;
@@ -27,6 +29,7 @@ abstract class CallRequestBase {
     this.amount = amount;
     this.gasLimit = gasLimit;
     this.gasPrice = gasPrice;
+    this.blockHeight = blockHeight;
   }
 }
 
@@ -73,9 +76,10 @@ export class LocalCallRequest extends CallRequestBase {
     methodName: string,
     sender: string,
     parameters: Parameter[] = [],
-    amount = '0'
+    amount = '0',
+    blockHeight = undefined
   ) {
-    super(contractAddress, methodName, sender, parameters, amount);
+    super(contractAddress, methodName, sender, parameters, amount, blockHeight);
   }
 
   public get cacheKey(): string {
@@ -83,6 +87,7 @@ export class LocalCallRequest extends CallRequestBase {
     key += `-${this.methodName}`;
     key += `-${this.sender}`;
     key += `-${this.amount}`;
+    key += `-${this.blockHeight}`
 
     this.parameters.forEach(param => key += param.result);
 
@@ -97,7 +102,8 @@ export class LocalCallRequest extends CallRequestBase {
       parameters: this.parameters.map(param => param.result),
       amount: this.amount,
       gasPrice: this.gasPrice,
-      gasLimit: this.gasLimit
+      gasLimit: this.gasLimit,
+      blockHeight: this.blockHeight
     }
   }
 

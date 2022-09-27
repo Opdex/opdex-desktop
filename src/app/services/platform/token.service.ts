@@ -386,6 +386,34 @@ export class TokenService {
     }
   }
 
+  public async getHistoricalTokenPricing(block: number, crsPrice: FixedDecimal, token: Token): Promise<FixedDecimal> {
+    let price = FixedDecimal.Zero(8);
+
+    if (token.isCrs) return crsPrice;
+
+    const pool = await firstValueFrom(this._liquidityPoolRepository.getPoolBySrcAddress(token.address)) ||
+                 await firstValueFrom(this._liquidityPoolRepository.getPoolByAddress(token.address));
+
+    const reservesRequest = new LocalCallRequest(pool.address, 'get_Reserves', pool.address, [], '0', block);
+    const reservesResponse = await firstValueFrom(this._cirrusApi.localCall(reservesRequest));
+    const reserveCrs = !!reservesResponse.return ? new FixedDecimal(reservesResponse.return[0], 8) : FixedDecimal.Zero(8);
+    const reserveSrc = !!reservesResponse.return ? new FixedDecimal(reservesResponse.return[1], token.decimals) : FixedDecimal.Zero(token.decimals);
+
+
+    if /* LP Token */ (pool.address === token.address) {
+      const totalSupplyRequest = new LocalCallRequest(pool.address, 'get_TotalSupply', pool.address, [], '0', block);
+      const totalSupplyResponse = await firstValueFrom(this._cirrusApi.localCall(totalSupplyRequest));
+      const totalSupply = new FixedDecimal(totalSupplyResponse.return, 8);
+      price = crsPrice.multiply(reserveCrs).multiply(new FixedDecimal('2', 8)).divide(totalSupply);
+    }
+    else /* SRC Token */ {
+      const crsPerSrc = reserveCrs.divide(reserveSrc);
+      price = crsPrice.multiply(crsPerSrc);
+    }
+
+    return price;
+  }
+
   private async _getStorageFixedDecimal(address: string, stateKey: string, parameterType: ParameterType, decimals: number): Promise<FixedDecimal> {
     const call = this._cirrusApi.getContractStorageItem(address, stateKey, parameterType).pipe(catchError(_ => of('0')));
     const response = await firstValueFrom(call);

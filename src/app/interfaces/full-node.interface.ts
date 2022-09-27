@@ -6,6 +6,7 @@ export interface ILocalCallRequest {
   amount: string;
   gasPrice: number;
   gasLimit: number;
+  blockHeight?: number;
 }
 
 export interface ICallRequest extends ILocalCallRequest {

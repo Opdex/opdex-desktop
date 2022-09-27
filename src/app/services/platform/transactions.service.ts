@@ -22,6 +22,7 @@ import { IApprovalLog, IBurnLog, ICollectMiningRewardsLog, ICollectStakingReward
   IDistributionLog, IMintLog, IRedeemVaultCertificateLog, IRewardMiningPoolLog, IStartMiningLog, IStartStakingLog, IStopMiningLog, IStopStakingLog, ISwapLog,
   ITransferLog, IVaultProposalPledgeLog, IVaultProposalVoteLog, IVaultProposalWithdrawPledgeLog, IVaultProposalWithdrawVoteLog } from '@interfaces/contract-logs.interface';
 import { IPriceHistory } from '@interfaces/coin-gecko.interface';
+import { Token } from '@models/platform/token';
 
 @Injectable({providedIn: 'root'})
 export class TransactionsService {
@@ -532,9 +533,9 @@ export class TransactionsService {
 
   private async _getCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
     if (tx.transactionType?.title === 'Allowance') return this._getGeneralCsvSummary(tx, crsPrice);
-    else if (tx.transactionType?.title === 'Provide') return [];
+    else if (tx.transactionType?.title === 'Provide') return await this._getProvidingCsvSummary(tx, crsPrice);
     else if (tx.transactionType?.title === 'Stake') return [];
-    else if (tx.transactionType?.title === 'Mine') return [];
+    else if (tx.transactionType?.title === 'Mine') return await this._getMiningCsvSummary(tx, crsPrice);
     else if (tx.transactionType?.title === 'Vault Certificate') return [];
     else if (tx.transactionType?.title === 'Ownership') return this._getGeneralCsvSummary(tx, crsPrice);
     else if (tx.transactionType?.title === 'Swap') return await this._getSwapCsvSummary(tx, crsPrice);
@@ -564,12 +565,11 @@ export class TransactionsService {
     const summary = await this.getTransferTransactionSummary(tx);
     const data = this._getGeneralCsvSummary(tx, crsPrice);
 
-    if (!summary.error) {
-      data[0].amountSpent = summary.transferAmount.formattedValue;
-      data[0].tokenSpent = summary.token.symbol;
-      // Todo: Get token fiat amount
-      data[0].totalFiatSpent = '0';
-    }
+    if (!!summary.error) return data;
+
+    data[0].amountSpent = summary.transferAmount.formattedValue;
+    data[0].tokenSpent = summary.token.symbol;
+    data[0].totalFiatSpent = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.token, summary.transferAmount)).formattedValue;
 
     return data;
   }
@@ -578,47 +578,120 @@ export class TransactionsService {
     const summary = await this.getSwapTransactionSummary(tx);
     const data = this._getGeneralCsvSummary(tx, crsPrice);
 
-    if (!summary.error) {
-      data[0].amountSpent = summary.tokenInAmount.formattedValue
-      data[0].tokenSpent = summary.tokenIn.symbol;
-      // Todo: Get spent fiat amount
-      data[0].totalFiatSpent = '0';
-      data[0].amountReceived = summary.tokenOutAmount.formattedValue
-      data[0].tokenReceived = summary.tokenOut.symbol;
-      // Todo: Get received fiat amount
-      data[0].totalFiatReceived = '0';
+    if (!!summary.error) return data;
+
+    data[0].amountSpent = summary.tokenInAmount.formattedValue
+    data[0].tokenSpent = summary.tokenIn.symbol;
+    data[0].totalFiatSpent = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenIn, summary.tokenInAmount)).formattedValue;
+    data[0].amountReceived = summary.tokenOutAmount.formattedValue
+    data[0].tokenReceived = summary.tokenOut.symbol;
+    data[0].totalFiatReceived = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenOut, summary.tokenOutAmount)).formattedValue;
+
+    return data;
+  }
+
+  private async _getMiningCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+    const summary = await this.getMineTransactionSummary(tx);
+    const data = this._getGeneralCsvSummary(tx, crsPrice);
+
+    if (!!summary.error) return data;
+
+    // Started Mining
+    if (summary.isAddition) {
+      data[0].amountSpent = summary.lptAmount.formattedValue
+      data[0].tokenSpent = summary.pool.lpToken.symbol;
+      data[0].totalFiatSpent = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount)).formattedValue;
+    }
+    // Stopped || Collected
+    else {
+      if (!summary.lptAmount.isZero) {
+        data[0].transactionType = 'Stop Mining';
+        data[0].amountReceived = summary.lptAmount.formattedValue;
+        data[0].tokenReceived = summary.pool.lpToken.symbol;
+        data[0].totalFiatReceived = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount)).formattedValue;
+      } else if (!summary.collectAmount.isZero) {
+        data[0].transactionType = 'Collect Mining Rewards';
+        data[0].amountReceived = summary.collectAmount.formattedValue;
+        data[0].tokenReceived = summary.pool.stakingToken.symbol;
+        data[0].totalFiatReceived = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount)).formattedValue;
+      }
+
+      // Collected ODX
+      if (!summary.lptAmount.isZero && !summary.collectAmount.isZero) {
+        data.push({
+          transactionHash: tx.hash,
+          transactionEventNumber: 1,
+          blockNumber: tx.block.height,
+          blockTime: this._getUtcDate(tx.block.time),
+          account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
+          gasFeeCrs: '0',
+          gasFeeFiat: '0',
+          transactionType: 'Collect Mining Rewards',
+          amountReceived: summary.collectAmount.formattedValue,
+          tokenReceived: summary.pool.stakingToken.symbol,
+          totalFiatReceived: (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount)).formattedValue
+        })
+      }
     }
 
     return data;
   }
 
-  // public async getAllowanceCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
-  //   const data = this.getGeneralCsvSummary(tx, crsPrice);
+  private async _getProvidingCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal): Promise<CsvData[]> {
+    const summary = await this.getProvideTransactionSummary(tx);
+    const data = this._getGeneralCsvSummary(tx, crsPrice);
 
-  //   let data: CsvData = {
-  //     transactionHash: tx.hash,
-  //     transactionEventNumber: 0,
-  //     blockNumber: tx.block.height,
-  //     blockTime: this._getUtcDate(tx.block.time),
-  //     account: 'Opdex',
-  //     gasFeeCrs: tx.gasCost.formattedValue,
-  //     gasFeeFiat: tx.gasCost.multiply(crsPrice).formattedValue,
-  //     transactionType: tx.transactionSummary,
-  //     // Todo: Rip nulls
-  //     amountSpent: null,
-  //     tokenSpent: null,
-  //     totalFiatSpent: null,
-  //     amountReceived: null,
-  //     tokenReceived: null,
-  //     totalFiatReceived: null
-  //   };
+    if (!!summary.error) return data;
 
-  //   return [data];
-  // }
+    if (summary.isAddition) {
+      // Input CRS
+      data[0].amountSpent = summary.crsAmount.formattedValue
+      data[0].tokenSpent = summary.pool.crsToken.symbol;
+      data[0].totalFiatSpent = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount)).formattedValue;
+      // Output OLPT
+      data[0].amountReceived = summary.lptAmount.formattedValue
+      data[0].tokenReceived = summary.pool.lpToken.symbol;
+      data[0].totalFiatReceived = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount)).formattedValue;
+    } else {
+      // Input OLPT
+      data[0].amountSpent = summary.lptAmount.formattedValue
+      data[0].tokenSpent = summary.pool.lpToken.symbol;
+      data[0].totalFiatSpent = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount)).formattedValue;
+      // Output CRS
+      data[0].amountReceived = summary.crsAmount.formattedValue
+      data[0].tokenReceived = summary.pool.crsToken.symbol;
+      data[0].totalFiatReceived = (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount)).formattedValue;
+    }
+
+    // summary.isAddition ? inputSRC : outputSrc
+    data.push({
+      transactionHash: tx.hash,
+      transactionEventNumber: 1,
+      blockNumber: tx.block.height,
+      blockTime: this._getUtcDate(tx.block.time),
+      account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
+      gasFeeCrs: '0',
+      gasFeeFiat: '0',
+      transactionType: tx.transactionSummary,
+      amountReceived: summary.isAddition ? null : summary.srcAmount.formattedValue,
+      tokenReceived:  summary.isAddition ? null : summary.pool.srcToken.symbol,
+      totalFiatReceived: summary.isAddition ? null : (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount)).formattedValue,
+      amountSpent: summary.isAddition ? summary.srcAmount.formattedValue : null,
+      tokenSpent: summary.isAddition ? summary.pool.srcToken.symbol : null,
+      totalFiatSpent: summary.isAddition ? (await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount)).formattedValue : null
+    });
+
+    return data;
+  }
 
   /////////////////////////////////////////
   // Helpers
   /////////////////////////////////////////
+  private async _getHistoricalTokenPrice(block: number, crsPrice: FixedDecimal, token: Token, amount: FixedDecimal): Promise<FixedDecimal> {
+    const srcPrice = await this._tokenService.getHistoricalTokenPricing(block, crsPrice, token);
+    return srcPrice.multiply(amount);
+  }
+
   // Todo: Maybe use .toISOString and remove 'T' and milliseconds
   private _getUtcDate(time: Date): string {
     // Returned as YYYY-MM-DD HH:mm:ss Z
