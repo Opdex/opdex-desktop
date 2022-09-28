@@ -1,3 +1,4 @@
+import { CurrencyService } from '@services/platform/currency.service';
 import { TransactionsService } from '@services/platform/transactions.service';
 import { CoinGeckoApiService } from '@services/api/coin-gecko-api.service';
 import { Icons } from '@enums/icons';
@@ -8,7 +9,6 @@ import { WalletService } from '@services/platform/wallet.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { Component, OnDestroy } from '@angular/core';
 import { saveAs } from 'file-saver';
-import { Currencies } from '@enums/currencies';
 
 const CsvColumns = [
   { header: 'Transaction Hash', property: 'transactionHash' },
@@ -19,6 +19,7 @@ const CsvColumns = [
   { header: 'Gas Fee (CRS)', property: 'gasFeeCrs' },
   { header: 'Gas Fee (Fiat)', property: 'gasFeeFiat' },
   { header: 'Transaction Type', property: 'transactionType' },
+  { header: 'Fiat Currency', property: 'currency' },
   { header: 'Amount Spent', property: 'amountSpent' },
   { header: 'Token Spent', property: 'tokenSpent' },
   { header: 'Total Fiat Spent', property: 'totalFiatSpent' },
@@ -36,6 +37,7 @@ export type CsvData = {
   gasFeeCrs: string;
   gasFeeFiat: string;
   transactionType: string;
+  currency: string;
   amountSpent?: string;
   tokenSpent?: string;
   totalFiatSpent?: string;
@@ -60,7 +62,8 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
     private _walletService: WalletService,
     private _contextService: UserContextService,
     private _coinGeckoService: CoinGeckoApiService,
-    private _transactionService: TransactionsService
+    private _transactionService: TransactionsService,
+    private _currencyService: CurrencyService
   ) {
     this.subscription.add(
       this._contextService.context$
@@ -82,10 +85,9 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
       if (transactions.length < take) break;
     }
 
-    const priceHistory = await firstValueFrom(this._coinGeckoService.getPriceHistory(Currencies.USD));
-    const csvData = await this._transactionService.getCsvSummaries(txs, priceHistory);
-    console.log(priceHistory);
-    console.log(txs);
+    const currency = this._currencyService.selectedCurrency.abbreviation;
+    const priceHistory = await firstValueFrom(this._coinGeckoService.getPriceHistory(currency));
+    const csvData = await this._transactionService.getCsvSummaries(txs, priceHistory, currency);
 
     this._formatCsv(csvData);
     this.save();

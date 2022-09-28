@@ -396,14 +396,14 @@ export class TokenService {
 
     const reservesRequest = new LocalCallRequest(pool.address, 'get_Reserves', pool.address, [], '0', block);
     const reservesResponse = await firstValueFrom(this._cirrusApi.localCall(reservesRequest));
-    const reserveCrs = !!reservesResponse.return ? new FixedDecimal(reservesResponse.return[0], 8) : FixedDecimal.Zero(8);
-    const reserveSrc = !!reservesResponse.return ? new FixedDecimal(reservesResponse.return[1], token.decimals) : FixedDecimal.Zero(token.decimals);
+    const reserveCrs = !!reservesResponse.return ? FixedDecimal.FromBigInt(reservesResponse.return[0], 8) : FixedDecimal.Zero(8);
+    const reserveSrc = !!reservesResponse.return ? FixedDecimal.FromBigInt(reservesResponse.return[1], token.decimals) : FixedDecimal.Zero(token.decimals);
 
 
     if /* LP Token */ (pool.address === token.address) {
       const totalSupplyRequest = new LocalCallRequest(pool.address, 'get_TotalSupply', pool.address, [], '0', block);
       const totalSupplyResponse = await firstValueFrom(this._cirrusApi.localCall(totalSupplyRequest));
-      const totalSupply = new FixedDecimal(totalSupplyResponse.return, 8);
+      const totalSupply = FixedDecimal.FromBigInt(totalSupplyResponse.return, 8);
       price = crsPrice.multiply(reserveCrs).multiply(new FixedDecimal('2', 8)).divide(totalSupply);
     }
     else /* SRC Token */ {
