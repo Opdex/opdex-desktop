@@ -1,5 +1,5 @@
+import { WalletExportService } from '@services/platform/wallet-export-service';
 import { CurrencyService } from '@services/platform/currency.service';
-import { TransactionsService } from '@services/platform/transactions.service';
 import { CoinGeckoApiService } from '@services/api/coin-gecko-api.service';
 import { Icons } from '@enums/icons';
 import { TransactionReceipt } from '@models/platform/transactionReceipt';
@@ -9,42 +9,8 @@ import { WalletService } from '@services/platform/wallet.service';
 import { Subscription, firstValueFrom } from 'rxjs';
 import { Component, OnDestroy } from '@angular/core';
 import { saveAs } from 'file-saver';
-
-const CsvColumns = [
-  { header: 'Transaction Hash', property: 'transactionHash' },
-  { header: 'Transaction Event No.', property: 'transactionEventNumber' },
-  { header: 'Block Number', property: 'blockNumber' },
-  { header: 'Block Time', property: 'blockTime' },
-  { header: 'Account', property: 'account' },
-  { header: 'Gas Fee (CRS)', property: 'gasFeeCrs' },
-  { header: 'Gas Fee (Fiat)', property: 'gasFeeFiat' },
-  { header: 'Transaction Type', property: 'transactionType' },
-  { header: 'Fiat Currency', property: 'currency' },
-  { header: 'Amount Spent', property: 'amountSpent' },
-  { header: 'Token Spent', property: 'tokenSpent' },
-  { header: 'Total Fiat Spent', property: 'totalFiatSpent' },
-  { header: 'Amount Received', property: 'amountReceived' },
-  { header: 'Token Received', property: 'tokenReceived' },
-  { header: 'Total Fiat Received', property: 'totalFiatReceived' },
-];
-
-export type CsvData = {
-  transactionHash: string;
-  transactionEventNumber: number;
-  blockNumber: number;
-  blockTime: string;
-  account: 'Cirrus' | 'Opdex';
-  gasFeeCrs: string;
-  gasFeeFiat: string;
-  transactionType: string;
-  currency: string;
-  amountSpent?: string;
-  tokenSpent?: string;
-  totalFiatSpent?: string;
-  amountReceived?: string;
-  tokenReceived?: string;
-  totalFiatReceived?: string;
-}
+import { CsvColumns } from '@lookups/wallet-export-csv-columns.lookup';
+import { CsvData } from '@models/platform/wallet-export-csv-data';
 
 @Component({
   selector: 'opdex-export-wallet-history-modal',
@@ -62,8 +28,8 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
     private _walletService: WalletService,
     private _contextService: UserContextService,
     private _coinGeckoService: CoinGeckoApiService,
-    private _transactionService: TransactionsService,
-    private _currencyService: CurrencyService
+    private _currencyService: CurrencyService,
+    private _walletExportService: WalletExportService
   ) {
     this.subscription.add(
       this._contextService.context$
@@ -87,7 +53,7 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
 
     const currency = this._currencyService.selectedCurrency.abbreviation;
     const priceHistory = await firstValueFrom(this._coinGeckoService.getPriceHistory(currency));
-    const csvData = await this._transactionService.getCsvSummaries(txs, priceHistory, currency);
+    const csvData = await this._walletExportService.getCsvSummaries(txs, priceHistory, currency);
 
     this._formatCsv(csvData);
     this.save();
