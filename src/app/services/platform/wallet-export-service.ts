@@ -58,7 +58,7 @@ export class WalletExportService {
   private _getGeneralCsvSummary(tx: TransactionReceipt, crsPrice: FixedDecimal, currency: Currencies): CsvData[] {
     return [{
       transactionHash: tx.hash,
-      transactionEventNumber: 0,
+      transactionEventNumber: 1,
       blockNumber: tx.block.height,
       blockTime: this._getUtcDate(tx.block.time),
       account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
@@ -77,7 +77,7 @@ export class WalletExportService {
 
     data[0].amountSpent = summary.transferAmount.formattedValue;
     data[0].tokenSpent = summary.token.symbol;
-    data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.token, summary.transferAmount);
+    data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.token, summary.transferAmount);
 
     return data;
   }
@@ -90,10 +90,10 @@ export class WalletExportService {
 
     data[0].amountSpent = summary.tokenInAmount.formattedValue
     data[0].tokenSpent = summary.tokenIn.symbol;
-    data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenIn, summary.tokenInAmount);
+    data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenIn, summary.tokenInAmount);
     data[0].amountReceived = summary.tokenOutAmount.formattedValue
     data[0].tokenReceived = summary.tokenOut.symbol;
-    data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenOut, summary.tokenOutAmount);
+    data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.tokenOut, summary.tokenOutAmount);
 
     return data;
   }
@@ -108,7 +108,7 @@ export class WalletExportService {
     if (summary.isAddition) {
       data[0].amountSpent = summary.lptAmount.formattedValue
       data[0].tokenSpent = summary.pool.lpToken.symbol;
-      data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
+      data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
     }
     // Stopped || Collected
     else {
@@ -116,19 +116,19 @@ export class WalletExportService {
         data[0].transactionType = 'Stop Mining';
         data[0].amountReceived = summary.lptAmount.formattedValue;
         data[0].tokenReceived = summary.pool.lpToken.symbol;
-        data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
+        data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
       } else if (!!summary.collectAmount && !summary.collectAmount.isZero) {
         data[0].transactionType = 'Collect Mining Rewards';
         data[0].amountReceived = summary.collectAmount.formattedValue;
         data[0].tokenReceived = summary.pool.stakingToken.symbol;
-        data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount);
+        data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount);
       }
 
       // Collected ODX
       if ((!!summary.lptAmount && !summary.lptAmount.isZero) && (!!summary.collectAmount && !summary.collectAmount.isZero)) {
         data.push({
           transactionHash: tx.hash,
-          transactionEventNumber: 1,
+          transactionEventNumber: 2,
           blockNumber: tx.block.height,
           blockTime: this._getUtcDate(tx.block.time),
           account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
@@ -138,7 +138,7 @@ export class WalletExportService {
           currency: currency.toUpperCase(),
           amountReceived: summary.collectAmount.formattedValue,
           tokenReceived: summary.pool.stakingToken.symbol,
-          totalFiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount)
+          fiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.collectAmount)
         })
       }
     }
@@ -156,26 +156,26 @@ export class WalletExportService {
       // Input CRS
       data[0].amountSpent = summary.crsAmount.formattedValue
       data[0].tokenSpent = summary.pool.crsToken.symbol;
-      data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount);
+      data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount);
       // Output OLPT
       data[0].amountReceived = summary.lptAmount.formattedValue
       data[0].tokenReceived = summary.pool.lpToken.symbol;
-      data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
+      data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
     } else {
       // Input OLPT
       data[0].amountSpent = summary.lptAmount.formattedValue
       data[0].tokenSpent = summary.pool.lpToken.symbol;
-      data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
+      data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.lpToken, summary.lptAmount);
       // Output CRS
       data[0].amountReceived = summary.crsAmount.formattedValue
       data[0].tokenReceived = summary.pool.crsToken.symbol;
-      data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount);
+      data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.crsToken, summary.crsAmount);
     }
 
     // summary.isAddition ? inputSRC : outputSrc
     data.push({
       transactionHash: tx.hash,
-      transactionEventNumber: 1,
+      transactionEventNumber: 2,
       blockNumber: tx.block.height,
       blockTime: this._getUtcDate(tx.block.time),
       account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
@@ -185,10 +185,10 @@ export class WalletExportService {
       currency: currency.toUpperCase(),
       amountReceived: summary.isAddition ? null : summary.srcAmount.formattedValue,
       tokenReceived:  summary.isAddition ? null : summary.pool.srcToken.symbol,
-      totalFiatReceived: summary.isAddition ? null : await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount),
+      fiatReceived: summary.isAddition ? null : await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount),
       amountSpent: summary.isAddition ? summary.srcAmount.formattedValue : null,
       tokenSpent: summary.isAddition ? summary.pool.srcToken.symbol : null,
-      totalFiatSpent: summary.isAddition ? await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount) : null
+      fiatSpent: summary.isAddition ? await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.srcToken, summary.srcAmount) : null
     });
 
     return data;
@@ -208,18 +208,18 @@ export class WalletExportService {
     if (startedStaking) {
       data[0].amountSpent = summary.stakingAmount.formattedValue
       data[0].tokenSpent = summary.pool.stakingToken.symbol;
-      data[0].totalFiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.stakingAmount);
+      data[0].fiatSpent = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.stakingAmount);
     } else if (stoppedStaking) {
       // Received ODX
       data[0].amountReceived = summary.stakingAmount.formattedValue
       data[0].tokenReceived = summary.pool.stakingToken.symbol;
-      data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.stakingAmount);
+      data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.pool.stakingToken, summary.stakingAmount);
 
       // Could have OLPT collected or CRS for amount one
       if (!!summary.collectAmountOne && !summary.collectAmountOne.isZero) {
         data.push({
           transactionHash: tx.hash,
-          transactionEventNumber: 1,
+          transactionEventNumber: 2,
           blockNumber: tx.block.height,
           blockTime: this._getUtcDate(tx.block.time),
           account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
@@ -229,8 +229,34 @@ export class WalletExportService {
           currency: currency.toUpperCase(),
           amountReceived: summary.collectAmountOne.formattedValue,
           tokenReceived:  summary.amountOneToken.symbol,
-          totalFiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountOneToken, summary.collectAmountOne),
+          fiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountOneToken, summary.collectAmountOne),
         });
+      }
+
+      // If amount two, would be liquidated rewards for SRC tokens
+      if (!!summary.collectAmountTwo && !summary.collectAmountTwo.isZero) {
+        data.push({
+          transactionHash: tx.hash,
+          transactionEventNumber: 3,
+          blockNumber: tx.block.height,
+          blockTime: this._getUtcDate(tx.block.time),
+          account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
+          gasFeeCrs: '0',
+          gasFeeFiat: '0',
+          transactionType: 'Collect Staking Rewards',
+          currency: currency.toUpperCase(),
+          amountReceived: summary.collectAmountTwo.formattedValue,
+          tokenReceived:  summary.amountTwoToken.symbol,
+          fiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountTwoToken, summary.collectAmountTwo),
+        });
+      }
+    } else if (onlyCollected) {
+      // Only collecting, would be OLPT or CRS
+      if (!!summary.collectAmountOne && !summary.collectAmountOne.isZero) {
+        data[0].transactionType = 'Collect Staking Rewards';
+        data[0].amountReceived = summary.collectAmountOne.formattedValue;
+        data[0].tokenReceived =  summary.amountOneToken.symbol;
+        data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountOneToken, summary.collectAmountOne);
       }
 
       // If amount two, would be liquidated rewards for SRC tokens
@@ -247,33 +273,7 @@ export class WalletExportService {
           currency: currency.toUpperCase(),
           amountReceived: summary.collectAmountTwo.formattedValue,
           tokenReceived:  summary.amountTwoToken.symbol,
-          totalFiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountTwoToken, summary.collectAmountTwo),
-        });
-      }
-    } else if (onlyCollected) {
-      // Only collecting, would be OLPT or CRS
-      if (!!summary.collectAmountOne && !summary.collectAmountOne.isZero) {
-        data[0].transactionType = 'Collect Staking Rewards';
-        data[0].amountReceived = summary.collectAmountOne.formattedValue;
-        data[0].tokenReceived =  summary.amountOneToken.symbol;
-        data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountOneToken, summary.collectAmountOne);
-      }
-
-      // If amount two, would be liquidated rewards for SRC tokens
-      if (!!summary.collectAmountTwo && !summary.collectAmountTwo.isZero) {
-        data.push({
-          transactionHash: tx.hash,
-          transactionEventNumber: 1,
-          blockNumber: tx.block.height,
-          blockTime: this._getUtcDate(tx.block.time),
-          account: !!tx.transactionType ? 'Opdex' : 'Cirrus',
-          gasFeeCrs: '0',
-          gasFeeFiat: '0',
-          transactionType: 'Collect Staking Rewards',
-          currency: currency.toUpperCase(),
-          amountReceived: summary.collectAmountTwo.formattedValue,
-          tokenReceived:  summary.amountTwoToken.symbol,
-          totalFiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountTwoToken, summary.collectAmountTwo),
+          fiatReceived: await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.amountTwoToken, summary.collectAmountTwo),
         });
       }
     }
@@ -289,7 +289,7 @@ export class WalletExportService {
 
     data[0].amountReceived = summary.amount.formattedValue;
     data[0].tokenReceived = summary.vaultToken.symbol;
-    data[0].totalFiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.vaultToken, summary.amount);
+    data[0].fiatReceived = await this._getHistoricalTokenPrice(tx.block.height, crsPrice, summary.vaultToken, summary.amount);
 
     return data;
   }
@@ -309,11 +309,11 @@ export class WalletExportService {
       if (summary.pledgeOrVote.withdrawal) {
         data[0].amountReceived = value;
         data[0].tokenReceived = token
-        data[0].totalFiatReceived =  fiat;
+        data[0].fiatReceived =  fiat;
       } else {
         data[0].amountSpent = value;
         data[0].tokenSpent = token
-        data[0].totalFiatSpent =  fiat;
+        data[0].fiatSpent =  fiat;
       }
     }
     // Created or completed proposal
@@ -328,14 +328,14 @@ export class WalletExportService {
         if (summary.proposal.creator === tx.from) {
           data[0].amountReceived = deposit.formattedValue;
           data[0].tokenReceived = summary.crs.symbol;
-          data[0].totalFiatReceived = depositFiat
+          data[0].fiatReceived = depositFiat
         }
       }
       // Created proposal
       else {
         data[0].amountSpent = deposit.formattedValue;
         data[0].tokenSpent = summary.crs.symbol;
-        data[0].totalFiatSpent = depositFiat
+        data[0].fiatSpent = depositFiat
       }
     }
 

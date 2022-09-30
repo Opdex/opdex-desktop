@@ -10,8 +10,8 @@ export const CsvColumns = [
   { header: 'Fiat Currency', property: 'currency' },
   { header: 'Amount Spent', property: 'amountSpent' },
   { header: 'Token Spent', property: 'tokenSpent' },
-  { header: 'Total Fiat Spent', property: 'totalFiatSpent' },
+  { header: 'Fiat Spent', property: 'fiatSpent' },
   { header: 'Amount Received', property: 'amountReceived' },
   { header: 'Token Received', property: 'tokenReceived' },
-  { header: 'Total Fiat Received', property: 'totalFiatReceived' },
+  { header: 'Fiat Received', property: 'fiatReceived' },
 ];

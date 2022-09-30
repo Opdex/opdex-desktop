@@ -10,8 +10,8 @@ export type CsvData = {
   currency: string;
   amountSpent?: string;
   tokenSpent?: string;
-  totalFiatSpent?: string;
+  fiatSpent?: string;
   amountReceived?: string;
   tokenReceived?: string;
-  totalFiatReceived?: string;
+  fiatReceived?: string;
 }
