@@ -65,19 +65,22 @@ export class AppComponent implements OnInit {
         switchMap(_ => this._coinGecko.getLatestPrice()),
         tap(pricing => this._currencyService.setPricing(pricing.stratis)),
         switchMap(_ => this._currencyService.selectedCurrency$))
-      .subscribe(currency => this.selectedCurrency = currency);
+      .subscribe(async currency => {
+        this.selectedCurrency = currency;
+        await this._checkAppUpdate();
+      });
 
     // intentionally offset 10 seconds
     timer(10000, 10000)
       .pipe(switchMap(_ => this._refreshNodeStatus()))
-      .subscribe(status => this.nodeStatus = status);
+      .subscribe(status => {
+        this.nodeStatus = status
+        this._checkNodeVersion();
+      });
 
     this._nodeService.latestBlock$
       .pipe(filter(_ => !!this.nodeStatus && this.nodeStatus.state === 'Started' && !this.nodeStatus.inIbd && !this._indexerService.indexing))
       .subscribe(async _ => await this._indexLatest());
-
-    await this._checkAppUpdate();
-    this._checkNodeVersion();
   }
 
   public handlePinnedToggle(event: boolean): void {
