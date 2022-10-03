@@ -11,6 +11,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { CsvColumns } from '@lookups/wallet-export-csv-columns.lookup';
 import { CsvData } from '@models/platform/wallet-export-csv-data';
+import { FormGroup, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'opdex-export-wallet-history-modal',
@@ -23,6 +24,10 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
   blob: Blob;
   icons = Icons;
   inProgress: boolean = false;
+  range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  });
 
   constructor(
     private _walletService: WalletService,
@@ -37,18 +42,36 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
   }
 
   async initDownload(): Promise<void> {
-    if (this.inProgress || this.blob) return;
+    const { start, end } = this.range.value;
+
+    if (this.inProgress || this.blob || !start || !end) return;
+
     this.inProgress = true;
 
+    const startDate = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+    const endDate = Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
     const take = 50;
     let skip = 0;
     let txs: TransactionReceipt[] = [];
+    let outOfRange = false;
 
-    while (true) {
+    while (true && !outOfRange) {
       let transactions = await this._walletService.getWalletHistory(this.context, skip, take);
-      txs.push(...transactions);
-      skip += transactions.length;
-      if (transactions.length < take) break;
+
+      const filteredTransactions = transactions.filter(tx => {
+        const date = Date.UTC(tx.block.time.getUTCFullYear(), tx.block.time.getUTCMonth(), tx.block.time.getUTCDate());
+
+        if (date > endDate) {
+          outOfRange = true;
+          return false;
+        }
+
+        return date >= startDate && date <= endDate;
+      });
+
+      txs.push(...filteredTransactions);
+      skip += filteredTransactions.length;
+      if (filteredTransactions.length < take) break;
     }
 
     const currency = this._currencyService.selectedCurrency.abbreviation;
