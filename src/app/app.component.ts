@@ -26,8 +26,8 @@ export class AppComponent implements OnInit {
   @HostBinding('class') componentCssClass: string;
   nodeStatus: INodeStatus;
   selectedCurrency: ICurrency;
-  indexedBlock: number;
-  indexedPercent: number = this._env.startHeight;
+  indexedBlock: number = this._env.startHeight;
+  indexedPercent: number;
   theme: string;
   icons = Icons;
   menuOpen = false;

@@ -66,7 +66,7 @@
               <mat-progress-bar mode="determinate" [value]="indexedPercent | formatNumber:0"></mat-progress-bar>
 
               <div class="flex-row-center-between">
-                <small>Block #{{(indexedBlock || 0) | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
+                <small>Block #{{indexedBlock | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
                 <small>{{ indexedPercent | formatNumber:0 }}%</small>
               </div>
             </ng-template>
