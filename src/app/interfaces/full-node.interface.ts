@@ -6,6 +6,7 @@ export interface ILocalCallRequest {
   amount: string;
   gasPrice: number;
   gasLimit: number;
+  blockHeight?: number;
 }
 
 export interface ICallRequest extends ILocalCallRequest {
@@ -125,4 +126,31 @@ export interface ISupportedContract {
 
 export interface IWalletsList {
   walletNames: string[];
+}
+
+export interface IBlockDetails {
+  hash: string;
+  confirmations: number;
+  size: number;
+  weight: number;
+  height: number;
+  version: number;
+  versionHex: string;
+  merkleroot: string;
+  tx: string [];
+  time: number;
+  mediantime: number;
+  nonce: number;
+  bits: string;
+  difficulty: number;
+  chainwork: string;
+  nTx: number;
+  previousblockhash: string;
+  nextblockhash: string;
+  signature: string;
+  modifierv2: string;
+  flags: string;
+  hashproof: string;
+  blocktrust: string;
+  chaintrust: string;
 }

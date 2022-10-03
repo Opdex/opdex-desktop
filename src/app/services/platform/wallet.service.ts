@@ -29,7 +29,12 @@ export class WalletService {
     const { wallet } = context;
     const history = await firstValueFrom(this._cirrus.getHistory(wallet.name, wallet.address, skip, take));
     const txs = await Promise.all(history.map(tx => firstValueFrom(this._cirrus.getContractReceipt(tx.hash))));
-    return txs.map(tx => new TransactionReceipt(tx));
+    const blocks = await Promise.all(txs.map(tx => firstValueFrom(this._cirrus.getBlockByHash(tx.blockHash))));
+    return txs.map(tx =>{
+      const walletHistory = history.find(item => item.hash === tx.transactionHash);
+      const block = blocks.find(block => block.hash === tx.blockHash);
+      return new TransactionReceipt(tx, walletHistory, new Date(block.mediantime * 1000));
+    });
   }
 
   public async getAllowance(token: string, wallet: string, spender: string): Promise<BigInt> {

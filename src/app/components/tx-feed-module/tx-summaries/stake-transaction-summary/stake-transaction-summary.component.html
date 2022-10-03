@@ -1,49 +1,51 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="pool && !error">
-    <div class="flex-row-center" *ngIf="!stakingAmount.isZero" [ngClass]="{'mb-2': isCollection}">
+  <ng-container *ngIf="summary.pool && !summary.error">
+    <div class="flex-row-center" *ngIf="!summary.stakingAmount.isZero" [ngClass]="{'mb-2': summary.isCollection}">
       <div class="no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '+' : '-'"
-          [value]="stakingAmount"
+          [prefix]="summary.isAddition ? '+' : '-'"
+          [value]="summary.stakingAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a>
-        <a class="ml-1 no-decoration" routerLink="/tokens/{{pool.stakingToken?.address}}">{{pool.stakingToken?.symbol}}</a>
+        <a class="no-decoration" routerLink="/pools/{{summary.pool.address}}">{{summary.pool.name}}</a>
+        <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.pool.stakingToken?.address}}">{{summary.pool.stakingToken?.symbol}}</a>
       </div>
     </div>
 
-    <div class="flex-row-center" *ngIf="isCollection">
+    <div class="flex-row-center" *ngIf="summary.isCollection">
       <div class="col no-wrap flex-shrink">
         <opdex-number
           class="mr-2"
           prefix="+"
-          [value]="collectAmountOne"
+          [value]="summary.collectAmountOne"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/pools/{{pool.address}}" *ngIf="!collectionLiquidatedRewards">{{pool.name}}</a>
-        <a class="ml-1 no-decoration" routerLink="/tokens/{{amountOneToken.address}}">{{amountOneToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/pools/{{summary.pool.address}}" *ngIf="!summary.collectionLiquidatedRewards">{{summary.pool.name}}</a>
+        <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.amountOneToken.address}}">{{summary.amountOneToken.symbol}}</a>
       </div>
 
-      <div class="col no-wrap" *ngIf="collectAmountTwo && amountTwoToken">
+      <div class="col no-wrap" *ngIf="summary.collectAmountTwo && summary.amountTwoToken">
         <opdex-number
           class="mr-2"
           prefix="+"
-          [value]="collectAmountTwo"
+          [value]="summary.collectAmountTwo"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/tokens/{{amountTwoToken.address}}">{{amountTwoToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/tokens/{{summary.amountTwoToken.address}}">{{summary.amountTwoToken.symbol}}</a>
       </div>
     </div>
   </ng-container>
 
-  <div *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>

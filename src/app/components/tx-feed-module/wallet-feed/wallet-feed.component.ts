@@ -1,3 +1,5 @@
+import { ExportWalletHistoryModalComponent } from './../../modals-module/export-wallet-history-modal/export-wallet-history-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 import { IndexerService } from '@services/platform/indexer.service';
 import { switchMap, Subscription } from 'rxjs';
 import { UserContext } from '@models/user-context';
@@ -29,7 +31,8 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
   constructor(
     private _indexerService: IndexerService,
     private _walletService: WalletService,
-    private _userContextService: UserContextService
+    private _userContextService: UserContextService,
+    private _dialog: MatDialog
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -97,6 +100,10 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
 
     this.skip = this.transactions.length + this.newTransactions.length;
     this.loading = false;
+  }
+
+  exportHistory(): void {
+    this._dialog.open(ExportWalletHistoryModalComponent, { width: '500px', disableClose: true });
   }
 
   ngOnDestroy(): void {

@@ -1,3 +1,5 @@
+import { FixedDecimal } from '@models/types/fixed-decimal';
+
 export interface ICurrenciesResponse {
   stratis: ICurrencyPricing;
 }
@@ -8,4 +10,10 @@ export interface ICurrencyPricing {
   gbp: number;
   jpy: number;
   cny: number;
+}
+
+export interface IPriceHistory {
+  unixMilliseconds: number;
+  date: Date;
+  price: FixedDecimal;
 }

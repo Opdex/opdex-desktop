@@ -1,5 +1,5 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="summary">
+  <ng-container *ngIf="summary && !summary.error">
     <div *ngIf="summary.pledgeOrVote?.amount" class="w-100 flex-row-center">
       <div class="col no-wrap flex-shrink" *ngIf="summary.proposal?.proposalId">
         <a class="no-decoration" href="javascript:void(0)" routerLink="/vault/proposal/{{summary.proposal.proposalId}}">#{{summary.proposal.proposalId}}</a>
@@ -38,6 +38,10 @@
       </div>
     </div>
   </ng-container>
+
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>

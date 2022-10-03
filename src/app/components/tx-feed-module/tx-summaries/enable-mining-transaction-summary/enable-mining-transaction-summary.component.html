@@ -1,27 +1,29 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="poolAmount && !error">
+  <ng-container *ngIf="summary.poolAmount && !summary.error">
     <div class="flex-row-center mb-2">
       <div class="no-wrap">
         <opdex-number
           class="mr-2"
           prefix="+"
-          [value]="poolAmount"
+          [value]="summary.poolAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="ml-1 no-decoration" routerLink="/tokens/{{stakingToken.address}}">{{stakingToken.symbol}}</a>
+        <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.stakingToken.address}}">{{summary.stakingToken.symbol}}</a>
       </div>
     </div>
 
-    <div class="flex-row-center flex-wrap" *ngIf="pools?.length">
-      <div class="mr-2 no-wrap" *ngFor="let pool of pools; trackBy: poolsTrackBy">
+    <div class="flex-row-center flex-wrap" *ngIf="summary?.pools?.length">
+      <div class="mr-2 no-wrap" *ngFor="let pool of summary.pools; trackBy: poolsTrackBy">
         <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a>
       </div>
     </div>
   </ng-container>
 
-  <div *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>

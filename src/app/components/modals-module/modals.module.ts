@@ -14,6 +14,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { BugReportModalComponent } from './bug-report-modal/bug-report-modal.component';
 import { HelpModalComponent } from './help-modal/help-modal.component';
@@ -21,6 +25,7 @@ import { CreateProposalModalComponent } from './create-proposal-modal/create-pro
 import { CreatePoolModalComponent } from './create-pool-modal/create-pool-modal.component';
 import { ConfirmResyncModalComponent } from './confirm-resync-modal/confirm-resync-modal.component';
 import { TermsModalComponent } from './terms-modal/terms-modal.component';
+import { ExportWalletHistoryModalComponent } from './export-wallet-history-modal/export-wallet-history-modal.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +34,8 @@ import { TermsModalComponent } from './terms-modal/terms-modal.component';
     CreatePoolModalComponent,
     CreateProposalModalComponent,
     ConfirmResyncModalComponent,
-    TermsModalComponent
+    TermsModalComponent,
+    ExportWalletHistoryModalComponent
   ],
   imports: [
     CommonModule,
@@ -39,12 +45,16 @@ import { TermsModalComponent } from './terms-modal/terms-modal.component';
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatProgressBarModule,
     SharedModule,
     ControlsModule,
     TransactionModule,
     MatSelectModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatDividerModule
   ],
   exports: [
     BugReportModalComponent,

@@ -1,16 +1,16 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="pool && !error">
+  <ng-container *ngIf="summary.pool && !summary.error">
     <div class="flex-row-center mb-2">
       <div class="no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '+' : '-'"
-          [value]="lptAmount"
+          [prefix]="summary.isAddition ? '+' : '-'"
+          [value]="summary.lptAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/pools/{{pool.address}}">{{pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{pool.address}}">{{pool.lpToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/pools/{{summary.pool.address}}">{{summary.pool.name}}</a> <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.pool.address}}">{{summary.pool.lpToken.symbol}}</a>
       </div>
     </div>
 
@@ -18,30 +18,32 @@
       <div class="col flex-shrink no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '-' : '+'"
-          [value]="crsAmount"
+          [prefix]="summary.isAddition ? '-' : '+'"
+          [value]="summary.crsAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/tokens/{{pool.crsToken.address}}">{{pool.crsToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/tokens/{{summary.pool.crsToken.address}}">{{summary.pool.crsToken.symbol}}</a>
       </div>
 
       <div class="col no-wrap">
         <opdex-number
           class="mr-2"
-          [prefix]="isAddition ? '-' : '+'"
-          [value]="srcAmount"
+          [prefix]="summary.isAddition ? '-' : '+'"
+          [value]="summary.srcAmount"
           [short]="true"
           [stopPropagation]="true">
         </opdex-number>
 
-        <a class="no-decoration" routerLink="/tokens/{{pool.srcToken.address}}">{{pool.srcToken.symbol}}</a>
+        <a class="no-decoration" routerLink="/tokens/{{summary.pool.srcToken.address}}">{{summary.pool.srcToken.symbol}}</a>
       </div>
     </div>
   </ng-container>
 
-  <div *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>

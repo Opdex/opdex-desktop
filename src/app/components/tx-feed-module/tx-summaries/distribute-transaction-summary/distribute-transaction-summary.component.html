@@ -1,5 +1,5 @@
 <ng-container *ngIf="!loading; else loader">
-  <ng-container *ngIf="token && !error">
+  <ng-container *ngIf="summary.token && !summary.error">
     <div class="flex-row-center mb-2">
       <button mat-icon-button color="primary" class="tiny mr-2" routerLink="/mining-governance">
         <mat-icon class="red">{{icons.mining}}</mat-icon>
@@ -8,12 +8,12 @@
       <opdex-number
         class="mr-2"
         prefix="+"
-        [value]="miningGovernanceAmount"
+        [value]="summary.miningGovernanceAmount"
         [short]="true"
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="ml-1 no-decoration" routerLink="/tokens/{{token.address}}">{{token.symbol}}</a>
+      <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.token.address}}">{{summary.token.symbol}}</a>
     </div>
 
     <div class="flex-row-center">
@@ -24,16 +24,18 @@
       <opdex-number
         class="mr-2"
         prefix="+"
-        [value]="vaultAmount"
+        [value]="summary.vaultAmount"
         [short]="true"
         [stopPropagation]="true">
       </opdex-number>
 
-      <a class="ml-1 no-decoration" routerLink="/tokens/{{token.address}}">{{token.symbol}}</a>
+      <a class="ml-1 no-decoration" routerLink="/tokens/{{summary.token.address}}">{{summary.token.symbol}}</a>
     </div>
   </ng-container>
 
-  <div *ngIf="error">{{error}}</div>
+  <div *ngIf="summary.error" class="flex-row-center">
+    <mat-icon class="mine mr-2 tiny">{{icons.error}}</mat-icon> {{summary.error}}
+  </div>
 </ng-container>
 
 <ng-template #loader>
