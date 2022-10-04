@@ -16,8 +16,8 @@ export class GitHubApiService extends RestApiService {
     super(_http, _router);
   }
 
-  getLatestVersion(): Observable<IGithubRelease> {
-    return this.get<IGithubRelease>(`${this.api}/repos/opdex/opdex-desktop/releases/latest`)
-      .pipe(catchError(_ => of(undefined)));
+  getLatestVersion(): Observable<IGithubRelease[]> {
+    return this.get<IGithubRelease[]>(`${this.api}/repos/opdex/opdex-desktop/releases`)
+      .pipe(catchError(_ => of([])));
   }
 }

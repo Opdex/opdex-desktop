@@ -60,15 +60,15 @@ export class AppComponent implements OnInit {
       }
     });
 
+    this._currencyService.selectedCurrency$
+      .subscribe(currency => this.selectedCurrency = currency);
+
     timer(0, 60000)
       .pipe(
         switchMap(_ => this._coinGecko.getLatestPrice()),
         tap(pricing => this._currencyService.setPricing(pricing.stratis)),
-        switchMap(_ => this._currencyService.selectedCurrency$))
-      .subscribe(async currency => {
-        this.selectedCurrency = currency;
-        await this._checkAppUpdate();
-      });
+        switchMap(_ => this._checkAppUpdate()))
+      .subscribe();
 
     // intentionally offset 10 seconds
     timer(10000, 10000)
@@ -111,9 +111,11 @@ export class AppComponent implements OnInit {
   }
 
   private async _checkAppUpdate(): Promise<void> {
-    const latestVersion = await firstValueFrom(this._githubApi.getLatestVersion());
-    if (latestVersion && this._env.version.compare(latestVersion.tag_name) === -1) {
-      this.appUpdateUrl = latestVersion.html_url;
+    const versions = await firstValueFrom(this._githubApi.getLatestVersion());
+    const latest = versions.length > 0 ? versions[0] : null;
+
+    if (!!latest && this._env.version.compare(latest.tag_name) === -1) {
+      this.appUpdateUrl = latest.html_url;
     }
   }
 

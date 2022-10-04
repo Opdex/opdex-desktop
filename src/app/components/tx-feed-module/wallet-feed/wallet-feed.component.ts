@@ -1,4 +1,4 @@
-import { ExportWalletHistoryModalComponent } from './../../modals-module/export-wallet-history-modal/export-wallet-history-modal.component';
+import { ExportWalletHistoryModalComponent } from '@components/modals-module/export-wallet-history-modal/export-wallet-history-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { IndexerService } from '@services/platform/indexer.service';
 import { switchMap, Subscription } from 'rxjs';
