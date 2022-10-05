@@ -11,7 +11,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { saveAs } from 'file-saver';
 import { CsvColumns } from '@lookups/wallet-export-csv-columns.lookup';
 import { CsvData } from '@models/platform/wallet-export-csv-data';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'opdex-export-wallet-history-modal',
@@ -24,10 +24,8 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
   blob: Blob;
   icons = Icons;
   inProgress: boolean = false;
-  range = new FormGroup({
-    start: new FormControl<Date | null>(null),
-    end: new FormControl<Date | null>(null),
-  });
+  years = [];
+  year = new FormControl<number>(null);
 
   constructor(
     private _walletService: WalletService,
@@ -39,17 +37,19 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
     this.subscription.add(
       this._contextService.context$
         .subscribe(context => this.context = context));
+
+    this._setYearOptions();
   }
 
   async initDownload(): Promise<void> {
-    const { start, end } = this.range.value;
+    const year = this.year.value;
 
-    if (this.inProgress || this.blob || !start || !end) return;
+    if (this.inProgress || this.blob || !year) return;
 
     this.inProgress = true;
 
-    const startDate = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
-    const endDate = Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
+    const startDate = Date.UTC(this.year.value, 0);
+    const endDate = Date.UTC(this.year.value + 1, 0);
     const take = 50;
     let skip = 0;
     let txs: TransactionReceipt[] = [];
@@ -61,12 +61,12 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
       const filteredTransactions = transactions.filter(tx => {
         const date = Date.UTC(tx.block.time.getUTCFullYear(), tx.block.time.getUTCMonth(), tx.block.time.getUTCDate());
 
-        if (date > endDate) {
+        if (date >= endDate) {
           outOfRange = true;
           return false;
         }
 
-        return date >= startDate && date <= endDate;
+        return date >= startDate && date < endDate;
       });
 
       txs.push(...filteredTransactions);
@@ -85,7 +85,19 @@ export class ExportWalletHistoryModalComponent implements OnDestroy {
 
   public save(): void {
     if (!this.blob) return;
-    saveAs(this.blob, 'Wallet History');
+    saveAs(this.blob, `Opdex_${this.context.wallet.address}_${this.year.value}`);
+  }
+
+  private _setYearOptions(): void {
+    const start = 2021;
+    const now = new Date().getUTCFullYear();
+    let index = 0;
+
+    while (!this.years.includes(start)) {
+      this.years.push(now - index++);
+    }
+
+    this.year.setValue(now);
   }
 
   private _formatCsv(data: CsvData[]): void {
