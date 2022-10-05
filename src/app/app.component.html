@@ -67,7 +67,7 @@
 
               <div class="flex-row-center-between">
                 <small>Block #{{indexedBlock | formatNumber:0}} of {{nodeStatus.blockStoreHeight | formatNumber:0}}</small>
-                <small>{{ indexedPercent | formatNumber:0 }}%</small>
+                <small *ngIf="indexedPercent > 0">{{ indexedPercent | formatNumber:0 }}%</small>
               </div>
             </ng-template>
           </opdex-card>
