@@ -1,0 +1,119 @@
+<div class="flex-row-center mb-3">
+  <opdex-token-icons [tokens]="[data.pool.crsToken, data.pool.srcToken]"></opdex-token-icons>
+  <h3 class="ml-2 mb-0">{{data.pool.name}} Position Details</h3>
+</div>
+
+<div class="position">
+  <div class="flex-row-center mb-1">
+    <mat-icon color="primary" class="tiny mr-1">{{icons.tokens}}</mat-icon>
+    <p class="sub-heading">{{data.pool.srcToken.symbol}} Balance</p>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.srcBalance"
+      [suffix]="data.pool.srcToken.symbol">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.srcBalance.multiply(data.pool.srcToken.pricing[selectedCurrency.abbreviation])"
+      [prefix]="selectedCurrency.htmlEntity"
+      [short]="true">
+    </opdex-number>
+  </div>
+</div>
+
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
+<div class="position">
+  <div class="flex-row-center mb-1">
+    <mat-icon class="green tiny mr-1">{{icons.provide}}</mat-icon>
+    <p class="sub-heading">Providing Balance</p>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.providingBalance"
+      [suffix]="data.pool.lpToken.symbol">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.providingBalance.multiply(data.pool.lpToken.pricing[selectedCurrency.abbreviation])"
+      [prefix]="selectedCurrency.htmlEntity"
+      [short]="true">
+    </opdex-number>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.pool.reserveCrs.multiply(data.providingBalance.divide(data.pool.lpToken.totalSupply))"
+      [suffix]="data.pool.crsToken.symbol"
+      [short]="true">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.pool.reserveSrc.multiply(data.providingBalance.divide(data.pool.lpToken.totalSupply))"
+      [suffix]="data.pool.srcToken.symbol"
+      [short]="true">
+    </opdex-number>
+  </div>
+</div>
+
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
+<div class="position">
+  <div class="flex-row-center mb-1">
+    <mat-icon class="purple tiny mr-1">{{icons.staking}}</mat-icon>
+    <p class="sub-heading">Staking Balance</p>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.stakingBalance"
+      [suffix]="data.pool.stakingToken.symbol">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.stakingBalance.multiply(data.pool.stakingToken.pricing[selectedCurrency.abbreviation])"
+      [prefix]="selectedCurrency.htmlEntity"
+      [short]="true">
+    </opdex-number>
+  </div>
+</div>
+
+<mat-divider class="mt-2 mb-2"></mat-divider>
+
+<div class="position">
+  <div class="flex-row-center mb-1">
+    <mat-icon class="red tiny mr-1">{{icons.mining}}</mat-icon>
+    <p class="sub-heading">Mining Balance</p>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.miningBalance"
+      [suffix]="data.pool.lpToken.symbol">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.miningBalance.multiply(data.pool.lpToken.pricing[selectedCurrency.abbreviation])"
+      [prefix]="selectedCurrency.htmlEntity"
+      [short]="true">
+    </opdex-number>
+  </div>
+
+  <div class="flex-row-center-between">
+    <opdex-number
+      [value]="data.pool.reserveCrs.multiply(data.miningBalance.divide(data.pool.lpToken.totalSupply))"
+      [suffix]="data.pool.crsToken.symbol"
+      [short]="true">
+    </opdex-number>
+
+    <opdex-number
+      [value]="data.pool.reserveSrc.multiply(data.miningBalance.divide(data.pool.lpToken.totalSupply))"
+      [suffix]="data.pool.srcToken.symbol"
+      [short]="true">
+    </opdex-number>
+  </div>
+</div>
+

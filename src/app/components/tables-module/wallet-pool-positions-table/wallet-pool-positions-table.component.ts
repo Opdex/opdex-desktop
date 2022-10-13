@@ -1,3 +1,5 @@
+import { WalletPoolPositionDetailsModalComponent } from './../../modals-module/wallet-pool-position-details-modal/wallet-pool-position-details-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 import { UserContextService } from '@services/utility/user-context.service';
 import { FixedDecimal } from '@models/types/fixed-decimal';
 import { WalletService } from '@services/platform/wallet.service';
@@ -45,10 +47,11 @@ export class WalletPoolPositionsTableComponent implements OnInit {
     private _liquidityPoolsService: LiquidityPoolService,
     private _currencyService: CurrencyService,
     private _walletService: WalletService,
-    private _userContextService: UserContextService
+    private _userContextService: UserContextService,
+    private _dialog: MatDialog
   ) {
     this.dataSource = new MatTableDataSource<LiquidityPoolPositions>();
-    this.displayedColumns = ['name', 'srcBalance', 'providingBalance', 'stakingBalance', 'miningBalance', 'options'];
+    this.displayedColumns = ['name', 'srcBalance', 'providingBalance', 'stakingBalance', 'miningBalance', 'details', 'options'];
   }
 
   ngOnInit() {
@@ -99,6 +102,11 @@ export class WalletPoolPositionsTableComponent implements OnInit {
     this.dataSource.data = [...positions];
     this.previous = this.skip > 0 && pools.count > this.skip;
     this.next = pools.count > this.take + this.skip;
+  }
+
+  openDetails($event: any, data: any) {
+    $event.stopPropagation();
+    this._dialog.open(WalletPoolPositionDetailsModalComponent, { width: '500px', data });
   }
 
   navigate(name: string): void {

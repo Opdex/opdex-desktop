@@ -24,6 +24,7 @@ import { CreatePoolModalComponent } from './create-pool-modal/create-pool-modal.
 import { ConfirmResyncModalComponent } from './confirm-resync-modal/confirm-resync-modal.component';
 import { TermsModalComponent } from './terms-modal/terms-modal.component';
 import { ExportWalletHistoryModalComponent } from './export-wallet-history-modal/export-wallet-history-modal.component';
+import { WalletPoolPositionDetailsModalComponent } from './wallet-pool-position-details-modal/wallet-pool-position-details-modal.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { ExportWalletHistoryModalComponent } from './export-wallet-history-modal
     CreateProposalModalComponent,
     ConfirmResyncModalComponent,
     TermsModalComponent,
-    ExportWalletHistoryModalComponent
+    ExportWalletHistoryModalComponent,
+    WalletPoolPositionDetailsModalComponent
   ],
   imports: [
     CommonModule,
