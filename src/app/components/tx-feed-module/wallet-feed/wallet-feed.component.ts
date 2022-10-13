@@ -23,7 +23,6 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
   transactions: TransactionReceipt[] = [];
   newTransactions: TransactionReceipt[] = [];
-  refreshing = false;
   endReached = false;
   loading = true;
   skip = 0;
@@ -56,12 +55,10 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
   }
 
   async onScroll(): Promise<void> {
-    this.refreshing = true;
-    await this._getTransactions(this.skip);
-    this.refreshing = false;
+    await this._getTransactions(this.skip, true);
   }
 
-  private async _getTransactions(skip: number = 0): Promise<void> {
+  private async _getTransactions(skip: number = 0, refresh: boolean = false): Promise<void> {
     const take = 10;
     const results = await this._walletService.getWalletHistory(this.context, skip, take);
     const transactions = results
@@ -90,7 +87,7 @@ export class WalletFeedComponent implements OnInit, OnDestroy {
       .filter(tx => this.newTransactions.find(existing => existing.hash === tx.hash) === undefined);
 
     if (latestTransactions.length > 0) {
-      if (this.refreshing) {
+      if (refresh) {
         this.transactions.push(...latestTransactions);
       } else {
         this.refreshAvailable = true;

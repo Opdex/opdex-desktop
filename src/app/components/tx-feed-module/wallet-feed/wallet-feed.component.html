@@ -20,7 +20,7 @@
           [tx]="tx"
           [showBottomDivider]="i < transactions.length - 1"></opdex-tx-receipt>
 
-        <div class="flex-row-center justify-content-center mt-3 mb-3" *ngIf="!endReached && refreshing">
+        <div class="flex-row-center justify-content-center mt-3 mb-3" *ngIf="!endReached">
           <mat-spinner class="tiny mr-2"></mat-spinner> Coming right up...
         </div>
       </ng-container>
