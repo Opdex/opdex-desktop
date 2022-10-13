@@ -29,9 +29,16 @@ export class TransactionsService {
     private _envService: EnvironmentsService
   ) { }
 
-  async searchTransactionReceipts(request: ReceiptSearchRequest) {
+  async searchTransactionReceipts(request: ReceiptSearchRequest): Promise<TransactionReceipt[]> {
     const txs = await firstValueFrom(this._cirrus.searchContractReceipts(request));
-    return txs.map(tx => new TransactionReceipt(tx));
+    const receipts = [];
+
+    for (var i = 0; i < txs.length; i++) {
+      const block = await firstValueFrom(this._cirrus.getBlockByHash(txs[i].blockHash));
+      receipts.push(new TransactionReceipt(txs[i], null, new Date(block.mediantime * 1000)))
+    }
+
+    return receipts;
   }
 
   public async replayQuote(quote: TransactionQuote): Promise<TransactionQuote> {

@@ -23,7 +23,10 @@
         </small>
 
         <div class="flex-row-center">
-          <small *ngIf="showTimeAgo">{{blocksAgo | formatNumber:0}} block<span *ngIf="blocksAgo != 1">s</span> ago</small>
+          <ng-container *ngIf="showTimeAgo">
+            <small *ngIf="!tx.block.time">{{blocksAgo | formatNumber:0}} block<span *ngIf="blocksAgo != 1">s</span> ago</small>
+            <small *ngIf="tx.block.time">{{tx.block.time | timeago}}</small>
+          </ng-container>
 
           <a mat-button
             color="primary"

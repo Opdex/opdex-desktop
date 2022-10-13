@@ -115,6 +115,6 @@ export class CirrusApiService extends CacheService {
   getBlockByHash(blockHash: string): Observable<IBlockDetails> {
     const endpoint = `${this.api}/BlockStore/Block?hash=${blockHash}&OutputJson=true&ShowTransactionDetails=false`;
     const observable$ = this._rest.get<IBlockDetails>(endpoint);
-    return this.getItem(endpoint, observable$);
+    return this.getItem(endpoint, observable$, 5400);
   }
 }
